@@ -91,24 +91,43 @@ class BookmarkDetailView extends StatelessWidget {
           BlocBuilder<BookmarkDetailBloc, BookmarkDetailState>(
             builder: (context, state) {
               if (state is! BookmarkDetailReady) return const SizedBox.shrink();
-              return Row(
-                children: [
-                  IconButton(
-                    tooltip: context.l10n.commonShare,
-                    icon: const FaIcon(FontAwesomeIcons.shareNodes),
-                    onPressed: () => context.read<BookmarkDetailBloc>().add(
-                      BookmarkDetailShareRequested(state.bookmark),
+              final l10n = context.l10n;
+              return PopupMenuButton<_DetailAction>(
+                icon: const FaIcon(FontAwesomeIcons.ellipsisVertical),
+                onSelected: (action) {
+                  switch (action) {
+                    case _DetailAction.share:
+                      context.read<BookmarkDetailBloc>().add(
+                        BookmarkDetailShareRequested(state.bookmark),
+                      );
+                    case _DetailAction.edit:
+                      _openEditor(context);
+                    case _DetailAction.delete:
+                      _confirmAndDelete(context, state.bookmark);
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _DetailAction.share,
+                    child: _MenuItem(
+                      icon: FontAwesomeIcons.shareNodes,
+                      label: l10n.commonShare,
                     ),
                   ),
-                  IconButton(
-                    tooltip: context.l10n.commonEdit,
-                    icon: const FaIcon(FontAwesomeIcons.pen),
-                    onPressed: () => _openEditor(context),
+                  PopupMenuItem(
+                    value: _DetailAction.edit,
+                    child: _MenuItem(
+                      icon: FontAwesomeIcons.pen,
+                      label: l10n.commonEdit,
+                    ),
                   ),
-                  IconButton(
-                    tooltip: context.l10n.commonDelete,
-                    icon: const FaIcon(FontAwesomeIcons.trashCan),
-                    onPressed: () => _confirmAndDelete(context, state.bookmark),
+                  PopupMenuItem(
+                    value: _DetailAction.delete,
+                    child: _MenuItem(
+                      icon: FontAwesomeIcons.trashCan,
+                      label: l10n.commonDelete,
+                      color: context.colorScheme.error,
+                    ),
                   ),
                 ],
               );
@@ -554,6 +573,30 @@ class _DetailCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: child,
       ),
+    );
+  }
+}
+
+/// Overflow-menu actions on the detail app bar.
+enum _DetailAction { share, edit, delete }
+
+/// A single row in the app-bar overflow menu: leading icon + label.
+class _MenuItem extends StatelessWidget {
+  const _MenuItem({required this.icon, required this.label, this.color});
+
+  final FaIconData icon;
+  final String label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = this.color ?? context.colorScheme.onSurface;
+    return Row(
+      children: [
+        FaIcon(icon, size: 16, color: color),
+        const SizedBox(width: AppSpacing.md),
+        Text(label, style: context.textTheme.bodyMedium?.copyWith(color: color)),
+      ],
     );
   }
 }
