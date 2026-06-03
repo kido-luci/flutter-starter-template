@@ -8,6 +8,7 @@ import '../../../../test_utils.dart';
 Bookmark _bookmark({
   required String id,
   List<String> tags = const [],
+  List<String> imageUrls = const [],
   required DateTime createdAt,
 }) => Bookmark(
   id: id,
@@ -15,6 +16,7 @@ Bookmark _bookmark({
   url: 'https://example.com/$id',
   description: 'desc $id',
   tags: tags,
+  imageUrls: imageUrls,
   createdAt: createdAt,
   updatedAt: createdAt,
 );
@@ -64,7 +66,12 @@ void main() {
     });
 
     test('projects bookmark fields into the summary', () async {
-      final item = _bookmark(id: '1', tags: ['x'], createdAt: DateTime.now());
+      final item = _bookmark(
+        id: '1',
+        tags: ['x'],
+        imageUrls: ['https://example.com/thumb.jpg'],
+        createdAt: DateTime.now(),
+      );
       final list = MockListBookmarks();
       when(list.call).thenAnswer((_) async => Ok([item]));
 
@@ -76,6 +83,7 @@ void main() {
       expect(summary.url, item.url);
       expect(summary.description, item.description);
       expect(summary.tags, item.tags);
+      expect(summary.imageUrls, item.imageUrls);
     });
 
     test('propagates failure', () async {

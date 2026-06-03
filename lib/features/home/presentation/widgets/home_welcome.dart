@@ -289,6 +289,7 @@ class _SuggestedBookmarkCard extends StatelessWidget {
               icon: FontAwesomeIcons.clockRotateLeft,
               label: label,
               height: 96,
+              imageUrl: bookmark.thumbnailUrl,
               colors: [
                 context.colorScheme.tertiaryContainer,
                 context.colorScheme.secondaryContainer,
@@ -624,15 +625,19 @@ class _BookmarkVisual extends StatelessWidget {
     required this.label,
     required this.height,
     required this.colors,
+    this.imageUrl,
   });
 
   final FaIconData icon;
   final String label;
   final double height;
   final List<Color> colors;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = this.imageUrl;
+
     return Container(
       height: height,
       width: double.infinity,
@@ -645,13 +650,37 @@ class _BookmarkVisual extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Center(
-            child: FaIcon(
-              icon,
-              size: AppIconSize.xl,
-              color: context.colorScheme.primary.withValues(alpha: 0.7),
+          if (imageUrl != null)
+            Positioned.fill(
+              child: AppNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                semanticLabel: label,
+              ),
+            )
+          else
+            Center(
+              child: FaIcon(
+                icon,
+                size: AppIconSize.xl,
+                color: context.colorScheme.primary.withValues(alpha: 0.7),
+              ),
             ),
-          ),
+          if (imageUrl != null)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0),
+                      Colors.black.withValues(alpha: 0.24),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           PositionedDirectional(
             top: AppSpacing.sm,
             end: AppSpacing.sm,

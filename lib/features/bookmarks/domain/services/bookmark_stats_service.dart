@@ -46,5 +46,6 @@ class BookmarkStatsService extends BookmarkStatsReader {
     url: bookmark.url,
     description: bookmark.description,
     tags: bookmark.tags,
+    imageUrls: bookmark.imageUrls,
   );
 }
