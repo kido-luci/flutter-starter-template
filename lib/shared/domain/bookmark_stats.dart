@@ -20,6 +20,7 @@ class BookmarkSummary {
   final List<String> tags;
   final List<String> imageUrls;
 
+  /// The first `http`/`https` image URL from [imageUrls], or null if none.
   String? get fallbackThumbnailUrl {
     for (final imageUrl in imageUrls) {
       final uri = Uri.tryParse(imageUrl);

@@ -87,6 +87,33 @@ void main() {
       expect(summary.fallbackThumbnailUrl, item.imageUrls.first);
     });
 
+    test('fallbackThumbnailUrl returns first http(s) url, ignoring others', () {
+      const summary = BookmarkSummary(
+        id: '1',
+        title: 'Title',
+        url: 'https://example.com',
+        description: 'Description',
+        tags: [],
+        imageUrls: [
+          'ftp://example.com/image.jpg',
+          'not a uri',
+          'https://example.com/thumb.jpg',
+        ],
+      );
+
+      expect(summary.fallbackThumbnailUrl, 'https://example.com/thumb.jpg');
+      expect(
+        const BookmarkSummary(
+          id: '2',
+          title: 'Title',
+          url: 'https://example.com',
+          description: 'Description',
+          tags: [],
+        ).fallbackThumbnailUrl,
+        isNull,
+      );
+    });
+
     test('propagates failure', () async {
       const failure = UnknownFailure('boom');
       final list = MockListBookmarks();

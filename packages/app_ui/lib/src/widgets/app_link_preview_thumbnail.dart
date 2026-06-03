@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 
@@ -26,6 +29,9 @@ class AppLinkPreviewThumbnail extends StatefulWidget {
 }
 
 class _AppLinkPreviewThumbnailState extends State<AppLinkPreviewThumbnail> {
+  static const Duration _previewFetchTimeout = Duration(seconds: 5);
+  static final Map<String, Future<String?>> _previewImageUrlCache = {};
+
   late Future<String?> _previewImageUrl;
 
   @override
@@ -50,7 +56,7 @@ class _AppLinkPreviewThumbnailState extends State<AppLinkPreviewThumbnail> {
         final previewImageUrl = snapshot.data;
         if (snapshot.connectionState != ConnectionState.done &&
             previewImageUrl == null) {
-          return widget.fallbackBuilder(context);
+          return _buildFallback(context);
         }
 
         if (previewImageUrl == null || previewImageUrl.isEmpty) {
@@ -69,9 +75,32 @@ class _AppLinkPreviewThumbnailState extends State<AppLinkPreviewThumbnail> {
     );
   }
 
-  Future<String?> _loadPreviewImageUrl() async {
-    final previewData = await getLinkPreviewData(widget.url);
-    return previewData?.image?.url.trim();
+  Future<String?> _loadPreviewImageUrl() {
+    final url = widget.url.trim();
+    if (url.isEmpty) return Future.value(null);
+
+    return _previewImageUrlCache.putIfAbsent(
+      url,
+      () => _fetchPreviewImageUrl(url),
+    );
+  }
+
+  Future<String?> _fetchPreviewImageUrl(String url) async {
+    try {
+      final previewData = await getLinkPreviewData(
+        url,
+      ).timeout(_previewFetchTimeout);
+      final imageUrl = previewData?.image?.url.trim();
+      return imageUrl == null || imageUrl.isEmpty ? null : imageUrl;
+    } on Object catch (error, stackTrace) {
+      developer.log(
+        'Failed to load link preview thumbnail for $url.',
+        name: 'AppLinkPreviewThumbnail',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return null;
+    }
   }
 
   Widget _buildFallback(BuildContext context) {
