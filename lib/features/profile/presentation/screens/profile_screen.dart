@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/di/injection.dart';
+import '../../../../app/di/injection.dart';
 // Deliberate cross-feature capability import: profile surfaces auth's
 // delete-account flow. Single consumer, so it stays in auth rather than being
 // promoted to `shared` (see the capability exception in CLAUDE.md).

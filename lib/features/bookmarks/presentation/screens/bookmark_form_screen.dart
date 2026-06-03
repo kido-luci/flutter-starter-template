@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/di/injection.dart';
+import '../../../../app/di/injection.dart';
 import '../bloc/bookmark_form/bookmark_form_bloc.dart';
 import '../widgets/bookmark_form_widgets.dart';
 

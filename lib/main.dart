@@ -8,7 +8,7 @@ import 'package:storage/storage.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap_error_app.dart';
-import 'core/di/injection.dart';
+import 'app/di/injection.dart';
 import 'core/platform/firebase/firebase_service.dart';
 
 Future<void> main() async {

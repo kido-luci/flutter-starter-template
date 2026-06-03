@@ -8,8 +8,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../app/di/injection.dart';
 import '../../../../app/router.dart';
-import '../../../../core/di/injection.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
 import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmark_detail/bookmark_detail_bloc.dart';

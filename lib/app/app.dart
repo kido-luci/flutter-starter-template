@@ -8,7 +8,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:theme/theme.dart';
 
-import '../core/di/injection.dart';
 import '../core/extensions/build_context_extensions.dart';
 import '../features/auth/presentation/auth_session.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
@@ -17,6 +16,7 @@ import '../features/bookmarks/domain/services/bookmarks_sync_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/domain/session.dart';
 import '../shared/presentation/session_scope.dart';
+import 'di/injection.dart';
 import 'router.dart';
 
 class App extends StatefulWidget {

@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/di/injection.dart';
 import '../../core/extensions/build_context_extensions.dart';
 import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../features/notifications/presentation/bloc/notifications_state.dart';
+import '../di/injection.dart';
 
 /// Hosts the persistent adaptive navigation around the authenticated branches.
 ///
