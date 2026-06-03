@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../layout/app_breakpoints.dart';
-import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 
 /// A single destination in the [AppAdaptiveScaffold] navigation.
@@ -30,7 +29,7 @@ class AppDestination {
 
 /// Scaffolding that adapts its navigation affordance to the available width.
 ///
-/// - Compact (`< [AppBreakpoints.medium]`): a bottom [NavigationBar].
+/// - Compact (`< [AppBreakpoints.medium]`): a floating bottom bar.
 /// - Medium (`< [AppBreakpoints.expanded]`): a collapsed [NavigationRail].
 /// - Expanded: an extended [NavigationRail] with labels.
 ///
@@ -106,9 +105,9 @@ class AppAdaptiveScaffold extends StatelessWidget {
 
 /// A floating, pill-shaped bottom navigation bar.
 ///
-/// The selected destination expands into a tinted pill that reveals its label,
-/// while the others collapse to icons. The bar floats above the body with a
-/// rounded surface and a soft shadow for a lifted, tactile feel.
+/// Destinations are icon-only on compact screens. The selected destination is
+/// shown with a circular tinted halo while labels remain available through
+/// semantics and tooltips.
 class _FloatingBottomBar extends StatelessWidget {
   const _FloatingBottomBar({
     required this.destinations,
@@ -126,35 +125,30 @@ class _FloatingBottomBar extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      minimum: const EdgeInsets.only(bottom: AppSpacing.xs),
+      minimum: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Align(
         alignment: Alignment.bottomCenter,
         heightFactor: 1,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
+            AppSpacing.xl,
             0,
-            AppSpacing.lg,
+            AppSpacing.xl,
             AppSpacing.xs,
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 460),
+            constraints: const BoxConstraints(maxWidth: 320),
             child: Material(
-              color: colorScheme.surfaceContainer.withValues(alpha: 0.96),
+              color: colorScheme.surface,
               clipBehavior: Clip.antiAlias,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-                side: BorderSide(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                ),
-              ),
-              shadowColor: colorScheme.shadow.withValues(alpha: 0.25),
-              elevation: 8,
+              shape: const StadiumBorder(),
+              shadowColor: colorScheme.shadow.withValues(alpha: 0.16),
+              elevation: 14,
               child: SizedBox(
                 height: 72,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
+                    horizontal: AppSpacing.md,
                     vertical: AppSpacing.xs,
                   ),
                   child: Row(
@@ -197,10 +191,8 @@ class _BottomBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final foreground = selected
-        ? colorScheme.onSecondaryContainer
-        : colorScheme.onSurfaceVariant;
+    final selectedColor = colorScheme.primary;
+    final foreground = selected ? selectedColor : colorScheme.onSurfaceVariant;
 
     return Semantics(
       button: true,
@@ -210,66 +202,35 @@ class _BottomBarItem extends StatelessWidget {
         message: destination.label,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          customBorder: const CircleBorder(),
           child: SizedBox(
             height: 64,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedContainer(
+            child: Center(
+              child: AnimatedContainer(
+                duration: _duration,
+                curve: _curve,
+                width: 52,
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? selectedColor.withValues(alpha: 0.1)
+                      : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: AnimatedSwitcher(
                   duration: _duration,
-                  curve: _curve,
-                  width: selected ? 54 : 38,
-                  height: 32,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? colorScheme.secondaryContainer
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                  ),
-                  child: AnimatedSwitcher(
-                    duration: _duration,
-                    child: Badge(
-                      isLabelVisible: destination.hasBadge,
-                      child: FaIcon(
-                        selected ? destination.selectedIcon : destination.icon,
-                        key: ValueKey<bool>(selected),
-                        color: foreground,
-                        size: 21,
-                      ),
+                  child: Badge(
+                    isLabelVisible: destination.hasBadge,
+                    child: FaIcon(
+                      selected ? destination.selectedIcon : destination.icon,
+                      key: ValueKey<bool>(selected),
+                      color: foreground,
+                      size: 20,
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                AnimatedDefaultTextStyle(
-                  duration: _duration,
-                  curve: _curve,
-                  style:
-                      textTheme.labelSmall?.copyWith(
-                        color: selected
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                      ) ??
-                      TextStyle(
-                        color: selected
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                      ),
-                  child: Text(
-                    destination.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -37,8 +37,9 @@ void main() {
       await pumpAt(tester, 500, onDestinationSelected: (i) => selected = i);
 
       expect(find.byType(NavigationRail), findsNothing);
-      // The selected destination reveals its label.
-      expect(find.text('Home'), findsOneWidget);
+      // Compact navigation keeps labels in tooltips/semantics only.
+      expect(find.text('Home'), findsNothing);
+      expect(find.byTooltip('Home'), findsOneWidget);
 
       // Tapping another destination reports its index.
       await tester.tap(
