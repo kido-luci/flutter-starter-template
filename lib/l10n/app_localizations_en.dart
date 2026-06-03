@@ -168,27 +168,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAppBarTitle => 'Home';
 
   @override
-  String get homeSignOutTooltip => 'Sign out';
-
-  @override
-  String get homeMyBookmarks => 'My bookmarks';
-
-  @override
   String get homeViewAllBookmarks => 'View all';
 
   @override
   String get homeNoDescription => 'No description';
-
-  @override
-  String get homeProfileTooltip => 'Profile';
-
-  @override
-  String homeWelcome(String username) {
-    return 'Welcome, $username!';
-  }
-
-  @override
-  String get homeSignedInBody => 'You are signed in.';
 
   @override
   String get homeRecentBookmarks => 'Recent Bookmarks';
@@ -267,13 +250,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNoMatches => 'No bookmarks match this view.';
 
   @override
-  String get homeStatsTotal => 'Total';
-
-  @override
-  String get homeStatsRecent => 'Recent';
-
-  @override
-  String get homeStatsTags => 'Tags';
+  String get homeBookmarkVisualFallback => 'Recent';
 
   @override
   String get profileAppBarTitle => 'Profile';

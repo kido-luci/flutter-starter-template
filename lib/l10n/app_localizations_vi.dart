@@ -170,27 +170,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeAppBarTitle => 'Trang chủ';
 
   @override
-  String get homeSignOutTooltip => 'Đăng xuất';
-
-  @override
-  String get homeMyBookmarks => 'Bookmark của tôi';
-
-  @override
   String get homeViewAllBookmarks => 'Xem tất cả';
 
   @override
   String get homeNoDescription => 'Không có mô tả';
-
-  @override
-  String get homeProfileTooltip => 'Hồ sơ';
-
-  @override
-  String homeWelcome(String username) {
-    return 'Chào, $username!';
-  }
-
-  @override
-  String get homeSignedInBody => 'Bạn đã đăng nhập.';
 
   @override
   String get homeRecentBookmarks => 'Bookmark gần đây';
@@ -267,13 +250,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeNoMatches => 'Không có bookmark nào khớp với chế độ xem này.';
 
   @override
-  String get homeStatsTotal => 'Tổng cộng';
-
-  @override
-  String get homeStatsRecent => 'Gần đây';
-
-  @override
-  String get homeStatsTags => 'Thẻ';
+  String get homeBookmarkVisualFallback => 'Gần đây';
 
   @override
   String get profileAppBarTitle => 'Hồ sơ';

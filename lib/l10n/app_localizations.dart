@@ -410,18 +410,6 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get homeAppBarTitle;
 
-  /// No description provided for @homeSignOutTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign out'**
-  String get homeSignOutTooltip;
-
-  /// No description provided for @homeMyBookmarks.
-  ///
-  /// In en, this message translates to:
-  /// **'My bookmarks'**
-  String get homeMyBookmarks;
-
   /// No description provided for @homeViewAllBookmarks.
   ///
   /// In en, this message translates to:
@@ -433,24 +421,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No description'**
   String get homeNoDescription;
-
-  /// No description provided for @homeProfileTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile'**
-  String get homeProfileTooltip;
-
-  /// No description provided for @homeWelcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome, {username}!'**
-  String homeWelcome(String username);
-
-  /// No description provided for @homeSignedInBody.
-  ///
-  /// In en, this message translates to:
-  /// **'You are signed in.'**
-  String get homeSignedInBody;
 
   /// No description provided for @homeRecentBookmarks.
   ///
@@ -578,23 +548,11 @@ abstract class AppLocalizations {
   /// **'No bookmarks match this view.'**
   String get homeNoMatches;
 
-  /// No description provided for @homeStatsTotal.
-  ///
-  /// In en, this message translates to:
-  /// **'Total'**
-  String get homeStatsTotal;
-
-  /// No description provided for @homeStatsRecent.
+  /// Short fallback label shown on bookmark artwork when a bookmark has no tags.
   ///
   /// In en, this message translates to:
   /// **'Recent'**
-  String get homeStatsRecent;
-
-  /// No description provided for @homeStatsTags.
-  ///
-  /// In en, this message translates to:
-  /// **'Tags'**
-  String get homeStatsTags;
+  String get homeBookmarkVisualFallback;
 
   /// No description provided for @profileAppBarTitle.
   ///

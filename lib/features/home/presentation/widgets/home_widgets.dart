@@ -9,7 +9,6 @@ import '../../../../shared/domain/bookmark_stats.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_state.dart';
 part 'home_welcome.dart';
-part 'home_stats.dart';
 part 'home_recent.dart';
 
 /// Entry widget for the Home feature dashboard.
@@ -98,8 +97,6 @@ class _HomeBodyState extends State<HomeBody> {
                             setState(() => _selectedFilterId = filter.id);
                           },
                         ).animateFadeIn(delay: 220.ms),
-                        const SizedBox(height: AppSpacing.xl),
-                        _StatsDashboard(state: state),
                         const SizedBox(height: AppSpacing.xl),
                         _SuggestedBookmarksSection(
                           items: filteredItems,

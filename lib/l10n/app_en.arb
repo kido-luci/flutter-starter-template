@@ -52,21 +52,8 @@
   "commonShare": "Share",
   "commonSignOut": "Sign out",
   "homeAppBarTitle": "Home",
-  "homeSignOutTooltip": "Sign out",
-  "homeMyBookmarks": "My bookmarks",
   "homeViewAllBookmarks": "View all",
   "homeNoDescription": "No description",
-  "homeProfileTooltip": "Profile",
-  "homeWelcome": "Welcome, {username}!",
-  "@homeWelcome": {
-    "placeholders": {
-      "username": {
-        "type": "String",
-        "example": "alice"
-      }
-    }
-  },
-  "homeSignedInBody": "You are signed in.",
   "homeRecentBookmarks": "Recent Bookmarks",
   "homeNoBookmarks": "No bookmarks yet. Tap + to add one.",
   "homeSearchTitle": "Search",
@@ -152,9 +139,10 @@
   "@homeNoMatches": {
     "description": "Empty-state message shown when active search or filters hide all recent bookmarks."
   },
-  "homeStatsTotal": "Total",
-  "homeStatsRecent": "Recent",
-  "homeStatsTags": "Tags",
+  "homeBookmarkVisualFallback": "Recent",
+  "@homeBookmarkVisualFallback": {
+    "description": "Short fallback label shown on bookmark artwork when a bookmark has no tags."
+  },
   "profileAppBarTitle": "Profile",
   "profileSectionAppearance": "Appearance",
   "profileSectionAccount": "Account",

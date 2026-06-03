@@ -277,7 +277,7 @@ class _SuggestedBookmarkCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = bookmark.tags.isNotEmpty
         ? bookmark.tags.first
-        : context.l10n.homeStatsRecent;
+        : context.l10n.homeBookmarkVisualFallback;
 
     return _ElevatedSurface(
       child: InkWell(
