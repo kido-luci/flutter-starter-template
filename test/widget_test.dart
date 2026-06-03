@@ -99,6 +99,7 @@ void main() {
         themeBloc: themeBloc,
         bookmarksSync: sync,
         navigatorObservers: const [],
+        videoPlayerService: MockVideoPlayerService(),
       ),
     );
     await tester.pump();

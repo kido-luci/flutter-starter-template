@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../../core/di/injection.dart';
 import '../bloc/bookmark_form/bookmark_form_bloc.dart';
 import 'app_video_player.dart';
 
@@ -50,7 +49,7 @@ class _BookmarkVideoAttachmentPreviewState
     _controller?.dispose();
     _controller = null;
 
-    final service = getIt<VideoPlayerService>();
+    final service = context.read<VideoPlayerService>();
     final uri = Uri.tryParse(videoUrl);
     final controller =
         uri != null && (uri.scheme == 'http' || uri.scheme == 'https')

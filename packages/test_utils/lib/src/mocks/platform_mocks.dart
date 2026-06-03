@@ -7,6 +7,8 @@ class MockPermissionService extends Mock implements PermissionService {}
 
 class MockShareService extends Mock implements ShareService {}
 
+class MockVideoPlayerService extends Mock implements VideoPlayerService {}
+
 void stubShareService(MockShareService share) {
   when(
     () => share.share(

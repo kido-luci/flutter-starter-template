@@ -324,7 +324,7 @@ class _VideoSectionState extends State<_VideoSection> {
   @override
   void initState() {
     super.initState();
-    final service = getIt<VideoPlayerService>();
+    final service = context.read<VideoPlayerService>();
     final uri = Uri.tryParse(widget.videoUrl);
     if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
       _videoPlayerController = service.network(uri);
