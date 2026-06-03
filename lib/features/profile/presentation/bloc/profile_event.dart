@@ -7,3 +7,7 @@ sealed class ProfileEvent {
 final class ProfileLoaded extends ProfileEvent {
   const ProfileLoaded();
 }
+
+final class ProfileUserIdCopied extends ProfileEvent {
+  const ProfileUserIdCopied();
+}

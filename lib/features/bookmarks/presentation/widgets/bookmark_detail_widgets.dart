@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:app_ui/app_ui.dart';
-import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,19 +16,6 @@ import '../bloc/bookmark_detail/bookmark_detail_bloc.dart';
 import '../bloc/bookmark_detail/bookmark_detail_state.dart';
 import 'app_video_player.dart';
 import 'bookmark_failure_messages.dart';
-
-Future<void> _shareBookmark(Bookmark bookmark) async {
-  getIt<AnalyticsService>()
-      .trackBookmarkShared(
-        bookmarkId: bookmark.id,
-        source: AnalyticsSources.detail,
-      )
-      .uw();
-  final content = bookmark.description.isNotEmpty
-      ? '${bookmark.title}\n${bookmark.url}\n\n${bookmark.description}'
-      : '${bookmark.title}\n${bookmark.url}';
-  await getIt<ShareService>().share(text: content, subject: bookmark.title);
-}
 
 /// Provides a [BookmarkDetailBloc] for [id] and renders the detail embedded in
 /// a side pane (no back button; delete/edit report back via callbacks instead
@@ -109,7 +94,9 @@ class BookmarkDetailView extends StatelessWidget {
                   IconButton(
                     tooltip: context.l10n.commonShare,
                     icon: const FaIcon(FontAwesomeIcons.shareNodes),
-                    onPressed: () => _shareBookmark(state.bookmark),
+                    onPressed: () => context.read<BookmarkDetailBloc>().add(
+                      BookmarkDetailShareRequested(state.bookmark),
+                    ),
                   ),
                   IconButton(
                     tooltip: context.l10n.commonEdit,
@@ -308,12 +295,7 @@ class _DetailBody extends StatelessWidget {
       _toast(context, context.l10n.bookmarkInvalidUrl);
       return;
     }
-    getIt<AnalyticsService>()
-        .trackBookmarkOpened(
-          bookmarkId: bookmark.id,
-          source: AnalyticsSources.detail,
-        )
-        .uw();
+    context.read<BookmarkDetailBloc>().add(BookmarkDetailUrlOpened(bookmark));
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       _toast(context, context.l10n.bookmarkCouldNotOpenUrl);

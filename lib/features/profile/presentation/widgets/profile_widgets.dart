@@ -1,6 +1,4 @@
-import 'package:analytics/analytics.dart';
 import 'package:app_ui/app_ui.dart';
-import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:theme/theme.dart';
 
 import '../../../../app/router.dart';
-import '../../../../core/di/injection.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
 import '../../../../shared/presentation/session_scope.dart';
 import '../../../auth/presentation/bloc/delete_account_cubit.dart';
@@ -127,7 +124,7 @@ class _CopyableId extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.sm),
       onTap: () {
         Clipboard.setData(ClipboardData(text: id));
-        getIt<AnalyticsService>().trackUserIdCopied().uw();
+        context.read<ProfileBloc>().add(const ProfileUserIdCopied());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.profileUserIdCopied)),
         );

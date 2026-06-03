@@ -15,6 +15,7 @@ void main() {
   late MockDeleteBookmark mockDelete;
   late MockBookmarksSyncController mockSync;
   late MockAnalyticsService mockAnalytics;
+  late MockShareService mockShare;
   late StreamController<BookmarksSyncStatus> statusController;
 
   setUp(() {
@@ -24,6 +25,8 @@ void main() {
     mockSync = MockBookmarksSyncController();
     mockAnalytics = MockAnalyticsService();
     stubAnalyticsService(mockAnalytics);
+    mockShare = MockShareService();
+    stubShareService(mockShare);
     statusController = StreamController<BookmarksSyncStatus>.broadcast();
     when(
       () => mockSync.statusStream,
@@ -40,6 +43,7 @@ void main() {
     mockDelete,
     mockSync,
     mockAnalytics,
+    mockShare,
   );
 
   group('BookmarksListBloc', () {

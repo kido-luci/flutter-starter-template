@@ -26,6 +26,12 @@ final class BookmarksListSortChanged extends BookmarksListEvent {
   final BookmarkSort sort;
 }
 
+final class BookmarksListShareRequested extends BookmarksListEvent {
+  const BookmarksListShareRequested(this.bookmark);
+
+  final Bookmark bookmark;
+}
+
 final class BookmarksListSyncRetried extends BookmarksListEvent {
   const BookmarksListSyncRetried();
 }

@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:analytics/analytics.dart';
+import 'package:app_platform/app_platform.dart';
 import 'package:architecture/architecture.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/entities/bookmark.dart';
 import '../../../domain/services/bookmarks_sync_controller.dart';
 import '../../../domain/usecases/delete_bookmark.dart';
 import '../../../domain/usecases/list_bookmarks.dart';
@@ -23,6 +25,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
     this._delete,
     this._sync,
     this._analytics,
+    this._share,
   ) : _searchAnalytics = BookmarksSearchAnalyticsTracker(_analytics),
       super(const BookmarksListState()) {
     on<BookmarksListLoadRequested>(
@@ -38,6 +41,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
       transformer: sequential(),
     );
     on<BookmarksListSortChanged>(_onSortChanged, transformer: sequential());
+    on<BookmarksListShareRequested>(_onShareRequested);
     on<BookmarksListSyncRetried>(_onSyncRetried, transformer: sequential());
     on<_BookmarksSyncStatusChanged>(
       _onSyncStatusChanged,
@@ -60,6 +64,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
   final DeleteBookmark _delete;
   final BookmarksSyncController _sync;
   final AnalyticsService _analytics;
+  final ShareService _share;
   final BookmarksSearchAnalyticsTracker _searchAnalytics;
   late final StreamSubscription<BookmarksSyncStatus> _syncSub;
   BookmarksSyncStatus _lastSyncStatus = BookmarksSyncStatus.idle;
@@ -139,6 +144,23 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
   ) {
     if (event.sort == state.sort) return;
     emit(state.copyWith(sort: event.sort));
+  }
+
+  void _onShareRequested(
+    BookmarksListShareRequested event,
+    Emitter<BookmarksListState> emit,
+  ) {
+    final bookmark = event.bookmark;
+    _analytics
+        .trackBookmarkShared(
+          bookmarkId: bookmark.id,
+          source: AnalyticsSources.list,
+        )
+        .uw();
+    final content = bookmark.description.isNotEmpty
+        ? '${bookmark.title}\n${bookmark.url}\n\n${bookmark.description}'
+        : '${bookmark.title}\n${bookmark.url}';
+    _share.share(text: content, subject: bookmark.title).uw();
   }
 
   Future<void> _onDeleteRequested(

@@ -132,7 +132,6 @@ extension GetItInjectableX on _i174.GetIt {
     final authNetworkModule = _$AuthNetworkModule();
     final bookmarksRemoteModule = _$BookmarksRemoteModule();
     final notificationsRemoteModule = _$NotificationsRemoteModule();
-    gh.factory<_i1013.ProfileBloc>(() => _i1013.ProfileBloc());
     await gh.singletonAsync<_i706.ObjectBox>(
       () => objectBoxModule.provideObjectBox(),
       preResolve: true,
@@ -148,6 +147,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i855.ActivityNotifier>(() => _i855.ActivityNotifier());
     gh.singleton<_i831.Store>(
       () => objectBoxModule.provideStore(gh<_i706.ObjectBox>()),
+    );
+    gh.factory<_i1013.ProfileBloc>(
+      () => _i1013.ProfileBloc(gh<_i548.AnalyticsService>()),
     );
     gh.lazySingleton<_i297.AuthLocalDataSource>(
       () => _i297.SecureStorageAuthDataSource(gh<_i431.FlutterSecureStorage>()),
@@ -282,13 +284,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i855.ActivityNotifier>(),
       ),
     );
-    gh.factory<_i373.BookmarkDetailBloc>(
-      () => _i373.BookmarkDetailBloc(
-        gh<_i690.GetBookmark>(),
-        gh<_i244.DeleteBookmark>(),
-        gh<_i548.AnalyticsService>(),
-      ),
-    );
     gh.factory<_i566.BookmarksListBloc>(
       () => _i566.BookmarksListBloc(
         gh<_i568.ListBookmarks>(),
@@ -296,6 +291,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i244.DeleteBookmark>(),
         gh<_i627.BookmarksSyncController>(),
         gh<_i548.AnalyticsService>(),
+        gh<_i199.ShareService>(),
+      ),
+    );
+    gh.factory<_i373.BookmarkDetailBloc>(
+      () => _i373.BookmarkDetailBloc(
+        gh<_i690.GetBookmark>(),
+        gh<_i244.DeleteBookmark>(),
+        gh<_i548.AnalyticsService>(),
+        gh<_i199.ShareService>(),
       ),
     );
     gh.lazySingleton<_i189.BookmarkStatsReader>(

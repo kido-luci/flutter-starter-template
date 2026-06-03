@@ -1,14 +1,10 @@
 import 'dart:io';
 
-import 'package:analytics/analytics.dart';
-import 'package:app_platform/app_platform.dart';
 import 'package:app_ui/app_ui.dart';
-import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
 import '../../../../gen/assets.gen.dart';
 import '../../domain/entities/bookmark.dart';
@@ -423,14 +419,5 @@ Future<void> _showItemMenu(BuildContext context, Bookmark bookmark) async {
     ),
   );
   if (result != 'share' || !context.mounted) return;
-  getIt<AnalyticsService>()
-      .trackBookmarkShared(
-        bookmarkId: bookmark.id,
-        source: AnalyticsSources.list,
-      )
-      .uw();
-  final content = bookmark.description.isNotEmpty
-      ? '${bookmark.title}\n${bookmark.url}\n\n${bookmark.description}'
-      : '${bookmark.title}\n${bookmark.url}';
-  await getIt<ShareService>().share(text: content, subject: bookmark.title);
+  context.read<BookmarksListBloc>().add(BookmarksListShareRequested(bookmark));
 }

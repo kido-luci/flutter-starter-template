@@ -10,18 +10,21 @@ void main() {
   late MockGetBookmark mockGet;
   late MockDeleteBookmark mockDelete;
   late MockAnalyticsService mockAnalytics;
+  late MockShareService mockShare;
 
   setUp(() {
     mockGet = MockGetBookmark();
     mockDelete = MockDeleteBookmark();
     mockAnalytics = MockAnalyticsService();
     stubAnalyticsService(mockAnalytics);
+    mockShare = MockShareService();
+    stubShareService(mockShare);
   });
 
   group('BookmarkDetailBloc', () {
     blocTest<BookmarkDetailBloc, BookmarkDetailState>(
       'initial state is loading',
-      build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics),
+      build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics, mockShare),
       verify: (bloc) {
         expect(bloc.state, const BookmarkDetailState.loading());
       },
@@ -32,7 +35,7 @@ void main() {
         'emits loading then ready on success',
         build: () {
           when(() => mockGet('1')).thenAnswer((_) async => Ok(testBookmark));
-          return BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics);
+          return BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics, mockShare);
         },
         act: (bloc) => bloc.add(const BookmarkDetailLoadRequested('1')),
         expect: () => [
@@ -55,7 +58,7 @@ void main() {
           when(
             () => mockGet('1'),
           ).thenAnswer((_) async => const Err(NotFoundFailure('Not found')));
-          return BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics);
+          return BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics, mockShare);
         },
         act: (bloc) => bloc.add(const BookmarkDetailLoadRequested('1')),
         expect: () => [
@@ -71,7 +74,7 @@ void main() {
         setUp: () {
           when(() => mockDelete('1')).thenAnswer((_) async => const Ok(null));
         },
-        build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics),
+        build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics, mockShare),
         seed: () => BookmarkDetailState.ready(testBookmark),
         act: (bloc) => bloc.add(const BookmarkDetailDeleteRequested('1')),
         expect: () => [
@@ -95,7 +98,7 @@ void main() {
             () => mockDelete('1'),
           ).thenAnswer((_) async => const Err(UnknownFailure('Failed')));
         },
-        build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics),
+        build: () => BookmarkDetailBloc(mockGet, mockDelete, mockAnalytics, mockShare),
         seed: () => BookmarkDetailState.ready(testBookmark),
         act: (bloc) => bloc.add(const BookmarkDetailDeleteRequested('1')),
         expect: () => [

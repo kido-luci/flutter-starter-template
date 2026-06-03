@@ -1,3 +1,5 @@
+import 'package:analytics/analytics.dart';
+import 'package:architecture/architecture.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -9,9 +11,12 @@ part 'profile_event.dart';
 
 @injectable
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  ProfileBloc() : super(const ProfileState()) {
+  ProfileBloc(this._analytics) : super(const ProfileState()) {
     on<ProfileLoaded>(_onLoaded, transformer: droppable());
+    on<ProfileUserIdCopied>(_onUserIdCopied);
   }
+
+  final AnalyticsService _analytics;
 
   Future<void> _onLoaded(
     ProfileLoaded event,
@@ -19,5 +24,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     final info = await PackageInfo.fromPlatform();
     emit(state.copyWith(packageInfo: info));
+  }
+
+  void _onUserIdCopied(
+    ProfileUserIdCopied event,
+    Emitter<ProfileState> emit,
+  ) {
+    _analytics.trackUserIdCopied().uw();
   }
 }

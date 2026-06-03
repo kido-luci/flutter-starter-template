@@ -2,12 +2,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../../test_utils.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  late MockAnalyticsService mockAnalytics;
+
+  setUp(() {
+    mockAnalytics = MockAnalyticsService();
+    stubAnalyticsService(mockAnalytics);
+  });
+
   group('ProfileBloc', () {
     test('initial state has no packageInfo', () async {
-      final bloc = ProfileBloc();
+      final bloc = ProfileBloc(mockAnalytics);
 
       expect(bloc.state.packageInfo, isNull);
 
@@ -16,7 +25,7 @@ void main() {
 
     test('ProfileLoaded populates packageInfo', () async {
       _stubPackageInfo();
-      final bloc = ProfileBloc();
+      final bloc = ProfileBloc(mockAnalytics);
 
       bloc.add(const ProfileLoaded());
       await bloc.stream.firstWhere((state) => state.packageInfo != null);

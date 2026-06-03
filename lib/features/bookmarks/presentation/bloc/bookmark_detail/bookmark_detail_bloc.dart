@@ -1,9 +1,11 @@
 import 'package:analytics/analytics.dart';
+import 'package:app_platform/app_platform.dart';
 import 'package:architecture/architecture.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/entities/bookmark.dart';
 import '../../../domain/usecases/delete_bookmark.dart';
 import '../../../domain/usecases/get_bookmark.dart';
 import 'bookmark_detail_state.dart';
@@ -13,7 +15,7 @@ part 'bookmark_detail_event.dart';
 @injectable
 class BookmarkDetailBloc
     extends Bloc<BookmarkDetailEvent, BookmarkDetailState> {
-  BookmarkDetailBloc(this._get, this._delete, this._analytics)
+  BookmarkDetailBloc(this._get, this._delete, this._analytics, this._share)
     : super(const BookmarkDetailState.loading()) {
     on<BookmarkDetailLoadRequested>(
       _onLoadRequested,
@@ -23,11 +25,14 @@ class BookmarkDetailBloc
       _onDeleteRequested,
       transformer: sequential(),
     );
+    on<BookmarkDetailShareRequested>(_onShareRequested);
+    on<BookmarkDetailUrlOpened>(_onUrlOpened);
   }
 
   final GetBookmark _get;
   final DeleteBookmark _delete;
   final AnalyticsService _analytics;
+  final ShareService _share;
 
   Future<void> _onLoadRequested(
     BookmarkDetailLoadRequested event,
@@ -78,5 +83,34 @@ class BookmarkDetailBloc
             .uw();
         emit(BookmarkDetailState.failure(failure));
     }
+  }
+
+  void _onShareRequested(
+    BookmarkDetailShareRequested event,
+    Emitter<BookmarkDetailState> emit,
+  ) {
+    final bookmark = event.bookmark;
+    _analytics
+        .trackBookmarkShared(
+          bookmarkId: bookmark.id,
+          source: AnalyticsSources.detail,
+        )
+        .uw();
+    final content = bookmark.description.isNotEmpty
+        ? '${bookmark.title}\n${bookmark.url}\n\n${bookmark.description}'
+        : '${bookmark.title}\n${bookmark.url}';
+    _share.share(text: content, subject: bookmark.title).uw();
+  }
+
+  void _onUrlOpened(
+    BookmarkDetailUrlOpened event,
+    Emitter<BookmarkDetailState> emit,
+  ) {
+    _analytics
+        .trackBookmarkOpened(
+          bookmarkId: event.bookmark.id,
+          source: AnalyticsSources.detail,
+        )
+        .uw();
   }
 }
