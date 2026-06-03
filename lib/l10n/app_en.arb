@@ -70,32 +70,88 @@
   "homeRecentBookmarks": "Recent Bookmarks",
   "homeNoBookmarks": "No bookmarks yet. Tap + to add one.",
   "homeSearchTitle": "Search",
+  "@homeSearchTitle": {
+    "description": "Section title above the home dashboard bookmark search field."
+  },
   "homeSearchSubtitle": "Find your saved articles, tools, and inspirations instantly.",
+  "@homeSearchSubtitle": {
+    "description": "Supporting text below the home dashboard search title."
+  },
   "homeSearchHint": "Search bookmarks...",
+  "@homeSearchHint": {
+    "description": "Placeholder text in the home dashboard bookmark search field."
+  },
   "homeQuickAdd": "Add Link",
+  "@homeQuickAdd": {
+    "description": "Label for the quick action that opens the new bookmark form."
+  },
   "homeQuickLibrary": "Library",
+  "@homeQuickLibrary": {
+    "description": "Label for the quick action that opens the full bookmarks library."
+  },
   "homeQuickTags": "Tags",
+  "@homeQuickTags": {
+    "description": "Label for the quick action that opens bookmark tag-related content."
+  },
   "homeFilterAll": "All",
+  "@homeFilterAll": {
+    "description": "Filter chip label for showing all recent bookmarks."
+  },
   "homeFilterDesign": "Design",
+  "@homeFilterDesign": {
+    "description": "Filter chip and fallback collection label for design-related bookmarks."
+  },
   "homeFilterArticles": "Articles",
+  "@homeFilterArticles": {
+    "description": "Filter chip and fallback collection label for article or blog bookmarks."
+  },
   "homeFilterInspiration": "Inspiration",
+  "@homeFilterInspiration": {
+    "description": "Filter chip label for inspiration-related bookmarks."
+  },
   "homeFilterTools": "Tools",
+  "@homeFilterTools": {
+    "description": "Filter chip and fallback collection label for tool-related bookmarks."
+  },
   "homeSuggestedTitle": "Suggested for You",
+  "@homeSuggestedTitle": {
+    "description": "Section title for suggested bookmark cards on the home dashboard."
+  },
   "homeFeaturedCollections": "Featured Collections",
+  "@homeFeaturedCollections": {
+    "description": "Section title for featured bookmark collection cards on the home dashboard."
+  },
   "homeWeeklyDigestTitle": "Weekly Digest",
+  "@homeWeeklyDigestTitle": {
+    "description": "Section title for the weekly digest panel on the home dashboard."
+  },
   "homeWeeklyDigestEyebrow": "Most Read",
+  "@homeWeeklyDigestEyebrow": {
+    "description": "Short eyebrow label displayed above the weekly digest headline."
+  },
   "homeWeeklyDigestHeadline": "Your saved knowledge catch-up",
-  "homeWeeklyDigestBody": "You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.",
+  "@homeWeeklyDigestHeadline": {
+    "description": "Headline text inside the weekly digest panel on the home dashboard."
+  },
+  "homeWeeklyDigestBody": "{count, plural, =0{You have no recent bookmarks. Review saved highlights when you add one.} =1{You saved 1 bookmark recently. Review the highlight and keep your reading flow moving.} other{You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.}}",
   "@homeWeeklyDigestBody": {
+    "description": "Body text inside the weekly digest panel. The count is the number of bookmarks saved in the recent window.",
     "placeholders": {
       "count": {
         "type": "int",
-        "example": "12"
+        "example": "12",
+        "description": "Number of bookmarks saved recently."
       }
     }
   },
   "homeReadDigest": "Read Digest",
+  "@homeReadDigest": {
+    "description": "Call-to-action button label in the weekly digest panel."
+  },
   "homeNoMatches": "No bookmarks match this view.",
+  "@homeNoMatches": {
+    "description": "Empty-state message shown when active search or filters hide all recent bookmarks."
+  },
   "homeStatsTotal": "Total",
   "homeStatsRecent": "Recent",
   "homeStatsTags": "Tags",

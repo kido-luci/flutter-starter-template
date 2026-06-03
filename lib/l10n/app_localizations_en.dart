@@ -247,7 +247,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeWeeklyDigestBody(int count) {
-    return 'You saved $count bookmarks recently. Review the highlights and keep your reading flow moving.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'You saved $count bookmarks recently. Review the highlights and keep your reading flow moving.',
+      one:
+          'You saved 1 bookmark recently. Review the highlight and keep your reading flow moving.',
+      zero:
+          'You have no recent bookmarks. Review saved highlights when you add one.',
+    );
+    return '$_temp0';
   }
 
   @override

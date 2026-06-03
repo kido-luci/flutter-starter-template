@@ -164,7 +164,7 @@ class _BookmarkFeedCard extends StatelessWidget {
                     bookmark.description.isNotEmpty
                         ? bookmark.description
                         : context.l10n.homeNoDescription,
-                    maxLines: featured ? 2 : 2,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.bodySmall?.copyWith(
                       color: context.colorScheme.onSurfaceVariant,

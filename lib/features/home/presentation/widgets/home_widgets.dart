@@ -12,7 +12,9 @@ part 'home_welcome.dart';
 part 'home_stats.dart';
 part 'home_recent.dart';
 
+/// Entry widget for the Home feature dashboard.
 class HomeBody extends StatefulWidget {
+  /// Creates the dashboard body used by the home screen.
   const HomeBody({super.key});
 
   @override
@@ -56,6 +58,9 @@ class _HomeBodyState extends State<HomeBody> {
             builder: (context, constraints) {
               final filters = _filters(context);
               final filteredItems = _filterItems(state.recentItems, filters);
+              final hasActiveFilters =
+                  _searchController.text.trim().isNotEmpty ||
+                  _selectedFilterId != 'all';
 
               return SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
@@ -107,7 +112,8 @@ class _HomeBodyState extends State<HomeBody> {
                         _RecentBookmarksSection(
                           recentItems: filteredItems,
                           isEmpty: state.totalBookmarks == 0,
-                          hasMatches: filteredItems.isNotEmpty,
+                          hasMatches:
+                              !hasActiveFilters || filteredItems.isNotEmpty,
                           animationDelay: 440.ms,
                         ),
                         const SizedBox(height: AppSpacing.xl),

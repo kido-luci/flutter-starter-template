@@ -464,115 +464,115 @@ abstract class AppLocalizations {
   /// **'No bookmarks yet. Tap + to add one.'**
   String get homeNoBookmarks;
 
-  /// No description provided for @homeSearchTitle.
+  /// Section title above the home dashboard bookmark search field.
   ///
   /// In en, this message translates to:
   /// **'Search'**
   String get homeSearchTitle;
 
-  /// No description provided for @homeSearchSubtitle.
+  /// Supporting text below the home dashboard search title.
   ///
   /// In en, this message translates to:
   /// **'Find your saved articles, tools, and inspirations instantly.'**
   String get homeSearchSubtitle;
 
-  /// No description provided for @homeSearchHint.
+  /// Placeholder text in the home dashboard bookmark search field.
   ///
   /// In en, this message translates to:
   /// **'Search bookmarks...'**
   String get homeSearchHint;
 
-  /// No description provided for @homeQuickAdd.
+  /// Label for the quick action that opens the new bookmark form.
   ///
   /// In en, this message translates to:
   /// **'Add Link'**
   String get homeQuickAdd;
 
-  /// No description provided for @homeQuickLibrary.
+  /// Label for the quick action that opens the full bookmarks library.
   ///
   /// In en, this message translates to:
   /// **'Library'**
   String get homeQuickLibrary;
 
-  /// No description provided for @homeQuickTags.
+  /// Label for the quick action that opens bookmark tag-related content.
   ///
   /// In en, this message translates to:
   /// **'Tags'**
   String get homeQuickTags;
 
-  /// No description provided for @homeFilterAll.
+  /// Filter chip label for showing all recent bookmarks.
   ///
   /// In en, this message translates to:
   /// **'All'**
   String get homeFilterAll;
 
-  /// No description provided for @homeFilterDesign.
+  /// Filter chip and fallback collection label for design-related bookmarks.
   ///
   /// In en, this message translates to:
   /// **'Design'**
   String get homeFilterDesign;
 
-  /// No description provided for @homeFilterArticles.
+  /// Filter chip and fallback collection label for article or blog bookmarks.
   ///
   /// In en, this message translates to:
   /// **'Articles'**
   String get homeFilterArticles;
 
-  /// No description provided for @homeFilterInspiration.
+  /// Filter chip label for inspiration-related bookmarks.
   ///
   /// In en, this message translates to:
   /// **'Inspiration'**
   String get homeFilterInspiration;
 
-  /// No description provided for @homeFilterTools.
+  /// Filter chip and fallback collection label for tool-related bookmarks.
   ///
   /// In en, this message translates to:
   /// **'Tools'**
   String get homeFilterTools;
 
-  /// No description provided for @homeSuggestedTitle.
+  /// Section title for suggested bookmark cards on the home dashboard.
   ///
   /// In en, this message translates to:
   /// **'Suggested for You'**
   String get homeSuggestedTitle;
 
-  /// No description provided for @homeFeaturedCollections.
+  /// Section title for featured bookmark collection cards on the home dashboard.
   ///
   /// In en, this message translates to:
   /// **'Featured Collections'**
   String get homeFeaturedCollections;
 
-  /// No description provided for @homeWeeklyDigestTitle.
+  /// Section title for the weekly digest panel on the home dashboard.
   ///
   /// In en, this message translates to:
   /// **'Weekly Digest'**
   String get homeWeeklyDigestTitle;
 
-  /// No description provided for @homeWeeklyDigestEyebrow.
+  /// Short eyebrow label displayed above the weekly digest headline.
   ///
   /// In en, this message translates to:
   /// **'Most Read'**
   String get homeWeeklyDigestEyebrow;
 
-  /// No description provided for @homeWeeklyDigestHeadline.
+  /// Headline text inside the weekly digest panel on the home dashboard.
   ///
   /// In en, this message translates to:
   /// **'Your saved knowledge catch-up'**
   String get homeWeeklyDigestHeadline;
 
-  /// No description provided for @homeWeeklyDigestBody.
+  /// Body text inside the weekly digest panel. The count is the number of bookmarks saved in the recent window.
   ///
   /// In en, this message translates to:
-  /// **'You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.'**
+  /// **'{count, plural, =0{You have no recent bookmarks. Review saved highlights when you add one.} =1{You saved 1 bookmark recently. Review the highlight and keep your reading flow moving.} other{You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.}}'**
   String homeWeeklyDigestBody(int count);
 
-  /// No description provided for @homeReadDigest.
+  /// Call-to-action button label in the weekly digest panel.
   ///
   /// In en, this message translates to:
   /// **'Read Digest'**
   String get homeReadDigest;
 
-  /// No description provided for @homeNoMatches.
+  /// Empty-state message shown when active search or filters hide all recent bookmarks.
   ///
   /// In en, this message translates to:
   /// **'No bookmarks match this view.'**

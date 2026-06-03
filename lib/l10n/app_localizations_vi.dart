@@ -249,7 +249,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String homeWeeklyDigestBody(int count) {
-    return 'Gần đây bạn đã lưu $count bookmark. Xem lại các điểm nổi bật để tiếp tục mạch đọc.';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Gần đây bạn đã lưu $count bookmark. Xem lại các điểm nổi bật để tiếp tục mạch đọc.',
+      zero:
+          'Gần đây bạn chưa lưu bookmark nào. Hãy quay lại khi có nội dung mới.',
+    );
+    return '$_temp0';
   }
 
   @override

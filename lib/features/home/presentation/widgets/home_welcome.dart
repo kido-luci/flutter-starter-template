@@ -522,7 +522,7 @@ class _WeeklyDigestPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.homeWeeklyDigestEyebrow.toUpperCase(),
+                  context.l10n.homeWeeklyDigestEyebrow,
                   style: context.textTheme.labelSmall?.copyWith(
                     color: context.colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w800,
