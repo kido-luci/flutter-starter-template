@@ -71,7 +71,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get registerAppBarTitle => 'Đăng ký';
 
   @override
-  String get registerHeadline => 'Tạo tài khoản mới';
+  String get registerHeadline => 'Tham gia Flutter Starter';
+
+  @override
+  String get registerSubtitle =>
+      'Tạo tài khoản để bắt đầu sắp xếp cuộc sống số của bạn thật rõ ràng và dễ dàng.';
+
+  @override
+  String get registerFullNameLabel => 'Họ và tên';
+
+  @override
+  String get registerFullNameHint => 'Jane Doe';
+
+  @override
+  String get registerEmailLabel => 'Địa chỉ email';
+
+  @override
+  String get registerEmailHint => 'jane@example.com';
 
   @override
   String get registerUsernameLabel => 'Tên đăng nhập';
@@ -80,10 +96,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get registerPasswordLabel => 'Mật khẩu';
 
   @override
+  String get registerPasswordHint => '••••••••';
+
+  @override
+  String get registerPasswordHelp => 'Mật khẩu phải có ít nhất 8 ký tự.';
+
+  @override
+  String get registerPasswordMinLengthError =>
+      'Mật khẩu phải có ít nhất 8 ký tự.';
+
+  @override
+  String get registerShowPassword => 'Hiện mật khẩu';
+
+  @override
+  String get registerHidePassword => 'Ẩn mật khẩu';
+
+  @override
   String get registerConfirmPasswordLabel => 'Xác nhận mật khẩu';
 
   @override
-  String get registerSubmit => 'Đăng ký';
+  String get registerSubmit => 'Tham gia Flutter Starter';
+
+  @override
+  String get registerLoginPrompt => 'Bạn đã có tài khoản? ';
+
+  @override
+  String get registerNavigateToLogin => 'Đăng nhập';
 
   @override
   String get errorPasswordsDoNotMatch => 'Mật khẩu không khớp.';

@@ -221,8 +221,38 @@ abstract class AppLocalizations {
   /// No description provided for @registerHeadline.
   ///
   /// In en, this message translates to:
-  /// **'Create an account'**
+  /// **'Join Flutter Starter'**
   String get registerHeadline;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to start organizing your digital life with clarity and ease.'**
+  String get registerSubtitle;
+
+  /// No description provided for @registerFullNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get registerFullNameLabel;
+
+  /// No description provided for @registerFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Jane Doe'**
+  String get registerFullNameHint;
+
+  /// No description provided for @registerEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get registerEmailLabel;
+
+  /// No description provided for @registerEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'jane@example.com'**
+  String get registerEmailHint;
 
   /// No description provided for @registerUsernameLabel.
   ///
@@ -236,6 +266,36 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get registerPasswordLabel;
 
+  /// No description provided for @registerPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get registerPasswordHint;
+
+  /// No description provided for @registerPasswordHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be at least 8 characters.'**
+  String get registerPasswordHelp;
+
+  /// No description provided for @registerPasswordMinLengthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be at least 8 characters.'**
+  String get registerPasswordMinLengthError;
+
+  /// No description provided for @registerShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get registerShowPassword;
+
+  /// No description provided for @registerHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get registerHidePassword;
+
   /// No description provided for @registerConfirmPasswordLabel.
   ///
   /// In en, this message translates to:
@@ -245,8 +305,20 @@ abstract class AppLocalizations {
   /// No description provided for @registerSubmit.
   ///
   /// In en, this message translates to:
-  /// **'Register'**
+  /// **'Join Flutter Starter'**
   String get registerSubmit;
+
+  /// No description provided for @registerLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get registerLoginPrompt;
+
+  /// No description provided for @registerNavigateToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get registerNavigateToLogin;
 
   /// No description provided for @errorPasswordsDoNotMatch.
   ///
