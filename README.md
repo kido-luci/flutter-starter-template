@@ -307,13 +307,35 @@ done
 ### 3. Open a Pull Request
 Push your branch to the remote and create a Pull Request (PR) targeting `main`.
 * The **`Analyze & Test`** GitHub Actions workflow will run automatically.
-* Once the check passes, the PR can be merged.
+* **CodeRabbit** posts an AI review automatically (see below).
+* Once the checks pass, the PR can be merged.
 
 ### 4. Cleanup
 After merging, delete the remote branch. You can prune your local tracking branches with:
 ```bash
 git fetch --prune
 ```
+
+### 🐰 AI Code Review (CodeRabbit)
+
+Every PR targeting `main` is reviewed automatically by
+[CodeRabbit](https://coderabbit.ai) — free for this public repo. It posts a
+high‑level summary plus inline, line‑by‑line suggestions, and you can chat with
+it directly in PR comments.
+
+Behavior is configured in [`.coderabbit.yaml`](.coderabbit.yaml): generated and
+vendored files are skipped, and the reviewer is fed this project's
+`core` / `shared` / `features` layering rules so feedback respects the
+architecture. Reviews use the `chill` profile to avoid style nitpicks already
+covered by `dart format` + `very_good_analysis`.
+
+| Comment in a PR        | Action                              |
+|------------------------|-------------------------------------|
+| `@coderabbitai review` | Re‑run the review                   |
+| `@coderabbitai summary`| Regenerate the PR summary           |
+| `@coderabbitai pause`  | Pause reviews on the PR             |
+| `@coderabbitai resume` | Resume reviews on the PR            |
+| `@coderabbitai help`   | List all commands                   |
 
 <br>
 
