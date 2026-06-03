@@ -180,6 +180,7 @@ dev_dependencies:
   # Generates native launcher icons for all platforms from a single source
   # image. Run: dart run flutter_launcher_icons (config below).
   flutter_launcher_icons: ^0.14.3
+  checks: ^0.3.1
 
 flutter_gen:
   output: lib/gen/

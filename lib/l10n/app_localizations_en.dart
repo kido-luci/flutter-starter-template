@@ -15,19 +15,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginAppBarTitle => 'Sign in';
 
   @override
-  String get loginHeadline => 'Welcome back';
+  String get loginHeadline => 'Welcome Back';
 
   @override
-  String get loginUsernameLabel => 'Username';
+  String get loginSubtitle => 'Sign in to organize your digital space.';
+
+  @override
+  String get loginUsernameLabel => 'Email Address';
+
+  @override
+  String get loginUsernameHint => 'hello@example.com';
 
   @override
   String get loginPasswordLabel => 'Password';
 
   @override
-  String get loginSubmit => 'Sign in';
+  String get loginPasswordHint => '••••••••';
 
   @override
-  String get loginNavigateToRegister => 'Don\'t have an account? Register here';
+  String get loginShowPassword => 'Show password';
+
+  @override
+  String get loginHidePassword => 'Hide password';
+
+  @override
+  String get loginForgotPassword => 'Forgot?';
+
+  @override
+  String get loginSubmit => 'Log In';
+
+  @override
+  String get loginDividerLabel => 'OR CONTINUE WITH';
+
+  @override
+  String get loginGoogle => 'Google';
+
+  @override
+  String get loginApple => 'Apple';
+
+  @override
+  String get loginRegisterPrompt => 'New to Flutter Starter? ';
+
+  @override
+  String get loginNavigateToRegister => 'Create an account';
+
+  @override
+  String get loginPasswordRecoveryUnavailable =>
+      'Password recovery isn\'t configured yet.';
+
+  @override
+  String get loginSocialUnavailable => 'Social sign-in isn\'t configured yet.';
 
   @override
   String get registerAppBarTitle => 'Register';

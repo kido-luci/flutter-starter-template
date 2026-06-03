@@ -113,14 +113,26 @@ abstract class AppLocalizations {
   /// No description provided for @loginHeadline.
   ///
   /// In en, this message translates to:
-  /// **'Welcome back'**
+  /// **'Welcome Back'**
   String get loginHeadline;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to organize your digital space.'**
+  String get loginSubtitle;
 
   /// No description provided for @loginUsernameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Username'**
+  /// **'Email Address'**
   String get loginUsernameLabel;
+
+  /// No description provided for @loginUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'hello@example.com'**
+  String get loginUsernameHint;
 
   /// No description provided for @loginPasswordLabel.
   ///
@@ -128,17 +140,77 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get loginPasswordLabel;
 
+  /// No description provided for @loginPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get loginPasswordHint;
+
+  /// No description provided for @loginShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get loginShowPassword;
+
+  /// No description provided for @loginHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get loginHidePassword;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot?'**
+  String get loginForgotPassword;
+
   /// No description provided for @loginSubmit.
   ///
   /// In en, this message translates to:
-  /// **'Sign in'**
+  /// **'Log In'**
   String get loginSubmit;
+
+  /// No description provided for @loginDividerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'OR CONTINUE WITH'**
+  String get loginDividerLabel;
+
+  /// No description provided for @loginGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google'**
+  String get loginGoogle;
+
+  /// No description provided for @loginApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple'**
+  String get loginApple;
+
+  /// No description provided for @loginRegisterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'New to Flutter Starter? '**
+  String get loginRegisterPrompt;
 
   /// No description provided for @loginNavigateToRegister.
   ///
   /// In en, this message translates to:
-  /// **'Don\'t have an account? Register here'**
+  /// **'Create an account'**
   String get loginNavigateToRegister;
+
+  /// No description provided for @loginPasswordRecoveryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Password recovery isn\'t configured yet.'**
+  String get loginPasswordRecoveryUnavailable;
+
+  /// No description provided for @loginSocialUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Social sign-in isn\'t configured yet.'**
+  String get loginSocialUnavailable;
 
   /// No description provided for @registerAppBarTitle.
   ///

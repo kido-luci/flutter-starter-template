@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:architecture/architecture.dart';
+import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
@@ -113,16 +114,16 @@ void main() {
       await Future<void>.delayed(Duration.zero);
     });
     await tester.pump();
-    for (var i = 0; i < 40 && find.text('Sign in').evaluate().isEmpty; i++) {
+    for (var i = 0; i < 40 && find.text('Log In').evaluate().isEmpty; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    expect(find.text('Sign in'), findsWidgets);
+    check(find.text('Log In').evaluate()).isNotEmpty();
 
     await tester.enterText(find.byType(TextFormField).at(0), 'alice');
     await tester.enterText(find.byType(TextFormField).at(1), 'hunter2');
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Log In'));
     await tester.runAsync(() async {
       await Future<void>.delayed(Duration.zero);
     });

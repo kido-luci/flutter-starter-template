@@ -18,16 +18,54 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loginHeadline => 'Chào mừng trở lại';
 
   @override
-  String get loginUsernameLabel => 'Tên đăng nhập';
+  String get loginSubtitle => 'Đăng nhập để sắp xếp không gian số của bạn.';
+
+  @override
+  String get loginUsernameLabel => 'Địa chỉ email';
+
+  @override
+  String get loginUsernameHint => 'hello@example.com';
 
   @override
   String get loginPasswordLabel => 'Mật khẩu';
 
   @override
+  String get loginPasswordHint => '••••••••';
+
+  @override
+  String get loginShowPassword => 'Hiện mật khẩu';
+
+  @override
+  String get loginHidePassword => 'Ẩn mật khẩu';
+
+  @override
+  String get loginForgotPassword => 'Quên?';
+
+  @override
   String get loginSubmit => 'Đăng nhập';
 
   @override
-  String get loginNavigateToRegister => 'Chưa có tài khoản? Đăng ký ngay';
+  String get loginDividerLabel => 'HOẶC TIẾP TỤC VỚI';
+
+  @override
+  String get loginGoogle => 'Google';
+
+  @override
+  String get loginApple => 'Apple';
+
+  @override
+  String get loginRegisterPrompt => 'Mới dùng Flutter Starter? ';
+
+  @override
+  String get loginNavigateToRegister => 'Tạo tài khoản';
+
+  @override
+  String get loginPasswordRecoveryUnavailable =>
+      'Khôi phục mật khẩu chưa được cấu hình.';
+
+  @override
+  String get loginSocialUnavailable =>
+      'Đăng nhập mạng xã hội chưa được cấu hình.';
 
   @override
   String get registerAppBarTitle => 'Đăng ký';
