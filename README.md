@@ -304,6 +304,17 @@ for package in packages/*; do
 done
 ```
 
+To run the formatting and analyzer gates automatically on every `git push`,
+enable the repo's pre-push hook once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The hook (`.githooks/pre-push`) runs the same `dart format` and
+`flutter analyze` checks CI enforces, so a formatting slip can't reach CI.
+Bypass in an emergency with `git push --no-verify`.
+
 ### 3. Open a Pull Request
 Push your branch to the remote and create a Pull Request (PR) targeting `main`.
 * The **`Analyze & Test`** GitHub Actions workflow will run automatically.

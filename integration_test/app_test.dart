@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
-import 'package:flutter_starter_template/core/di/injection.dart';
+import 'package:flutter_starter_template/app/di/injection.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
@@ -105,6 +105,7 @@ void main() {
         themeBloc: themeBloc,
         bookmarksSync: sync,
         navigatorObservers: const [],
+        videoPlayerService: MockVideoPlayerService(),
       ),
     );
 

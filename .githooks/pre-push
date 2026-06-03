@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Pre-push guard: runs the same fast static checks as the CI "Analyze & Test"
+# job so formatting/analyzer problems are caught locally instead of failing CI.
+#
+# Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# Bypass in an emergency:
+#   git push --no-verify
+#
+set -euo pipefail
+
+# Prefer the FVM-pinned SDK (this repo pins Flutter via .fvmrc); fall back to a
+# plain toolchain if FVM is not installed.
+if command -v fvm >/dev/null 2>&1; then
+  dart() { fvm dart "$@"; }
+  flutter() { fvm flutter "$@"; }
+fi
+
+echo "▶ pre-push: verifying formatting (dart format)…"
+if ! dart format --output=none --set-exit-if-changed .; then
+  echo "✖ Formatting issues found. Fix with: fvm dart format ." >&2
+  exit 1
+fi
+
+echo "▶ pre-push: analyzing (flutter analyze)…"
+if ! flutter analyze; then
+  echo "✖ Analyzer issues found. Resolve them before pushing." >&2
+  exit 1
+fi
+
+echo "✓ pre-push checks passed"
