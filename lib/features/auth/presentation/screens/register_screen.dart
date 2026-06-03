@@ -11,6 +11,8 @@ import '../../../../gen/assets.gen.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 
+final _emailPattern = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -305,9 +307,16 @@ class _RegisterFormCard extends StatelessWidget {
                   AutofillHints.newUsername,
                   AutofillHints.email,
                 ],
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? context.l10n.fieldRequired
-                    : null,
+                validator: (value) {
+                  final email = value?.trim() ?? '';
+                  if (email.isEmpty) {
+                    return context.l10n.fieldRequired;
+                  }
+                  if (!_emailPattern.hasMatch(email)) {
+                    return context.l10n.registerInvalidEmail;
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: AppSpacing.xxl),
               _RegisterTextField(

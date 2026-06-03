@@ -106,6 +106,25 @@ void main() {
       verifyNever(() => mockBloc.add(any()));
     });
 
+    testWidgets('shows validation error for malformed email', (tester) async {
+      await tester.pumpWidget(wrapWithDependencies(mockBloc));
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.enterText(find.byType(TextFormField).at(0), 'not-an-email');
+      await tester.enterText(find.byType(TextFormField).at(1), 'password123');
+      await tester.ensureVisible(
+        find.widgetWithText(FilledButton, 'Join Flutter Starter'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'Join Flutter Starter'),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Enter a valid email address.'), findsOneWidget);
+      verifyNever(() => mockBloc.add(any()));
+    });
+
     testWidgets('calls register with entered credentials', (tester) async {
       await tester.pumpWidget(wrapWithDependencies(mockBloc));
       await tester.pump(const Duration(seconds: 1));

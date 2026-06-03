@@ -83,6 +83,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerEmailHint => 'jane@example.com';
 
   @override
+  String get registerInvalidEmail => 'Enter a valid email address.';
+
+  @override
   String get registerUsernameLabel => 'Username';
 
   @override

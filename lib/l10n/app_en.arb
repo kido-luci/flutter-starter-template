@@ -24,6 +24,7 @@
   "registerSubtitle": "Create an account to start organizing your digital life with clarity and ease.",
   "registerEmailLabel": "Email Address",
   "registerEmailHint": "jane@example.com",
+  "registerInvalidEmail": "Enter a valid email address.",
   "registerUsernameLabel": "Username",
   "registerPasswordLabel": "Password",
   "registerPasswordHint": "••••••••",

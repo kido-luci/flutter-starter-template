@@ -24,6 +24,7 @@
   "registerSubtitle": "Tạo tài khoản để bắt đầu sắp xếp cuộc sống số của bạn thật rõ ràng và dễ dàng.",
   "registerEmailLabel": "Địa chỉ email",
   "registerEmailHint": "jane@example.com",
+  "registerInvalidEmail": "Nhập địa chỉ email hợp lệ.",
   "registerUsernameLabel": "Tên đăng nhập",
   "registerPasswordLabel": "Mật khẩu",
   "registerPasswordHint": "••••••••",

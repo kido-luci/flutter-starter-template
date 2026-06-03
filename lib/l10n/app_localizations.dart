@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'jane@example.com'**
   String get registerEmailHint;
 
+  /// No description provided for @registerInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get registerInvalidEmail;
+
   /// No description provided for @registerUsernameLabel.
   ///
   /// In en, this message translates to:

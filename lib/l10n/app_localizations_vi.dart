@@ -84,6 +84,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get registerEmailHint => 'jane@example.com';
 
   @override
+  String get registerInvalidEmail => 'Nhập địa chỉ email hợp lệ.';
+
+  @override
   String get registerUsernameLabel => 'Tên đăng nhập';
 
   @override
