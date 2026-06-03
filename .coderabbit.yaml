@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit configuration for flutter-starter-template.
+# Docs: https://docs.coderabbit.ai/getting-started/configure-coderabbit
+language: en-US
+tone_instructions: >-
+  Be concise and pragmatic. Prioritize correctness, null-safety, and the
+  project's layering rules over style nits. Skip trivial formatting comments;
+  `dart format` and very_good_analysis already enforce style.
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  # Don't waste review budget on generated or vendored output.
+  path_filters:
+    - "!**/*.g.dart"
+    - "!**/*.freezed.dart"
+    - "!**/*.gr.dart"
+    - "!**/*.config.dart"
+    - "!**/*.mocks.dart"
+    - "!lib/firebase_options.dart"
+    - "!lib/objectbox.g.dart"
+    - "!lib/objectbox-model.json"
+    - "!lib/gen/**"
+    - "!lib/l10n/**/*.arb"
+    - "!**/l10n/generated/**"
+    - "!ios/Pods/**"
+    - "!**/*.lock"
+
+  # Architecture-aware guidance fed to the reviewer.
+  path_instructions:
+    - path: "lib/features/**"
+      instructions: >-
+        A feature must not import another feature's presentation layer. Shared
+        state is read through a `shared` contract; the only exception is a
+        single-consumer capability (e.g. a Cubit) surfaced in another feature.
+        Each feature owns its data/domain/presentation layers.
+    - path: "lib/shared/**"
+      instructions: >-
+        Only business vocabulary genuinely used by 2+ features belongs here
+        (rule of three). Flag additions that have a single consumer or that
+        look like a catch-all dumping ground.
+    - path: "lib/core/**"
+      instructions: >-
+        Core is cross-cutting, NON-visual infrastructure with no business
+        meaning (network, DI, error types, analytics, notifications). Flag any
+        business logic or widgets that leak in here.
+    - path: "lib/**/*.dart"
+      instructions: >-
+        Enforce sound null-safety (avoid `!` unless provably non-null), const
+        constructors where possible, small single-purpose widgets/functions,
+        and `dart:developer` log over print. Prefer composition over
+        inheritance and ListView.builder for long lists.
+    - path: "test/**"
+      instructions: >-
+        Expect Arrange-Act-Assert structure. Prefer fakes/stubs over mocks.
+        Flag missing coverage for new domain logic or state management.
+
+  auto_title_instructions: >-
+    Use Conventional Commit style (feat:, fix:, refactor:, chore:, test:).
+
+  tools:
+    github-checks:
+      enabled: true
+
+chat:
+  auto_reply: true
