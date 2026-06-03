@@ -1,6 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/build_context_extensions.dart';
@@ -48,10 +49,10 @@ class _BookmarkFormViewState extends State<BookmarkFormView> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: widget.isEditing
-          ? context.l10n.bookmarkFormEditTitle
-          : context.l10n.bookmarkFormNewTitle,
       padding: EdgeInsets.zero,
+      safeArea: false,
+      backgroundColor: _BookmarkFormColors.background,
+      resizeToAvoidBottomInset: true,
       body: BlocConsumer<BookmarkFormBloc, BookmarkFormState>(
         listenWhen: (prev, curr) => prev.status != curr.status,
         listener: (context, state) {
@@ -80,40 +81,64 @@ class _BookmarkFormViewState extends State<BookmarkFormView> {
           }
           _hydrateFromState(state);
           final isSubmitting = state.status == BookmarkFormStatus.submitting;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  BookmarkFormFields(
-                    titleController: _title,
-                    urlController: _url,
-                    descriptionController: _description,
-                    tagsController: _tags,
-                    validateUrl: (value) => _validateUrl(context, value),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  BookmarkAttachmentsSection(
-                    state: state,
-                  ).animateSlideLeft(delay: 175.ms),
-                  const SizedBox(height: AppSpacing.xxl),
-                  AppButton(
-                    label: widget.isEditing
-                        ? context.l10n.commonSave
-                        : context.l10n.commonCreate,
-                    isLoading: isSubmitting,
-                    expand: true,
-                    onPressed: () {
+          return Form(
+            key: _formKey,
+            child: Stack(
+              children: [
+                CustomScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _BookmarkTaskHeader(
+                        title: widget.isEditing
+                            ? context.l10n.bookmarkFormEditTitle
+                            : context.l10n.bookmarkFormNewTitle,
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.xl,
+                        AppSpacing.sm,
+                        AppSpacing.xl,
+                        128,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            BookmarkFormFields(
+                              titleController: _title,
+                              urlController: _url,
+                              descriptionController: _description,
+                              tagsController: _tags,
+                              validateUrl: (value) =>
+                                  _validateUrl(context, value),
+                            ),
+                            const SizedBox(height: AppSpacing.xxl),
+                            BookmarkAttachmentsSection(
+                              state: state,
+                            ).animateSlideLeft(delay: 175.ms),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _StickySubmitBar(
+                    isEditing: widget.isEditing,
+                    isSubmitting: isSubmitting,
+                    onSubmit: () {
                       if (_formKey.currentState?.validate() != true) return;
                       context.read<BookmarkFormBloc>().add(
                         const BookmarkFormSubmitted(),
                       );
                     },
-                  ).animateSlideUp(delay: 200.ms),
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -131,4 +156,105 @@ class _BookmarkFormViewState extends State<BookmarkFormView> {
     }
     return null;
   }
+}
+
+class _BookmarkTaskHeader extends StatelessWidget {
+  const _BookmarkTaskHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: SizedBox(
+        height: 64,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: AppSpacing.sm),
+                child: IconButton(
+                  icon: const FaIcon(FontAwesomeIcons.xmark),
+                  color: _BookmarkFormColors.mutedText,
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  onPressed: () => Navigator.of(context).maybePop(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 64),
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: _BookmarkFormColors.text,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StickySubmitBar extends StatelessWidget {
+  const _StickySubmitBar({
+    required this.isEditing,
+    required this.isSubmitting,
+    required this.onSubmit,
+  });
+
+  final bool isEditing;
+  final bool isSubmitting;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: _BookmarkFormColors.background.withValues(alpha: 0.94),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x080A192F),
+            blurRadius: 30,
+            offset: Offset(0, -10),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.xl,
+          ),
+          child: AppButton(
+            label: isEditing
+                ? context.l10n.commonSave
+                : context.l10n.commonCreate,
+            icon: FontAwesomeIcons.bookmark,
+            size: AppButtonSize.large,
+            isLoading: isSubmitting,
+            expand: true,
+            onPressed: onSubmit,
+          ).animateSlideUp(delay: 200.ms),
+        ),
+      ),
+    );
+  }
+}
+
+abstract final class _BookmarkFormColors {
+  static const background = Color(0xFFF7F9FB);
+  static const text = Color(0xFF191C1E);
+  static const mutedText = Color(0xFF434656);
 }
