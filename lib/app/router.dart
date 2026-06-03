@@ -45,16 +45,6 @@ class BookmarkNewRoute extends GoRouteData with $BookmarkNewRoute {
         TypedGoRoute<BookmarksListRoute>(
           path: '/bookmarks',
           name: 'bookmarks',
-          routes: <TypedRoute<RouteData>>[
-            TypedGoRoute<BookmarkDetailRoute>(
-              path: ':id',
-              name: 'bookmark_detail',
-            ),
-            TypedGoRoute<BookmarkEditRoute>(
-              path: ':id/edit',
-              name: 'bookmark_edit',
-            ),
-          ],
         ),
       ],
     ),
@@ -175,6 +165,13 @@ class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
       const BookmarksListScreen();
 }
 
+/// Route data for the bookmark detail, declared outside the app shell so the
+/// detail screen presents full-screen without the persistent bottom navigation
+/// bar (mirrors [BookmarkNewRoute]).
+@TypedGoRoute<BookmarkDetailRoute>(
+  path: '/bookmarks/:id',
+  name: 'bookmark_detail',
+)
 class BookmarkDetailRoute extends GoRouteData with $BookmarkDetailRoute {
   const BookmarkDetailRoute(this.id);
 
@@ -185,6 +182,12 @@ class BookmarkDetailRoute extends GoRouteData with $BookmarkDetailRoute {
       BookmarkDetailScreen(id: id);
 }
 
+/// Route data for editing a bookmark, declared outside the app shell so the
+/// edit form presents full-screen without the persistent bottom navigation bar.
+@TypedGoRoute<BookmarkEditRoute>(
+  path: '/bookmarks/:id/edit',
+  name: 'bookmark_edit',
+)
 class BookmarkEditRoute extends GoRouteData with $BookmarkEditRoute {
   const BookmarkEditRoute(this.id);
 
