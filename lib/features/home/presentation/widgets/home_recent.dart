@@ -131,7 +131,8 @@ class _BookmarkFeedCard extends StatelessWidget {
                   : FontAwesomeIcons.link,
               label: tagLabel,
               height: featured ? 192 : 144,
-              imageUrl: bookmark.thumbnailUrl,
+              linkUrl: bookmark.url,
+              fallbackImageUrl: bookmark.fallbackThumbnailUrl,
               colors: featured
                   ? [
                       context.colorScheme.primaryContainer,

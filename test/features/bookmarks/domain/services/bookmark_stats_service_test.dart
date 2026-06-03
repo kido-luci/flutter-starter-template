@@ -84,6 +84,7 @@ void main() {
       expect(summary.description, item.description);
       expect(summary.tags, item.tags);
       expect(summary.imageUrls, item.imageUrls);
+      expect(summary.fallbackThumbnailUrl, item.imageUrls.first);
     });
 
     test('propagates failure', () async {

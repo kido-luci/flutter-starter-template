@@ -20,7 +20,7 @@ class BookmarkSummary {
   final List<String> tags;
   final List<String> imageUrls;
 
-  String? get thumbnailUrl {
+  String? get fallbackThumbnailUrl {
     for (final imageUrl in imageUrls) {
       final uri = Uri.tryParse(imageUrl);
       if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {

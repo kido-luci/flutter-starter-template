@@ -5,6 +5,7 @@ export 'app_carousel.dart';
 export 'app_empty_view.dart';
 export 'app_error_view.dart';
 export 'app_link_preview.dart';
+export 'app_link_preview_thumbnail.dart';
 export 'app_list_detail_pane.dart';
 export 'app_loading.dart';
 export 'app_network_image.dart';

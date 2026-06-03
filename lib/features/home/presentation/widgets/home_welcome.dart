@@ -289,7 +289,8 @@ class _SuggestedBookmarkCard extends StatelessWidget {
               icon: FontAwesomeIcons.clockRotateLeft,
               label: label,
               height: 96,
-              imageUrl: bookmark.thumbnailUrl,
+              linkUrl: bookmark.url,
+              fallbackImageUrl: bookmark.fallbackThumbnailUrl,
               colors: [
                 context.colorScheme.tertiaryContainer,
                 context.colorScheme.secondaryContainer,
@@ -625,19 +626,19 @@ class _BookmarkVisual extends StatelessWidget {
     required this.label,
     required this.height,
     required this.colors,
-    this.imageUrl,
+    required this.linkUrl,
+    this.fallbackImageUrl,
   });
 
   final FaIconData icon;
   final String label;
   final double height;
   final List<Color> colors;
-  final String? imageUrl;
+  final String linkUrl;
+  final String? fallbackImageUrl;
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = this.imageUrl;
-
     return Container(
       height: height,
       width: double.infinity,
@@ -650,24 +651,22 @@ class _BookmarkVisual extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          if (imageUrl != null)
-            Positioned.fill(
-              child: AppNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                semanticLabel: label,
-              ),
-            )
-          else
-            Center(
-              child: FaIcon(
-                icon,
-                size: AppIconSize.xl,
-                color: context.colorScheme.primary.withValues(alpha: 0.7),
+          Positioned.fill(
+            child: AppLinkPreviewThumbnail(
+              url: linkUrl,
+              fallbackImageUrl: fallbackImageUrl,
+              semanticLabel: label,
+              fallbackBuilder: (context) => Center(
+                child: FaIcon(
+                  icon,
+                  size: AppIconSize.xl,
+                  color: context.colorScheme.primary.withValues(alpha: 0.7),
+                ),
               ),
             ),
-          if (imageUrl != null)
-            Positioned.fill(
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -681,6 +680,7 @@ class _BookmarkVisual extends StatelessWidget {
                 ),
               ),
             ),
+          ),
           PositionedDirectional(
             top: AppSpacing.sm,
             end: AppSpacing.sm,
