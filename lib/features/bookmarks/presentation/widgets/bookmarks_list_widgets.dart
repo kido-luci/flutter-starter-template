@@ -101,6 +101,7 @@ class _BookmarksListViewState extends State<BookmarksListView> {
               : 0,
         ),
         child: FloatingActionButton(
+          heroTag: 'bookmarks-add-bookmark-fab',
           onPressed: _openNew,
           tooltip: context.l10n.bookmarksAddTooltip,
           child: const FaIcon(FontAwesomeIcons.plus),

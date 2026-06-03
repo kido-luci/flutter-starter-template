@@ -46,6 +46,7 @@ class _HomeBodyState extends State<HomeBody> {
               : 0,
         ),
         child: FloatingActionButton(
+          heroTag: 'home-add-bookmark-fab',
           onPressed: () => const BookmarkNewRoute().push<void>(context),
           tooltip: context.l10n.bookmarksAddTooltip,
           child: const FaIcon(FontAwesomeIcons.plus),
