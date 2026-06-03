@@ -77,8 +77,12 @@ class _ActivitiesList extends StatelessWidget {
 Future<void> _refresh(BuildContext context) {
   final bloc = context.read<NotificationsBloc>()
     ..add(const NotificationsLoadRequested());
-  // Keep the spinner visible until the reload settles.
-  return bloc.stream.firstWhere((s) => !s.isLoading);
+  // Keep the spinner visible until the reload settles. Fall back to the
+  // current state if the bloc closes mid-refresh so the future never throws.
+  return bloc.stream.firstWhere(
+    (s) => !s.isLoading,
+    orElse: () => bloc.state,
+  );
 }
 
 class _TabEmptyState extends StatelessWidget {

@@ -284,6 +284,12 @@ abstract class AppLocalizations {
   /// **'My bookmarks'**
   String get homeMyBookmarks;
 
+  /// No description provided for @homeViewAllBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get homeViewAllBookmarks;
+
   /// No description provided for @homeNoDescription.
   ///
   /// In en, this message translates to:

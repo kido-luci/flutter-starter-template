@@ -96,10 +96,7 @@ class BookmarkDetailBloc
           source: AnalyticsSources.detail,
         )
         .uw();
-    final content = bookmark.description.isNotEmpty
-        ? '${bookmark.title}\n${bookmark.url}\n\n${bookmark.description}'
-        : '${bookmark.title}\n${bookmark.url}';
-    _share.share(text: content, subject: bookmark.title).uw();
+    _share.share(text: bookmark.shareText, subject: bookmark.title).uw();
   }
 
   void _onUrlOpened(

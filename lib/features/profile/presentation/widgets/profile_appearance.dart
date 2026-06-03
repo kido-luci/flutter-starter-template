@@ -73,32 +73,39 @@ class _ColorSchemeSelector extends StatelessWidget {
             runSpacing: AppSpacing.md,
             children: _schemes.map((scheme) {
               final isActive = scheme == state.scheme;
-              return GestureDetector(
-                onTap: () =>
-                    context.read<ThemeBloc>().add(ThemeSchemeChanged(scheme)),
-                child: AnimatedContainer(
-                  duration: AppDurations.xfast,
-                  width: _swatchSize,
-                  height: _swatchSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isActive
-                          ? context.colorScheme.primary
-                          : context.colorScheme.outline.withValues(alpha: 0.3),
-                      width: isActive ? 3 : 1.5,
+              return Semantics(
+                button: true,
+                selected: isActive,
+                label: _labelFor(scheme),
+                child: GestureDetector(
+                  onTap: () =>
+                      context.read<ThemeBloc>().add(ThemeSchemeChanged(scheme)),
+                  child: AnimatedContainer(
+                    duration: AppDurations.xfast,
+                    width: _swatchSize,
+                    height: _swatchSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isActive
+                            ? context.colorScheme.primary
+                            : context.colorScheme.outline.withValues(
+                                alpha: 0.3,
+                              ),
+                        width: isActive ? 3 : 1.5,
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Container(
-                      width: _swatchInnerSize,
-                      height: _swatchInnerSize,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: _schemeColors(scheme),
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                    child: Center(
+                      child: Container(
+                        width: _swatchInnerSize,
+                        height: _swatchInnerSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: _schemeColors(scheme),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                         ),
                       ),
                     ),
@@ -111,6 +118,25 @@ class _ColorSchemeSelector extends StatelessWidget {
       },
     );
   }
+
+  /// Screen-reader label for a swatch. These are color-theme proper names, so
+  /// they are intentionally not localized (the same approach the scheme uses
+  /// throughout).
+  String _labelFor(FlexScheme scheme) => switch (scheme) {
+    FlexScheme.material => 'Material',
+    FlexScheme.deepPurple => 'Deep purple',
+    FlexScheme.indigo => 'Indigo',
+    FlexScheme.blue => 'Blue',
+    FlexScheme.green => 'Green',
+    FlexScheme.red => 'Red',
+    FlexScheme.mango => 'Mango',
+    FlexScheme.gold => 'Gold',
+    FlexScheme.sakura => 'Sakura',
+    FlexScheme.hippieBlue => 'Hippie blue',
+    FlexScheme.aquaBlue => 'Aqua blue',
+    FlexScheme.jungle => 'Jungle',
+    _ => scheme.name,
+  };
 
   List<Color> _schemeColors(FlexScheme scheme) => switch (scheme) {
     FlexScheme.material => const [Color(0xFF6750A4), Color(0xFFB4B0D0)],

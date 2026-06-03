@@ -16,11 +16,20 @@ set -euo pipefail
 if command -v fvm >/dev/null 2>&1; then
   dart() { fvm dart "$@"; }
   flutter() { fvm flutter "$@"; }
+  format_fix_cmd="fvm dart format ."
+else
+  format_fix_cmd="dart format ."
+fi
+
+if ! command -v dart >/dev/null 2>&1 || ! command -v flutter >/dev/null 2>&1; then
+  echo "✖ Missing required tooling: dart/flutter not found in PATH." >&2
+  echo "  Install the Flutter SDK or FVM and retry (or skip with --no-verify)." >&2
+  exit 1
 fi
 
 echo "▶ pre-push: verifying formatting (dart format)…"
 if ! dart format --output=none --set-exit-if-changed .; then
-  echo "✖ Formatting issues found. Fix with: fvm dart format ." >&2
+  echo "✖ Formatting issues found. Fix with: ${format_fix_cmd}" >&2
   exit 1
 fi
 

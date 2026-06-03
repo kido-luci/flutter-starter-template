@@ -163,7 +163,7 @@ class _PrimaryActionPanel extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.md),
             AppButton(
-              label: context.l10n.homeMyBookmarks,
+              label: context.l10n.homeViewAllBookmarks,
               icon: FontAwesomeIcons.arrowRight,
               variant: AppButtonVariant.tonal,
               size: AppButtonSize.small,

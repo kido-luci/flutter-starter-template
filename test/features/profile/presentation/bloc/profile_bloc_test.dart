@@ -37,6 +37,22 @@ void main() {
 
       await bloc.close();
     });
+
+    test('ProfileUserIdCopied logs the analytics event', () async {
+      final bloc = ProfileBloc(mockAnalytics);
+
+      bloc.add(const ProfileUserIdCopied());
+      await Future<void>.delayed(Duration.zero);
+
+      verify(
+        () => mockAnalytics.logEvent(
+          'user_id_copied',
+          parameters: any(named: 'parameters'),
+        ),
+      ).called(1);
+
+      await bloc.close();
+    });
   });
 }
 

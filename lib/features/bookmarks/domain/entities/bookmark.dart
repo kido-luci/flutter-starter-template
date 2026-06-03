@@ -27,6 +27,14 @@ class Bookmark {
   final bool isPendingSync;
 }
 
+extension BookmarkShareText on Bookmark {
+  /// Plain-text representation used when sharing via the platform share sheet.
+  ///
+  /// Kept here so every share entry point formats the text identically.
+  String get shareText =>
+      description.isNotEmpty ? '$title\n$url\n\n$description' : '$title\n$url';
+}
+
 class BookmarkInput {
   const BookmarkInput({
     required this.title,

@@ -103,6 +103,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeMyBookmarks => 'Bookmark của tôi';
 
   @override
+  String get homeViewAllBookmarks => 'Xem tất cả';
+
+  @override
   String get homeNoDescription => 'Không có mô tả';
 
   @override
