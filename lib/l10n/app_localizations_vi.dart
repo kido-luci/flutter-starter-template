@@ -376,7 +376,28 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookmarksSortTitleAz => 'Tiêu đề (A–Z)';
 
   @override
-  String get bookmarkAppBarTitle => 'Bookmark';
+  String get bookmarkAppBarTitle => 'Chi tiết Bookmark';
+
+  @override
+  String get bookmarkSourceLabel => 'Nguồn';
+
+  @override
+  String get bookmarkVisitWebsite => 'Mở trang web';
+
+  @override
+  String get bookmarkDetailsLabel => 'Chi tiết';
+
+  @override
+  String get bookmarkDateCreatedLabel => 'Ngày tạo';
+
+  @override
+  String get bookmarkLastModifiedLabel => 'Cập nhật lần cuối';
+
+  @override
+  String get bookmarkMediaLabel => 'Phương tiện';
+
+  @override
+  String get bookmarkOpenInBrowser => 'Mở trong trình duyệt';
 
   @override
   String get bookmarkNotFound => 'Không tìm thấy bookmark.';

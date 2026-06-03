@@ -785,8 +785,50 @@ abstract class AppLocalizations {
   /// No description provided for @bookmarkAppBarTitle.
   ///
   /// In en, this message translates to:
-  /// **'Bookmark'**
+  /// **'Bookmark Details'**
   String get bookmarkAppBarTitle;
+
+  /// No description provided for @bookmarkSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get bookmarkSourceLabel;
+
+  /// No description provided for @bookmarkVisitWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Website'**
+  String get bookmarkVisitWebsite;
+
+  /// No description provided for @bookmarkDetailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get bookmarkDetailsLabel;
+
+  /// No description provided for @bookmarkDateCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Created'**
+  String get bookmarkDateCreatedLabel;
+
+  /// No description provided for @bookmarkLastModifiedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Modified'**
+  String get bookmarkLastModifiedLabel;
+
+  /// No description provided for @bookmarkMediaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get bookmarkMediaLabel;
+
+  /// No description provided for @bookmarkOpenInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Browser'**
+  String get bookmarkOpenInBrowser;
 
   /// No description provided for @bookmarkNotFound.
   ///

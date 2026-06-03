@@ -374,7 +374,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarksSortTitleAz => 'Title (A–Z)';
 
   @override
-  String get bookmarkAppBarTitle => 'Bookmark';
+  String get bookmarkAppBarTitle => 'Bookmark Details';
+
+  @override
+  String get bookmarkSourceLabel => 'Source';
+
+  @override
+  String get bookmarkVisitWebsite => 'Visit Website';
+
+  @override
+  String get bookmarkDetailsLabel => 'Details';
+
+  @override
+  String get bookmarkDateCreatedLabel => 'Date Created';
+
+  @override
+  String get bookmarkLastModifiedLabel => 'Last Modified';
+
+  @override
+  String get bookmarkMediaLabel => 'Media';
+
+  @override
+  String get bookmarkOpenInBrowser => 'Open in Browser';
 
   @override
   String get bookmarkNotFound => 'Bookmark not found.';
