@@ -78,12 +78,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tạo tài khoản để bắt đầu sắp xếp cuộc sống số của bạn thật rõ ràng và dễ dàng.';
 
   @override
-  String get registerFullNameLabel => 'Họ và tên';
-
-  @override
-  String get registerFullNameHint => 'Jane Doe';
-
-  @override
   String get registerEmailLabel => 'Địa chỉ email';
 
   @override
@@ -103,7 +97,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get registerPasswordMinLengthError =>
-      'Mật khẩu phải có ít nhất 8 ký tự.';
+      'Mật khẩu cần có ít nhất 8 ký tự.';
 
   @override
   String get registerShowPassword => 'Hiện mật khẩu';

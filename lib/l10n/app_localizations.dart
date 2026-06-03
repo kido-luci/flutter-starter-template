@@ -230,18 +230,6 @@ abstract class AppLocalizations {
   /// **'Create an account to start organizing your digital life with clarity and ease.'**
   String get registerSubtitle;
 
-  /// No description provided for @registerFullNameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Full Name'**
-  String get registerFullNameLabel;
-
-  /// No description provided for @registerFullNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Jane Doe'**
-  String get registerFullNameHint;
-
   /// No description provided for @registerEmailLabel.
   ///
   /// In en, this message translates to:
@@ -281,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordMinLengthError.
   ///
   /// In en, this message translates to:
-  /// **'Must be at least 8 characters.'**
+  /// **'Password must be at least 8 characters.'**
   String get registerPasswordMinLengthError;
 
   /// No description provided for @registerShowPassword.

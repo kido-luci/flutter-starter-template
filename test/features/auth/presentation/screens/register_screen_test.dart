@@ -59,7 +59,6 @@ void main() {
 
       expect(find.text('Flutter Starter'), findsOneWidget);
       expect(find.text('Join Flutter Starter'), findsAtLeast(1));
-      expect(find.text('Full Name'), findsOneWidget);
       expect(find.text('Email Address'), findsOneWidget);
       expect(find.text('Password'), findsOneWidget);
       expect(find.text('Must be at least 8 characters.'), findsOneWidget);
@@ -86,12 +85,11 @@ void main() {
       await tester.pumpWidget(wrapWithDependencies(mockBloc));
       await tester.pump(const Duration(seconds: 1));
 
-      await tester.enterText(find.byType(TextFormField).at(0), 'Jane Doe');
       await tester.enterText(
-        find.byType(TextFormField).at(1),
+        find.byType(TextFormField).at(0),
         'jane@example.com',
       );
-      await tester.enterText(find.byType(TextFormField).at(2), 'short');
+      await tester.enterText(find.byType(TextFormField).at(1), 'short');
       await tester.ensureVisible(
         find.widgetWithText(FilledButton, 'Join Flutter Starter'),
       );
@@ -101,7 +99,10 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('Must be at least 8 characters.'), findsAtLeast(1));
+      expect(
+        find.text('Password must be at least 8 characters.'),
+        findsOneWidget,
+      );
       verifyNever(() => mockBloc.add(any()));
     });
 
@@ -109,12 +110,11 @@ void main() {
       await tester.pumpWidget(wrapWithDependencies(mockBloc));
       await tester.pump(const Duration(seconds: 1));
 
-      await tester.enterText(find.byType(TextFormField).at(0), 'Jane Doe');
       await tester.enterText(
-        find.byType(TextFormField).at(1),
+        find.byType(TextFormField).at(0),
         'jane@example.com',
       );
-      await tester.enterText(find.byType(TextFormField).at(2), 'password123');
+      await tester.enterText(find.byType(TextFormField).at(1), 'password123');
       await tester.ensureVisible(
         find.widgetWithText(FilledButton, 'Join Flutter Starter'),
       );
@@ -154,12 +154,11 @@ void main() {
       await tester.pumpWidget(wrapWithDependencies(mockBloc));
       await tester.pump(const Duration(seconds: 1));
 
-      await tester.enterText(find.byType(TextFormField).at(0), 'Jane Doe');
       await tester.enterText(
-        find.byType(TextFormField).at(1),
+        find.byType(TextFormField).at(0),
         'jane@example.com',
       );
-      await tester.enterText(find.byType(TextFormField).at(2), 'password123');
+      await tester.enterText(find.byType(TextFormField).at(1), 'password123');
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump(const Duration(milliseconds: 100));
 

@@ -20,14 +20,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -71,18 +69,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isCompact = constraints.maxWidth < 420;
+                  final topPadding = isCompact
+                      ? AppSpacing.xxxl
+                      : AppSpacing.xxxxl;
+                  const bottomPadding = AppSpacing.xxxl;
                   return SingleChildScrollView(
                     padding: EdgeInsets.fromLTRB(
                       AppSpacing.xl,
-                      isCompact ? AppSpacing.xxxl : AppSpacing.xxxxl,
+                      topPadding,
                       AppSpacing.xl,
-                      AppSpacing.xxxl,
+                      bottomPadding,
                     ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         minHeight:
-                            constraints.maxHeight -
-                            (isCompact ? AppSpacing.xxxl : AppSpacing.xxxxl),
+                            constraints.maxHeight - topPadding - bottomPadding,
                       ),
                       child: Center(
                         child: ConstrainedBox(
@@ -103,7 +104,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   const SizedBox(height: AppSpacing.xxxl),
                                   _RegisterFormCard(
                                     formKey: _formKey,
-                                    fullNameController: _fullNameController,
                                     emailController: _emailController,
                                     passwordController: _passwordController,
                                     obscurePassword: _obscurePassword,
@@ -249,7 +249,6 @@ class _RegisterIntro extends StatelessWidget {
 class _RegisterFormCard extends StatelessWidget {
   const _RegisterFormCard({
     required this.formKey,
-    required this.fullNameController,
     required this.emailController,
     required this.passwordController,
     required this.obscurePassword,
@@ -260,7 +259,6 @@ class _RegisterFormCard extends StatelessWidget {
   });
 
   final GlobalKey<FormState> formKey;
-  final TextEditingController fullNameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final bool obscurePassword;
@@ -296,18 +294,6 @@ class _RegisterFormCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _RegisterTextField(
-                controller: fullNameController,
-                label: context.l10n.registerFullNameLabel,
-                hint: context.l10n.registerFullNameHint,
-                icon: FontAwesomeIcons.user,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.name],
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? context.l10n.fieldRequired
-                    : null,
-              ),
-              const SizedBox(height: AppSpacing.xxl),
               _RegisterTextField(
                 controller: emailController,
                 label: context.l10n.registerEmailLabel,
@@ -536,8 +522,7 @@ class _LoginPrompt extends StatelessWidget {
           onPressed: isSubmitting ? null : () => const LoginRoute().go(context),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            minimumSize: const Size(48, 48),
             textStyle: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
