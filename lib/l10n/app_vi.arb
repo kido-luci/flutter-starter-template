@@ -61,6 +61,33 @@
   "homeSignedInBody": "Bạn đã đăng nhập.",
   "homeRecentBookmarks": "Bookmark gần đây",
   "homeNoBookmarks": "Chưa có bookmark nào. Nhấn + để thêm.",
+  "homeSearchTitle": "Tìm kiếm",
+  "homeSearchSubtitle": "Tìm nhanh bài viết, công cụ và nguồn cảm hứng đã lưu.",
+  "homeSearchHint": "Tìm bookmark...",
+  "homeQuickAdd": "Thêm liên kết",
+  "homeQuickLibrary": "Thư viện",
+  "homeQuickTags": "Thẻ",
+  "homeFilterAll": "Tất cả",
+  "homeFilterDesign": "Thiết kế",
+  "homeFilterArticles": "Bài viết",
+  "homeFilterInspiration": "Cảm hứng",
+  "homeFilterTools": "Công cụ",
+  "homeSuggestedTitle": "Gợi ý cho bạn",
+  "homeFeaturedCollections": "Bộ sưu tập nổi bật",
+  "homeWeeklyDigestTitle": "Tóm tắt tuần",
+  "homeWeeklyDigestEyebrow": "Đọc nhiều nhất",
+  "homeWeeklyDigestHeadline": "Điểm lại kho tri thức đã lưu",
+  "homeWeeklyDigestBody": "Gần đây bạn đã lưu {count} bookmark. Xem lại các điểm nổi bật để tiếp tục mạch đọc.",
+  "@homeWeeklyDigestBody": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "homeReadDigest": "Đọc tóm tắt",
+  "homeNoMatches": "Không có bookmark nào khớp với chế độ xem này.",
   "homeStatsTotal": "Tổng cộng",
   "homeStatsRecent": "Gần đây",
   "homeStatsTags": "Thẻ",

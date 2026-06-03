@@ -72,17 +72,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      clipBehavior: Clip.antiAlias,
-      color: context.colorScheme.surfaceContainerHighest.withValues(
-        alpha: context.isDark ? 0.32 : 0.48,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        side: BorderSide(
-          color: context.colorScheme.outlineVariant.withValues(alpha: 0.36),
-        ),
-      ),
+    return _ElevatedSurface(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(

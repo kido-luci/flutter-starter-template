@@ -69,6 +69,33 @@
   "homeSignedInBody": "You are signed in.",
   "homeRecentBookmarks": "Recent Bookmarks",
   "homeNoBookmarks": "No bookmarks yet. Tap + to add one.",
+  "homeSearchTitle": "Search",
+  "homeSearchSubtitle": "Find your saved articles, tools, and inspirations instantly.",
+  "homeSearchHint": "Search bookmarks...",
+  "homeQuickAdd": "Add Link",
+  "homeQuickLibrary": "Library",
+  "homeQuickTags": "Tags",
+  "homeFilterAll": "All",
+  "homeFilterDesign": "Design",
+  "homeFilterArticles": "Articles",
+  "homeFilterInspiration": "Inspiration",
+  "homeFilterTools": "Tools",
+  "homeSuggestedTitle": "Suggested for You",
+  "homeFeaturedCollections": "Featured Collections",
+  "homeWeeklyDigestTitle": "Weekly Digest",
+  "homeWeeklyDigestEyebrow": "Most Read",
+  "homeWeeklyDigestHeadline": "Your saved knowledge catch-up",
+  "homeWeeklyDigestBody": "You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.",
+  "@homeWeeklyDigestBody": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "homeReadDigest": "Read Digest",
+  "homeNoMatches": "No bookmarks match this view.",
   "homeStatsTotal": "Total",
   "homeStatsRecent": "Recent",
   "homeStatsTags": "Tags",

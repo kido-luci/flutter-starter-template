@@ -464,6 +464,120 @@ abstract class AppLocalizations {
   /// **'No bookmarks yet. Tap + to add one.'**
   String get homeNoBookmarks;
 
+  /// No description provided for @homeSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get homeSearchTitle;
+
+  /// No description provided for @homeSearchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your saved articles, tools, and inspirations instantly.'**
+  String get homeSearchSubtitle;
+
+  /// No description provided for @homeSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search bookmarks...'**
+  String get homeSearchHint;
+
+  /// No description provided for @homeQuickAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Link'**
+  String get homeQuickAdd;
+
+  /// No description provided for @homeQuickLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get homeQuickLibrary;
+
+  /// No description provided for @homeQuickTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get homeQuickTags;
+
+  /// No description provided for @homeFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get homeFilterAll;
+
+  /// No description provided for @homeFilterDesign.
+  ///
+  /// In en, this message translates to:
+  /// **'Design'**
+  String get homeFilterDesign;
+
+  /// No description provided for @homeFilterArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get homeFilterArticles;
+
+  /// No description provided for @homeFilterInspiration.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspiration'**
+  String get homeFilterInspiration;
+
+  /// No description provided for @homeFilterTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get homeFilterTools;
+
+  /// No description provided for @homeSuggestedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested for You'**
+  String get homeSuggestedTitle;
+
+  /// No description provided for @homeFeaturedCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured Collections'**
+  String get homeFeaturedCollections;
+
+  /// No description provided for @homeWeeklyDigestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Digest'**
+  String get homeWeeklyDigestTitle;
+
+  /// No description provided for @homeWeeklyDigestEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Read'**
+  String get homeWeeklyDigestEyebrow;
+
+  /// No description provided for @homeWeeklyDigestHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved knowledge catch-up'**
+  String get homeWeeklyDigestHeadline;
+
+  /// No description provided for @homeWeeklyDigestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You saved {count} bookmarks recently. Review the highlights and keep your reading flow moving.'**
+  String homeWeeklyDigestBody(int count);
+
+  /// No description provided for @homeReadDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'Read Digest'**
+  String get homeReadDigest;
+
+  /// No description provided for @homeNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks match this view.'**
+  String get homeNoMatches;
+
   /// No description provided for @homeStatsTotal.
   ///
   /// In en, this message translates to:

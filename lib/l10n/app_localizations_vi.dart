@@ -199,6 +199,66 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeNoBookmarks => 'Chưa có bookmark nào. Nhấn + để thêm.';
 
   @override
+  String get homeSearchTitle => 'Tìm kiếm';
+
+  @override
+  String get homeSearchSubtitle =>
+      'Tìm nhanh bài viết, công cụ và nguồn cảm hứng đã lưu.';
+
+  @override
+  String get homeSearchHint => 'Tìm bookmark...';
+
+  @override
+  String get homeQuickAdd => 'Thêm liên kết';
+
+  @override
+  String get homeQuickLibrary => 'Thư viện';
+
+  @override
+  String get homeQuickTags => 'Thẻ';
+
+  @override
+  String get homeFilterAll => 'Tất cả';
+
+  @override
+  String get homeFilterDesign => 'Thiết kế';
+
+  @override
+  String get homeFilterArticles => 'Bài viết';
+
+  @override
+  String get homeFilterInspiration => 'Cảm hứng';
+
+  @override
+  String get homeFilterTools => 'Công cụ';
+
+  @override
+  String get homeSuggestedTitle => 'Gợi ý cho bạn';
+
+  @override
+  String get homeFeaturedCollections => 'Bộ sưu tập nổi bật';
+
+  @override
+  String get homeWeeklyDigestTitle => 'Tóm tắt tuần';
+
+  @override
+  String get homeWeeklyDigestEyebrow => 'Đọc nhiều nhất';
+
+  @override
+  String get homeWeeklyDigestHeadline => 'Điểm lại kho tri thức đã lưu';
+
+  @override
+  String homeWeeklyDigestBody(int count) {
+    return 'Gần đây bạn đã lưu $count bookmark. Xem lại các điểm nổi bật để tiếp tục mạch đọc.';
+  }
+
+  @override
+  String get homeReadDigest => 'Đọc tóm tắt';
+
+  @override
+  String get homeNoMatches => 'Không có bookmark nào khớp với chế độ xem này.';
+
+  @override
   String get homeStatsTotal => 'Tổng cộng';
 
   @override
