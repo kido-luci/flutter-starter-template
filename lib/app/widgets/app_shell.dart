@@ -15,9 +15,14 @@ import '../di/injection.dart';
 /// indexed stack of branch navigators), so each destination keeps its own
 /// navigation stack.
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.navigationShell});
+  const AppShell({
+    super.key,
+    required this.navigationShell,
+    this.showNavigation = true,
+  });
 
   final StatefulNavigationShell navigationShell;
+  final bool showNavigation;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -39,6 +44,8 @@ class _AppShellState extends State<AppShell> {
       child: BlocBuilder<NotificationsBloc, NotificationsState>(
         builder: (context, state) {
           final l10n = context.l10n;
+          if (!widget.showNavigation) return widget.navigationShell;
+
           final destinations = [
             AppDestination(
               icon: FontAwesomeIcons.house,

@@ -77,7 +77,10 @@ class AppShellRouteData extends StatefulShellRouteData {
     BuildContext context,
     GoRouterState state,
     StatefulNavigationShell navigationShell,
-  ) => AppShell(navigationShell: navigationShell);
+  ) => AppShell(
+    navigationShell: navigationShell,
+    showNavigation: state.name != 'bookmark_new',
+  );
 }
 
 class HomeBranchData extends StatefulShellBranchData {
