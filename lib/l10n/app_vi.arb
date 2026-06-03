@@ -146,6 +146,7 @@
   "bookmarkDescriptionLabel": "Mô tả (tùy chọn)",
   "bookmarkTagsLabel": "Thẻ",
   "bookmarkTagsHint": "các, giá trị, phân tách, bằng, dấu phẩy",
+  "bookmarkPreviewLabel": "Bookmark",
   "bookmarkTitleRequired": "Bắt buộc nhập tiêu đề",
   "bookmarkUrlRequired": "Bắt buộc nhập URL",
   "bookmarkUrlInvalid": "Nhập URL hợp lệ (https://…)",

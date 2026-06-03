@@ -426,6 +426,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookmarkTagsHint => 'các, giá trị, phân tách, bằng, dấu phẩy';
 
   @override
+  String get bookmarkPreviewLabel => 'Bookmark';
+
+  @override
   String get bookmarkTitleRequired => 'Bắt buộc nhập tiêu đề';
 
   @override

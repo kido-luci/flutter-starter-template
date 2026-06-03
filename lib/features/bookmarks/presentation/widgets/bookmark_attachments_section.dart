@@ -10,19 +10,23 @@ import '../bloc/bookmark_form/bookmark_form_bloc.dart';
 import '../bloc/bookmark_form/bookmark_form_state.dart';
 import 'bookmark_video_attachment_preview.dart';
 
+/// Shows media previews and attachment actions for the bookmark form.
 class BookmarkAttachmentsSection extends StatelessWidget {
+  /// Creates a stateless attachments section backed by [state].
   const BookmarkAttachmentsSection({super.key, required this.state});
 
+  /// Current bookmark form state that supplies image and video attachments.
   final BookmarkFormState state;
 
   @override
   Widget build(BuildContext context) {
     final videoUrl = state.videoUrl;
+    final colorScheme = context.colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: _AttachmentColors.surface,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: _AttachmentColors.outline),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -31,16 +35,16 @@ class BookmarkAttachmentsSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const FaIcon(
+                FaIcon(
                   FontAwesomeIcons.images,
                   size: 16,
-                  color: _AttachmentColors.mutedText,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'MEDIA',
                   style: context.textTheme.labelLarge?.copyWith(
-                    color: _AttachmentColors.mutedText,
+                    color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0,
                   ),
@@ -218,12 +222,13 @@ class _AttachmentActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: _AttachmentColors.primary,
-        backgroundColor: _AttachmentColors.surfaceLow,
-        side: const BorderSide(color: _AttachmentColors.outline),
+        foregroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerLow,
+        side: BorderSide(color: colorScheme.outline),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.lg,
@@ -247,12 +252,4 @@ class _AttachmentActionButton extends StatelessWidget {
       ),
     );
   }
-}
-
-abstract final class _AttachmentColors {
-  static const surface = Color(0xFFFFFFFF);
-  static const surfaceLow = Color(0xFFF2F4F6);
-  static const outline = Color(0xFFE0E3E5);
-  static const primary = Color(0xFF0052FF);
-  static const mutedText = Color(0xFF434656);
 }

@@ -225,6 +225,10 @@
   "bookmarkDescriptionLabel": "Description (optional)",
   "bookmarkTagsLabel": "Tags",
   "bookmarkTagsHint": "comma, separated, values",
+  "bookmarkPreviewLabel": "Bookmark",
+  "@bookmarkPreviewLabel": {
+    "description": "Short label shown in the bookmark form preview placeholder."
+  },
   "bookmarkTitleRequired": "Title is required",
   "bookmarkUrlRequired": "URL is required",
   "bookmarkUrlInvalid": "Enter a valid URL (https://…)",

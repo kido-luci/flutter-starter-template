@@ -878,6 +878,12 @@ abstract class AppLocalizations {
   /// **'comma, separated, values'**
   String get bookmarkTagsHint;
 
+  /// Short label shown in the bookmark form preview placeholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get bookmarkPreviewLabel;
+
   /// No description provided for @bookmarkTitleRequired.
   ///
   /// In en, this message translates to:

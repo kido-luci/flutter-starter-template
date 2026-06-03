@@ -424,6 +424,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkTagsHint => 'comma, separated, values';
 
   @override
+  String get bookmarkPreviewLabel => 'Bookmark';
+
+  @override
   String get bookmarkTitleRequired => 'Title is required';
 
   @override

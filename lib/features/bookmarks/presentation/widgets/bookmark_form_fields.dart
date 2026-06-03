@@ -259,7 +259,7 @@ class _PreviewImagePlaceholder extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'BOOKMARK',
+                  context.l10n.bookmarkPreviewLabel,
                   style: context.textTheme.labelLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -365,7 +365,7 @@ class _FieldPanel extends StatelessWidget {
                 FaIcon(icon, size: 16, color: _BookmarkFieldColors.mutedText),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  label.toUpperCase(),
+                  label,
                   style: context.textTheme.labelLarge?.copyWith(
                     color: _BookmarkFieldColors.mutedText,
                     fontWeight: FontWeight.w700,
