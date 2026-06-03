@@ -19,6 +19,15 @@ import 'widgets/app_shell.dart';
 
 part 'router.g.dart';
 
+@TypedGoRoute<BookmarkNewRoute>(path: '/bookmarks/new', name: 'bookmark_new')
+class BookmarkNewRoute extends GoRouteData with $BookmarkNewRoute {
+  const BookmarkNewRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const BookmarkFormScreen();
+}
+
 @TypedStatefulShellRoute<AppShellRouteData>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
     TypedStatefulShellBranch<HomeBranchData>(
@@ -32,7 +41,6 @@ part 'router.g.dart';
           path: '/bookmarks',
           name: 'bookmarks',
           routes: <TypedRoute<RouteData>>[
-            TypedGoRoute<BookmarkNewRoute>(path: 'new', name: 'bookmark_new'),
             TypedGoRoute<BookmarkDetailRoute>(
               path: ':id',
               name: 'bookmark_detail',
@@ -77,10 +85,7 @@ class AppShellRouteData extends StatefulShellRouteData {
     BuildContext context,
     GoRouterState state,
     StatefulNavigationShell navigationShell,
-  ) => AppShell(
-    navigationShell: navigationShell,
-    showNavigation: state.name != 'bookmark_new',
-  );
+  ) => AppShell(navigationShell: navigationShell);
 }
 
 class HomeBranchData extends StatefulShellBranchData {
@@ -163,14 +168,6 @@ class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const BookmarksListScreen();
-}
-
-class BookmarkNewRoute extends GoRouteData with $BookmarkNewRoute {
-  const BookmarkNewRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const BookmarkFormScreen();
 }
 
 class BookmarkDetailRoute extends GoRouteData with $BookmarkDetailRoute {
