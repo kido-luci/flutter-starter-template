@@ -54,15 +54,24 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # Generated files (*.g.dart, *.freezed.dart, *.config.dart, etc.) are
-      # committed to the repo. Regenerate them and fail if anything changed,
-      # so a PR can never merge with stale generated code.
-      - name: Verify generated code is up to date
+      # NOTE: we deliberately do NOT cache .dart_tool/build here. Generated
+      # files are git-ignored, so the checkout has none; a restored build cache
+      # makes build_runner believe outputs already exist and skip regenerating
+      # them (observed with flutter_gen's assets.gen.dart), yielding a broken
+      # tree. A fresh full build from an empty cache is correct, if slower.
+
+      # Generate code so analyze/test see it. Most generated files
+      # (*.g.dart, *.freezed.dart, *.config.dart, *.gen.dart) are git-ignored
+      # and produced fresh here. ObjectBox's binding (lib/objectbox.g.dart) and
+      # model (lib/objectbox-model.json) ARE tracked — they hold stable schema
+      # UIDs — so the diff guard fails the build if those drift, i.e. someone
+      # changed an @Entity without committing the regenerated binding.
+      - name: Generate code & verify ObjectBox binding is up to date
         run: |
           dart run build_runner build --delete-conflicting-outputs
-          if ! git diff --quiet --exit-code; then
-            echo "::error::Generated code is out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit the result."
-            git diff --stat
+          if ! git diff --quiet --exit-code -- lib/objectbox.g.dart lib/objectbox-model.json; then
+            echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit lib/objectbox.g.dart + lib/objectbox-model.json."
+            git diff --stat -- lib/objectbox.g.dart lib/objectbox-model.json
             exit 1
           fi
 

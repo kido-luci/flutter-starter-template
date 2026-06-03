@@ -27,6 +27,15 @@ if ! command -v dart >/dev/null 2>&1 || ! command -v flutter >/dev/null 2>&1; th
   exit 1
 fi
 
+# Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, so a clean
+# tree has none and analyze would fail on missing sources. Generate first,
+# mirroring CI. Fast once build_runner's cache is warm.
+echo "▶ pre-push: generating code (build_runner)…"
+if ! dart run build_runner build --delete-conflicting-outputs; then
+  echo "✖ Code generation failed. Resolve build_runner errors before pushing." >&2
+  exit 1
+fi
+
 echo "▶ pre-push: verifying formatting (dart format)…"
 if ! dart format --output=none --set-exit-if-changed .; then
   echo "✖ Formatting issues found. Fix with: ${format_fix_cmd}" >&2

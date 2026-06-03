@@ -677,34 +677,44 @@ fvm dart run build_runner watch --delete-conflicting-outputs   # incremental
 
 Runs Freezed, Retrofit, Injectable, ObjectBox, `go_router_builder`, `flutter_gen`, and `json_serializable`.
 
-### 📦 Generated files are committed (not ignored)
+### 📦 Generated files are git-ignored (regenerate after clone)
 
-This repo **tracks** generated output (`*.g.dart`, `*.freezed.dart`,
-`*.config.dart`, `*.gen.dart`, `lib/objectbox.g.dart`, `lib/objectbox-model.json`)
-rather than `.gitignore`-ing it. Reasons:
+This repo **does not track** most generated output (`*.g.dart`,
+`*.freezed.dart`, `*.config.dart`, `*.gen.dart`) — it is `.gitignore`-d and
+regenerated on demand. So **after cloning (or after any `pub get`), run
+`build_runner` once** before the project will compile:
 
-- **ObjectBox requires it.** `lib/objectbox-model.json` holds the stable
-  entity/property UIDs that keep on-device data intact across schema
-  migrations — it is a source-of-truth file and **must** be version-controlled.
-  Committing the matching `objectbox.g.dart` keeps the pair consistent.
-- **Reproducible checkouts.** A fresh clone, a reviewer, or CI compiles
-  immediately without first running `build_runner`, and regenerated code shows
-  up in the PR diff — so "someone forgot to regenerate" is caught at review.
-- **Simpler CI.** No mandatory codegen step before every analyze/test run.
+```bash
+fvm dart run build_runner build --delete-conflicting-outputs
+```
 
-Two safeguards keep the trade-off (diff noise) in check:
+Until you do, your IDE/analyzer will show errors for the missing generated
+sources. This keeps PR diffs free of generated noise and avoids
+generated-file merge conflicts.
 
-- **`.gitattributes`** marks these files `linguist-generated=true`, so GitHub
-  collapses them in diffs and excludes them from language stats.
-- **CI** runs `build_runner` and fails if the working tree changes (the
-  _"Verify generated code is up to date"_ step in
-  [`.github/workflows/ci.yml`](.github/workflows/ci.yml)),
-  so stale generated code can never merge.
+**ObjectBox is the one deliberate exception** — `lib/objectbox.g.dart` **and**
+`lib/objectbox-model.json` stay version-controlled (the `.gitignore` negates
+the binding; the model file matches no glob). Together they hold the stable
+entity/property **UIDs** that keep on-device data intact across schema
+migrations, so regenerating them from scratch would risk a destructive schema
+change. Both are source-of-truth files.
 
-If your team prefers ignoring generated files instead, you'd need to: add the
-patterns to `.gitignore` (but **keep `objectbox-model.json` tracked**), make the
-CI `build_runner` step run before analyze/test on every job, and add a local
-pre-build hook so contributors don't compile stale code.
+How the pieces stay consistent:
+
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs
+  `build_runner` before analyze/test (producing the ignored files), and the
+  _"Generate code & verify ObjectBox binding is up to date"_ step fails if the
+  tracked ObjectBox files drift — i.e. someone changed an `@Entity` without
+  committing the regenerated binding.
+- **Release lanes** ([`.github/workflows/release.yml`](.github/workflows/release.yml))
+  run `build_runner` before the Fastlane build, since `flutter build` does not.
+- **`.dart_tool/build` is intentionally not cached** in CI/release. Because the
+  outputs are git-ignored, a checkout has none; a restored build cache makes
+  `build_runner` skip regenerating files it believes already exist (observed
+  with `flutter_gen`'s `assets.gen.dart`), producing a broken tree. Each run
+  does a correct full build from an empty cache instead.
+- **`.gitattributes`** still marks `*.g.dart`/`*.freezed.dart`/etc.
+  `linguist-generated=true`, which applies to the tracked ObjectBox binding.
 
 <br>
 

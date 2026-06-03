@@ -55,6 +55,17 @@ jobs:
           channel: stable
           cache: true
 
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # the lane builds, or the Dart compile fails on missing sources. We do
+      # NOT cache .dart_tool/build: with the outputs git-ignored, a restored
+      # cache makes build_runner skip regenerating files it believes exist,
+      # producing a broken tree. A full build from an empty cache is correct.
+      - name: Generate code
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
       - name: Set up Ruby + Fastlane
         uses: ruby/setup-ruby@v1
         with:
@@ -115,6 +126,17 @@ jobs:
       # machine-global, so each runner must disable SPM before the first build.
       - name: Disable Swift Package Manager
         run: flutter config --no-enable-swift-package-manager
+
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # the lane builds, or the Dart compile fails on missing sources. We do
+      # NOT cache .dart_tool/build: with the outputs git-ignored, a restored
+      # cache makes build_runner skip regenerating files it believes exist,
+      # producing a broken tree. A full build from an empty cache is correct.
+      - name: Generate code
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
 
       - name: Set up Ruby + Fastlane
         uses: ruby/setup-ruby@v1

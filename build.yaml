@@ -2,3 +2,34 @@ global_options:
   freezed:freezed:
     runs_before:
       - retrofit_generator:retrofit_generator
+
+# Builder scoping. Each generator's annotations live in a small, well-defined
+# set of directories, so we restrict `generate_for` to those globs. This keeps
+# intent explicit and avoids these builders considering unrelated files.
+#
+# Measured impact is small for this project (incremental builds are already
+# ~1s; the ~24s cold cost is dominated by build-script bootstrap + freezed's
+# analysis pass, neither of which scoping addresses). Note: CI/release
+# intentionally do NOT cache `.dart_tool/build` — because generated files are
+# git-ignored, a restored cache makes build_runner skip regenerating outputs it
+# believes exist, producing a broken tree. Correctness comes from a fresh full
+# build, not from caching and not from this scoping.
+#
+# Deliberately NOT scoped:
+#   - freezed:     @freezed lives in both data/models and presentation/bloc,
+#                  and is the dominant cost; no narrow glob exists.
+#   - injectable:  the config builder must see the whole DI graph.
+#   - objectbox:   its resolver/synthetic-input setup is fragile; the ~2s it
+#                  costs isn't worth risking broken entity/schema generation.
+targets:
+  $default:
+    builders:
+      # @RestApi clients live only in feature data/datasources directories.
+      retrofit_generator:
+        generate_for:
+          - lib/**/data/datasources/**
+      # @JsonSerializable (incl. freezed models with fromJson) lives only in
+      # feature data/models directories.
+      json_serializable:
+        generate_for:
+          - lib/**/data/models/**

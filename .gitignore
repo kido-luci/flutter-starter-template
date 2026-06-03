@@ -11,6 +11,21 @@
 .pub/
 build/
 
+# -------------------------------------------------------------------------
+# build_runner-generated Dart code. Regenerated on demand
+# (`dart run build_runner build --delete-conflicting-outputs`); CI and the
+# release lanes generate it before building. See README "Code Generation".
+# -------------------------------------------------------------------------
+*.g.dart
+*.freezed.dart
+*.config.dart
+*.gen.dart
+# ObjectBox is the deliberate exception: its generated binding stays tracked
+# alongside lib/objectbox-model.json (which no glob matches). Together they
+# encode stable entity/schema UIDs that must persist across builds for
+# on-device DB migrations.
+!lib/objectbox.g.dart
+
 # Test coverage output
 coverage/
 
