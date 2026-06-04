@@ -58,10 +58,26 @@ class AppAdaptiveScaffold extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         if (width < AppBreakpoints.medium) {
+          final mediaQuery = MediaQuery.of(context);
           return Scaffold(
             body: Stack(
               children: [
-                Positioned.fill(child: body),
+                // The body paints full-height behind the translucent pill so
+                // its content shows through the blur. We still add the bar's
+                // height to the body's bottom padding so its scroll views and
+                // FABs clear the pill (mirroring `Scaffold.extendBody`).
+                Positioned.fill(
+                  child: MediaQuery(
+                    data: mediaQuery.copyWith(
+                      padding: mediaQuery.padding.copyWith(
+                        bottom:
+                            mediaQuery.padding.bottom +
+                            _floatingBarReservedHeight,
+                      ),
+                    ),
+                    child: body,
+                  ),
+                ),
                 Positioned(
                   left: 0,
                   right: 0,
@@ -112,6 +128,15 @@ class AppAdaptiveScaffold extends StatelessWidget {
     );
   }
 }
+
+/// Height of the floating pill itself.
+const double _floatingBarPillHeight = 72;
+
+/// Vertical space the floating bar occupies above the device's bottom
+/// safe-area inset: the pill plus its inner and outer margins. Added to the
+/// body's bottom padding so content clears the bar.
+const double _floatingBarReservedHeight =
+    _floatingBarPillHeight + AppSpacing.xs + AppSpacing.md;
 
 /// A floating, pill-shaped bottom navigation bar.
 ///
@@ -165,7 +190,7 @@ class _FloatingBottomBar extends StatelessWidget {
                     color: colorScheme.surface.withValues(alpha: 0.7),
                   ),
                   child: SizedBox(
-                    height: 72,
+                    height: _floatingBarPillHeight,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
