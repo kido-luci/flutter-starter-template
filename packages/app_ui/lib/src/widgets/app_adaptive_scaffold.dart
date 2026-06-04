@@ -58,26 +58,13 @@ class AppAdaptiveScaffold extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         if (width < AppBreakpoints.medium) {
-          final mediaQuery = MediaQuery.of(context);
           return Scaffold(
             body: Stack(
               children: [
-                // The body paints full-height behind the translucent pill so
-                // its content shows through the blur. We still add the bar's
-                // height to the body's bottom padding so its scroll views and
-                // FABs clear the pill (mirroring `Scaffold.extendBody`).
-                Positioned.fill(
-                  child: MediaQuery(
-                    data: mediaQuery.copyWith(
-                      padding: mediaQuery.padding.copyWith(
-                        bottom:
-                            mediaQuery.padding.bottom +
-                            _floatingBarReservedHeight,
-                      ),
-                    ),
-                    child: body,
-                  ),
-                ),
+                // The body fills the screen and paints behind the translucent
+                // pill so its content shows through the blur. Screens add their
+                // own bottom padding to keep scroll content clear of the pill.
+                Positioned.fill(child: body),
                 Positioned(
                   left: 0,
                   right: 0,
@@ -131,12 +118,6 @@ class AppAdaptiveScaffold extends StatelessWidget {
 
 /// Height of the floating pill itself.
 const double _floatingBarPillHeight = 72;
-
-/// Vertical space the floating bar occupies above the device's bottom
-/// safe-area inset: the pill plus its inner and outer margins. Added to the
-/// body's bottom padding so content clears the bar.
-const double _floatingBarReservedHeight =
-    _floatingBarPillHeight + AppSpacing.xs + AppSpacing.md;
 
 /// A floating, pill-shaped bottom navigation bar.
 ///
