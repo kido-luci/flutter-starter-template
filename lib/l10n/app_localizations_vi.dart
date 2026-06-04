@@ -382,6 +382,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookmarksSortTitleAz => 'Tiêu đề (A–Z)';
 
   @override
+  String get bookmarksTabAll => 'Tất cả';
+
+  @override
+  String get bookmarksTabRecent => 'Gần đây';
+
+  @override
+  String get bookmarksTabCollections => 'Bộ sưu tập';
+
+  @override
+  String get bookmarksRecentEmptyTitle => 'Chưa có gì gần đây';
+
+  @override
+  String get bookmarksRecentEmptyMessage =>
+      'Các dấu trang bạn thêm trong tuần này sẽ xuất hiện ở đây.';
+
+  @override
+  String get bookmarksCollectionsComingSoonTitle => 'Bộ sưu tập sắp ra mắt';
+
+  @override
+  String get bookmarksCollectionsComingSoonMessage =>
+      'Nhóm các dấu trang liên quan vào bộ sưu tập trong bản cập nhật sắp tới.';
+
+  @override
+  String get bookmarkMoreActions => 'Thêm thao tác';
+
+  @override
   String get bookmarkAppBarTitle => 'Chi tiết Bookmark';
 
   @override

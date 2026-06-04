@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:app_ui/app_ui.dart';
-import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,7 +11,6 @@ import '../../domain/entities/bookmark.dart';
 import '../../domain/services/bookmarks_sync_controller.dart';
 import '../bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import '../bloc/bookmarks_list/bookmarks_list_state.dart';
-import 'bookmark_detail_widgets.dart';
 import 'bookmarks_list_master.dart';
 
 class BookmarksListView extends StatefulWidget {
@@ -23,11 +21,9 @@ class BookmarksListView extends StatefulWidget {
 }
 
 class _BookmarksListViewState extends State<BookmarksListView> {
-  static const double _twoPaneMinWidth = 700;
-
   final _searchController = TextEditingController();
   Timer? _debounce;
-  String? _selectedId;
+  BookmarkTab _activeTab = BookmarkTab.all;
 
   @override
   void dispose() {
@@ -70,14 +66,6 @@ class _BookmarksListViewState extends State<BookmarksListView> {
     }
   }
 
-  void _onItemTap(Bookmark bookmark, {required bool twoPane}) {
-    if (twoPane) {
-      setState(() => _selectedId = bookmark.id);
-    } else {
-      _openDetail(bookmark);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -107,62 +95,14 @@ class _BookmarksListViewState extends State<BookmarksListView> {
           child: const FaIcon(FontAwesomeIcons.plus),
         ).animateScale(delay: 300.ms),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final twoPane = constraints.maxWidth >= _twoPaneMinWidth;
-          return AppListDetailPane(
-            twoPaneMinWidth: _twoPaneMinWidth,
-            master: BookmarksListMaster(
-              searchController: _searchController,
-              selectedId: _selectedId,
-              twoPane: twoPane,
-              onSearchChanged: _onSearchChanged,
-              onClearSearch: _clearSearch,
-              onReload: _reload,
-              onItemTap: (bookmark) => _onItemTap(bookmark, twoPane: twoPane),
-              onDeletedSelected: () => setState(() => _selectedId = null),
-            ),
-            detail: twoPane && _selectedId != null
-                ? BookmarkDetailPane(
-                    key: ValueKey(_selectedId),
-                    id: _selectedId!,
-                    onDeleted: () {
-                      setState(() => _selectedId = null);
-                      _reload().uw();
-                    },
-                    onEdited: _reload,
-                  )
-                : null,
-            placeholder: const _DetailPlaceholder(),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _DetailPlaceholder extends StatelessWidget {
-  const _DetailPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FaIcon(
-            FontAwesomeIcons.bookmark,
-            size: AppIconSize.xxxl,
-            color: context.colorScheme.outline,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            context.l10n.bookmarksDetailPlaceholder,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
+      body: BookmarksListMaster(
+        searchController: _searchController,
+        activeTab: _activeTab,
+        onSearchChanged: _onSearchChanged,
+        onClearSearch: _clearSearch,
+        onTabChanged: (tab) => setState(() => _activeTab = tab),
+        onReload: _reload,
+        onItemTap: _openDetail,
       ),
     );
   }

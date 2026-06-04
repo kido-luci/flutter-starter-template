@@ -8,29 +8,36 @@ import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import '../bloc/bookmarks_list/bookmarks_list_state.dart';
 import 'bookmark_failure_messages.dart';
-import 'bookmarks_list_tile.dart';
+import 'bookmarks_list_card.dart';
+
+/// The bookmark browsing tabs shown above the grid.
+///
+/// [collections] has no backing data model yet and renders a "coming soon"
+/// placeholder; [recent] filters to bookmarks created within the last week.
+enum BookmarkTab { all, recent, collections }
+
+/// How recent a bookmark must be to appear under [BookmarkTab.recent].
+const Duration _recentWindow = Duration(days: 7);
 
 class BookmarksListMaster extends StatelessWidget {
   const BookmarksListMaster({
     super.key,
     required this.searchController,
-    required this.selectedId,
-    required this.twoPane,
+    required this.activeTab,
     required this.onSearchChanged,
     required this.onClearSearch,
+    required this.onTabChanged,
     required this.onReload,
     required this.onItemTap,
-    required this.onDeletedSelected,
   });
 
   final TextEditingController searchController;
-  final String? selectedId;
-  final bool twoPane;
+  final BookmarkTab activeTab;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onClearSearch;
+  final ValueChanged<BookmarkTab> onTabChanged;
   final Future<void> Function() onReload;
   final ValueChanged<Bookmark> onItemTap;
-  final VoidCallback onDeletedSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +48,7 @@ class BookmarksListMaster extends StatelessWidget {
           onChanged: onSearchChanged,
           onClear: onClearSearch,
         ),
+        _BookmarkFilterTabs(activeTab: activeTab, onTabChanged: onTabChanged),
         Expanded(
           child: BlocBuilder<BookmarksListBloc, BookmarksListState>(
             builder: (context, state) {
@@ -55,33 +63,221 @@ class BookmarksListMaster extends StatelessWidget {
                   ),
                 );
               }
-              final visible = state.visibleItems;
-              if (visible.isEmpty) {
-                return _BookmarksEmptyState(query: state.query);
+
+              if (activeTab == BookmarkTab.collections) {
+                return _CollectionsComingSoon();
               }
-              return RefreshIndicator(
-                onRefresh: onReload,
-                child: AppSlidableAutoCloseGroup(
-                  child: ListView.separated(
-                    itemCount: visible.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final bookmark = visible[index];
-                      return BookmarksListTile(
-                        bookmark: bookmark,
-                        index: index,
-                        selected: twoPane && bookmark.id == selectedId,
-                        onTap: () => onItemTap(bookmark),
-                        onDeleteSelectedBookmark: onDeletedSelected,
-                      );
-                    },
-                  ),
-                ),
+
+              final visible = _itemsForTab(state.visibleItems, activeTab);
+              if (visible.isEmpty) {
+                return _BookmarksEmptyState(
+                  tab: activeTab,
+                  query: state.query,
+                );
+              }
+
+              return _BookmarksGrid(
+                items: visible,
+                onReload: onReload,
+                onItemTap: onItemTap,
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  List<Bookmark> _itemsForTab(List<Bookmark> items, BookmarkTab tab) {
+    if (tab != BookmarkTab.recent) return items;
+    final cutoff = DateTime.now().subtract(_recentWindow);
+    return items.where((b) => b.createdAt.isAfter(cutoff)).toList();
+  }
+}
+
+/// A responsive masonry grid: a single lazy column on phones and 2-3 balanced
+/// columns on wider screens.
+class _BookmarksGrid extends StatelessWidget {
+  const _BookmarksGrid({
+    required this.items,
+    required this.onReload,
+    required this.onItemTap,
+  });
+
+  static const EdgeInsets _padding = EdgeInsets.fromLTRB(
+    AppSpacing.lg,
+    AppSpacing.sm,
+    AppSpacing.lg,
+    96,
+  );
+
+  final List<Bookmark> items;
+  final Future<void> Function() onReload;
+  final ValueChanged<Bookmark> onItemTap;
+
+  int _columnsFor(double width) {
+    if (width >= AppBreakpoints.expanded) return 3;
+    if (width >= AppBreakpoints.medium) return 2;
+    return 1;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = _columnsFor(constraints.maxWidth);
+        return RefreshIndicator(
+          onRefresh: onReload,
+          child: columns == 1
+              ? ListView.separated(
+                  padding: _padding,
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.md),
+                  itemBuilder: (context, index) => BookmarkCard(
+                    bookmark: items[index],
+                    index: index,
+                    onTap: () => onItemTap(items[index]),
+                  ),
+                )
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: _padding,
+                  child: _MasonryColumns(
+                    columns: columns,
+                    items: items,
+                    onItemTap: onItemTap,
+                  ),
+                ),
+        );
+      },
+    );
+  }
+}
+
+/// Lays cards out across [columns] balanced columns, preserving order.
+class _MasonryColumns extends StatelessWidget {
+  const _MasonryColumns({
+    required this.columns,
+    required this.items,
+    required this.onItemTap,
+  });
+
+  final int columns;
+  final List<Bookmark> items;
+  final ValueChanged<Bookmark> onItemTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final buckets = List.generate(columns, (_) => <Widget>[]);
+    for (var i = 0; i < items.length; i++) {
+      final bookmark = items[i];
+      buckets[i % columns].add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: BookmarkCard(
+            bookmark: bookmark,
+            index: i,
+            onTap: () => onItemTap(bookmark),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var column = 0; column < columns; column++) ...[
+          if (column > 0) const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: buckets[column],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _BookmarkFilterTabs extends StatelessWidget {
+  const _BookmarkFilterTabs({
+    required this.activeTab,
+    required this.onTabChanged,
+  });
+
+  final BookmarkTab activeTab;
+  final ValueChanged<BookmarkTab> onTabChanged;
+
+  String _labelFor(BuildContext context, BookmarkTab tab) => switch (tab) {
+    BookmarkTab.all => context.l10n.bookmarksTabAll,
+    BookmarkTab.recent => context.l10n.bookmarksTabRecent,
+    BookmarkTab.collections => context.l10n.bookmarksTabCollections,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        children: [
+          for (final tab in BookmarkTab.values) ...[
+            _FilterChip(
+              label: _labelFor(context, tab),
+              selected: tab == activeTab,
+              onTap: () => onTabChanged(tab),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+        ],
+      ),
+    ).animateSlideDown(duration: 300.ms);
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Material(
+      color: selected
+          ? colorScheme.primaryContainer
+          : colorScheme.surfaceContainerHigh,
+      shape: const StadiumBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: context.textTheme.labelLarge?.copyWith(
+                color: selected
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -104,7 +300,7 @@ class _BookmarksSearchField extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.md,
         AppSpacing.lg,
-        AppSpacing.xs,
+        AppSpacing.sm,
       ),
       child: AppTextField(
         controller: controller,
@@ -127,24 +323,48 @@ class _BookmarksSearchField extends StatelessWidget {
   }
 }
 
-class _BookmarksEmptyState extends StatelessWidget {
-  const _BookmarksEmptyState({required this.query});
+class _CollectionsComingSoon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AppEmptyView(
+      icon: FontAwesomeIcons.layerGroup,
+      title: context.l10n.bookmarksCollectionsComingSoonTitle,
+      message: context.l10n.bookmarksCollectionsComingSoonMessage,
+    );
+  }
+}
 
+class _BookmarksEmptyState extends StatelessWidget {
+  const _BookmarksEmptyState({required this.tab, required this.query});
+
+  final BookmarkTab tab;
   final String query;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isFiltered = query.trim().isNotEmpty;
+
+    if (isFiltered) {
+      return AppEmptyView(
+        icon: FontAwesomeIcons.magnifyingGlassMinus,
+        title: l10n.bookmarksNoMatchesTitle,
+        message: l10n.bookmarksNoMatchesMessage,
+      );
+    }
+
+    if (tab == BookmarkTab.recent) {
+      return AppEmptyView(
+        icon: FontAwesomeIcons.clock,
+        title: l10n.bookmarksRecentEmptyTitle,
+        message: l10n.bookmarksRecentEmptyMessage,
+      );
+    }
+
     return AppEmptyView(
-      icon: isFiltered
-          ? FontAwesomeIcons.magnifyingGlassMinus
-          : FontAwesomeIcons.bookmark,
-      title: isFiltered
-          ? context.l10n.bookmarksNoMatchesTitle
-          : context.l10n.bookmarksEmptyTitle,
-      message: isFiltered
-          ? context.l10n.bookmarksNoMatchesMessage
-          : context.l10n.bookmarksEmptyMessage,
+      icon: FontAwesomeIcons.bookmark,
+      title: l10n.bookmarksEmptyTitle,
+      message: l10n.bookmarksEmptyMessage,
     );
   }
 }

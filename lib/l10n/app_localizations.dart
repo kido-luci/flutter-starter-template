@@ -794,6 +794,54 @@ abstract class AppLocalizations {
   /// **'Title (A–Z)'**
   String get bookmarksSortTitleAz;
 
+  /// No description provided for @bookmarksTabAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get bookmarksTabAll;
+
+  /// No description provided for @bookmarksTabRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get bookmarksTabRecent;
+
+  /// No description provided for @bookmarksTabCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get bookmarksTabCollections;
+
+  /// No description provided for @bookmarksRecentEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recent'**
+  String get bookmarksRecentEmptyTitle;
+
+  /// No description provided for @bookmarksRecentEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks you add this week show up here.'**
+  String get bookmarksRecentEmptyMessage;
+
+  /// No description provided for @bookmarksCollectionsComingSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections coming soon'**
+  String get bookmarksCollectionsComingSoonTitle;
+
+  /// No description provided for @bookmarksCollectionsComingSoonMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Group related bookmarks into collections in a future update.'**
+  String get bookmarksCollectionsComingSoonMessage;
+
+  /// No description provided for @bookmarkMoreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get bookmarkMoreActions;
+
   /// No description provided for @bookmarkAppBarTitle.
   ///
   /// In en, this message translates to:

@@ -380,6 +380,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarksSortTitleAz => 'Title (A–Z)';
 
   @override
+  String get bookmarksTabAll => 'All';
+
+  @override
+  String get bookmarksTabRecent => 'Recent';
+
+  @override
+  String get bookmarksTabCollections => 'Collections';
+
+  @override
+  String get bookmarksRecentEmptyTitle => 'Nothing recent';
+
+  @override
+  String get bookmarksRecentEmptyMessage =>
+      'Bookmarks you add this week show up here.';
+
+  @override
+  String get bookmarksCollectionsComingSoonTitle => 'Collections coming soon';
+
+  @override
+  String get bookmarksCollectionsComingSoonMessage =>
+      'Group related bookmarks into collections in a future update.';
+
+  @override
+  String get bookmarkMoreActions => 'More actions';
+
+  @override
   String get bookmarkAppBarTitle => 'Bookmark Details';
 
   @override
