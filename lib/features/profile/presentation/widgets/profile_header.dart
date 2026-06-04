@@ -5,36 +5,47 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final session = SessionScope.of(context);
-    return ListenableBuilder(
-      listenable: session,
-      builder: (context, _) {
-        final user = session.currentUser;
-        final username = user?.username ?? '';
-        final initial = username.isNotEmpty ? username[0].toUpperCase() : '?';
-        return Column(
-          children: [
-            CircleAvatar(
-              radius: 48,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                initial,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer,
+    return _SettingsCard(
+      child: ListenableBuilder(
+        listenable: session,
+        builder: (context, _) {
+          final user = session.currentUser;
+          final username = user?.username ?? '';
+          final initial = username.isNotEmpty ? username[0].toUpperCase() : '?';
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.xl,
+            ),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 44,
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                  child: Text(
+                    initial,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ).animateScale(),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  username,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-            ).animateScale(),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              username,
-              style: theme.textTheme.titleLarge,
-            ).animateSlideDown(delay: 150.ms),
-            const SizedBox(height: AppSpacing.xs),
-            _CopyableId(id: user?.id ?? '').animateFadeIn(delay: 250.ms),
-          ],
-        );
-      },
+                const SizedBox(height: AppSpacing.xs),
+                _CopyableId(id: user?.id ?? ''),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -78,32 +89,6 @@ class _CopyableId extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        AppSpacing.xs,
-        AppSpacing.xl,
-        AppSpacing.sm,
-      ),
-      child: Text(
-        text.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.primary,
-          letterSpacing: 0.8,
         ),
       ),
     );

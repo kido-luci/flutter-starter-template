@@ -111,6 +111,8 @@
   "changePasswordMismatchError": "Mật khẩu mới không khớp.",
   "profileSectionAbout": "Giới thiệu",
   "profileUserIdCopied": "Đã sao chép ID người dùng",
+  "profileAppearanceThemeLabel": "Chủ đề",
+  "profileAppearanceColorLabel": "Màu nhấn",
   "profileThemeSystemDefault": "Mặc định hệ thống",
   "profileThemeLight": "Sáng",
   "profileThemeDark": "Tối",

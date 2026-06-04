@@ -314,6 +314,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileUserIdCopied => 'User ID copied';
 
   @override
+  String get profileAppearanceThemeLabel => 'Theme';
+
+  @override
+  String get profileAppearanceColorLabel => 'Accent color';
+
+  @override
   String get profileThemeSystemDefault => 'System default';
 
   @override

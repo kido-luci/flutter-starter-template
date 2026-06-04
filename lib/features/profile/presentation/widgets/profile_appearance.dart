@@ -1,5 +1,29 @@
 part of 'profile_widgets.dart';
 
+class _AppearanceCard extends StatelessWidget {
+  const _AppearanceCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsCard(
+      title: context.l10n.profileSectionAppearance,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SubLabel(context.l10n.profileAppearanceThemeLabel),
+          const _ThemeModeSelector(),
+          const _SettingsDivider(),
+          _SubLabel(context.l10n.profileAppearanceColorLabel),
+          const SizedBox(height: AppSpacing.xs),
+          const _ColorSchemeSelector(),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+      ),
+    );
+  }
+}
+
 class _ThemeModeSelector extends StatelessWidget {
   const _ThemeModeSelector();
 

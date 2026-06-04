@@ -1,5 +1,17 @@
 part of 'profile_widgets.dart';
 
+class _AboutCard extends StatelessWidget {
+  const _AboutCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsCard(
+      title: context.l10n.profileSectionAbout,
+      child: const _AppInfoTile(),
+    );
+  }
+}
+
 class _AppInfoTile extends StatelessWidget {
   const _AppInfoTile();
 

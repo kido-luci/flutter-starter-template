@@ -314,6 +314,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileUserIdCopied => 'Đã sao chép ID người dùng';
 
   @override
+  String get profileAppearanceThemeLabel => 'Chủ đề';
+
+  @override
+  String get profileAppearanceColorLabel => 'Màu nhấn';
+
+  @override
   String get profileThemeSystemDefault => 'Mặc định hệ thống';
 
   @override

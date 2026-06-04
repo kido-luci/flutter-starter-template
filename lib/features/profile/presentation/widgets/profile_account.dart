@@ -1,5 +1,25 @@
 part of 'profile_widgets.dart';
 
+class _AccountCard extends StatelessWidget {
+  const _AccountCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsCard(
+      title: context.l10n.profileSectionAccount,
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ChangePasswordTile(),
+          _SettingsDivider(),
+          _DeleteAccountTile(),
+          SizedBox(height: AppSpacing.xs),
+        ],
+      ),
+    );
+  }
+}
+
 class _ChangePasswordTile extends StatelessWidget {
   const _ChangePasswordTile();
 

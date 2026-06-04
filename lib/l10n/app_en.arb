@@ -170,6 +170,8 @@
   "changePasswordMismatchError": "New passwords do not match.",
   "profileSectionAbout": "About",
   "profileUserIdCopied": "User ID copied",
+  "profileAppearanceThemeLabel": "Theme",
+  "profileAppearanceColorLabel": "Accent color",
   "profileThemeSystemDefault": "System default",
   "profileThemeLight": "Light",
   "profileThemeDark": "Dark",

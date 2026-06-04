@@ -668,6 +668,18 @@ abstract class AppLocalizations {
   /// **'User ID copied'**
   String get profileUserIdCopied;
 
+  /// No description provided for @profileAppearanceThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get profileAppearanceThemeLabel;
+
+  /// No description provided for @profileAppearanceColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent color'**
+  String get profileAppearanceColorLabel;
+
   /// No description provided for @profileThemeSystemDefault.
   ///
   /// In en, this message translates to:

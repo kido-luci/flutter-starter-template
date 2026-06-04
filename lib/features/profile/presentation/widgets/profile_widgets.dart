@@ -46,32 +46,134 @@ class ProfileBody extends StatelessWidget {
         title: context.l10n.profileAppBarTitle,
         padding: EdgeInsets.zero,
         body: ListView(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.xxxl,
+          ),
           children: [
-            const _ProfileHeader(),
+            const _ProfileHeader().animateSlideDown(),
+            const SizedBox(height: AppSpacing.lg),
+            const _AccountCard().animateSlideUp(delay: 120.ms),
+            const SizedBox(height: AppSpacing.lg),
+            const _AppearanceCard().animateSlideUp(delay: 200.ms),
+            const SizedBox(height: AppSpacing.lg),
+            const _AboutCard().animateSlideUp(delay: 280.ms),
             const SizedBox(height: AppSpacing.xxl),
-            _SectionLabel(
-              context.l10n.profileSectionAccount,
-            ).animateSlideRight(delay: 300.ms),
-            const _ChangePasswordTile().animateSlideRight(delay: 325.ms),
-            const _DeleteAccountTile().animateSlideRight(delay: 340.ms),
-            const SizedBox(height: AppSpacing.xxl),
-            _SectionLabel(
-              context.l10n.profileSectionAppearance,
-            ).animateSlideRight(delay: 350.ms),
-            const _ThemeModeSelector().animateSlideRight(delay: 375.ms),
-            const SizedBox(height: AppSpacing.sm),
-            const _ColorSchemeSelector().animateSlideRight(delay: 400.ms),
-            const SizedBox(height: AppSpacing.xxl),
-            _SectionLabel(
-              context.l10n.profileSectionAbout,
-            ).animateSlideRight(delay: 425.ms),
-            const _AppInfoTile().animateSlideRight(delay: 450.ms),
-            const SizedBox(height: AppSpacing.xxxl),
-            const _SignOutButton().animateSlideUp(delay: 500.ms),
+            const _SignOutButton().animateFadeIn(delay: 360.ms),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Bento-style surface used to group related settings: a white (lowest-tone)
+/// rounded card with a soft ambient shadow, optionally led by a [title].
+class _SettingsCard extends StatelessWidget {
+  const _SettingsCard({required this.child, this.title});
+
+  final Widget child;
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+    final isLight = theme.brightness == Brightness.light;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(
+              0xFF0A192F,
+            ).withValues(alpha: isLight ? 0.05 : 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (title != null) _CardTitle(title!),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CardTitle extends StatelessWidget {
+  const _CardTitle(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.xs,
+      ),
+      child: Text(
+        text,
+        style: context.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+/// Small uppercase caption used to label a group of controls inside a card.
+class _SubLabel extends StatelessWidget {
+  const _SubLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.xs,
+      ),
+      child: Text(
+        text.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+/// Hairline separator between rows within a [_SettingsCard].
+class _SettingsDivider extends StatelessWidget {
+  const _SettingsDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: AppSpacing.lg,
+      endIndent: AppSpacing.lg,
+      color: context.colorScheme.outlineVariant.withValues(alpha: 0.4),
     );
   }
 }
