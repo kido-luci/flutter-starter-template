@@ -4,6 +4,7 @@ import 'package:flutter_starter_template/features/notifications/domain/entities/
 import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
 import 'package:flutter_starter_template/features/notifications/domain/entities/user_activity.dart';
 import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed.dart';
+import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed_local.dart';
 import 'package:flutter_starter_template/features/notifications/domain/usecases/mark_notification_read.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
@@ -13,11 +14,16 @@ import '../../../../test_utils.dart';
 
 class MockGetNotificationsFeed extends Mock implements GetNotificationsFeed {}
 
+class MockGetNotificationsFeedLocal extends Mock
+    implements GetNotificationsFeedLocal {}
+
 class MockMarkNotificationRead extends Mock implements MarkNotificationRead {}
 
 void main() {
   late MockGetNotificationsFeed getFeed;
+  late MockGetNotificationsFeedLocal getFeedLocal;
   late MockMarkNotificationRead markRead;
+  late MockNotificationsSyncController sync;
 
   final now = DateTime(2026, 6, 1, 12);
   late AppNotification unreadNotification;
@@ -29,11 +35,14 @@ void main() {
 
   setUp(() {
     getFeed = MockGetNotificationsFeed();
+    getFeedLocal = MockGetNotificationsFeedLocal();
     markRead = MockMarkNotificationRead();
+    sync = MockNotificationsSyncController();
     activityNotifier = MockActivityNotifier();
     when(
       () => activityNotifier.onActivityOccurred,
     ).thenAnswer((_) => const Stream.empty());
+    when(() => sync.onSynced).thenAnswer((_) => const Stream.empty());
 
     unreadNotification = AppNotification(
       id: 'n-1',
@@ -63,8 +72,13 @@ void main() {
     );
   });
 
-  NotificationsBloc buildBloc() =>
-      NotificationsBloc(getFeed, markRead, activityNotifier);
+  NotificationsBloc buildBloc() => NotificationsBloc(
+    getFeed,
+    getFeedLocal,
+    markRead,
+    activityNotifier,
+    sync,
+  );
 
   group('NotificationsBloc', () {
     test('initial state is empty', () {
@@ -161,6 +175,26 @@ void main() {
               !state.notifications.first.isRead && state.unreadCount == 1,
         ),
       ],
+    );
+
+    blocTest<NotificationsBloc, NotificationsState>(
+      'silently refreshes from the cache after a sync completes',
+      setUp: () {
+        when(() => getFeedLocal()).thenAnswer((_) async => Ok(feed));
+        when(() => sync.onSynced).thenAnswer((_) => Stream.value(null));
+      },
+      build: buildBloc,
+      expect: () => [
+        predicate<NotificationsState>(
+          (state) =>
+              !state.isLoading &&
+              state.notifications.length == 2 &&
+              state.activities.length == 1,
+        ),
+      ],
+      verify: (_) {
+        verify(() => getFeedLocal()).called(1);
+      },
     );
 
     blocTest<NotificationsBloc, NotificationsState>(

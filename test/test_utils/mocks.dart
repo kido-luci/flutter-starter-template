@@ -14,6 +14,7 @@ import 'package:flutter_starter_template/features/bookmarks/domain/usecases/get_
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_local_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/update_bookmark.dart';
+import 'package:flutter_starter_template/features/notifications/domain/services/notifications_sync_controller.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';
@@ -56,6 +57,9 @@ class MockDeleteBookmark extends Mock implements DeleteBookmark {}
 
 class MockBookmarksSyncController extends Mock
     implements BookmarksSyncController {}
+
+class MockNotificationsSyncController extends Mock
+    implements NotificationsSyncController {}
 
 class FakeBookmarkInput extends Fake implements BookmarkInput {}
 

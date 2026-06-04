@@ -15,3 +15,9 @@ final class NotificationMarkReadRequested extends NotificationsEvent {
 
   final String id;
 }
+
+/// Re-reads the local cache after a background sync, without showing a loading
+/// indicator or triggering another sync.
+final class _NotificationsReloadSilently extends NotificationsEvent {
+  const _NotificationsReloadSilently();
+}

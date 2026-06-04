@@ -15,6 +15,8 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/bookmarks/data/local/bookmark_entity.dart';
+import 'features/notifications/data/local/activity_entity.dart';
+import 'features/notifications/data/local/notification_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -102,6 +104,106 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(2, 919939177363945290),
+    name: 'ActivityEntity',
+    lastPropertyId: const obx_int.IdUid(5, 3358862512730183168),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1252568795501351072),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8712645750653639276),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(2, 4900372963106232767),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 8458822913889059882),
+        name: 'description',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 8330749528174122264),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3358862512730183168),
+        name: 'createdAt',
+        type: 12,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(3, 1349722681213321324),
+    name: 'NotificationEntity',
+    lastPropertyId: const obx_int.IdUid(8, 310238830684819705),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5623171801112591648),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3490771905479002669),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(3, 7678540160299865532),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2530253008106623603),
+        name: 'title',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 4962516224363033753),
+        name: 'body',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 6903004669254115199),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 3496464928661177200),
+        name: 'isRead',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 1877937495822827689),
+        name: 'createdAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 310238830684819705),
+        name: 'pendingRead',
+        type: 1,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -147,8 +249,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(1, 8542772984841996240),
-    lastIndexId: const obx_int.IdUid(1, 1205513408758410617),
+    lastEntityId: const obx_int.IdUid(3, 1349722681213321324),
+    lastIndexId: const obx_int.IdUid(3, 7678540160299865532),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -281,6 +383,138 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    ActivityEntity: obx_int.EntityDefinition<ActivityEntity>(
+      model: _entities[1],
+      toOneRelations: (ActivityEntity object) => [],
+      toManyRelations: (ActivityEntity object) => {},
+      getId: (ActivityEntity object) => object.id,
+      setId: (ActivityEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ActivityEntity object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final descriptionOffset = fbb.writeString(object.description);
+        final typeOffset = fbb.writeString(object.type);
+        fbb.startTable(6);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addOffset(2, descriptionOffset);
+        fbb.addOffset(3, typeOffset);
+        fbb.addInt64(4, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final descriptionParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0) / 1000)
+              .round(),
+          isUtc: true,
+        );
+        final object = ActivityEntity(
+          id: idParam,
+          uuid: uuidParam,
+          description: descriptionParam,
+          type: typeParam,
+          createdAt: createdAtParam,
+        );
+
+        return object;
+      },
+    ),
+    NotificationEntity: obx_int.EntityDefinition<NotificationEntity>(
+      model: _entities[2],
+      toOneRelations: (NotificationEntity object) => [],
+      toManyRelations: (NotificationEntity object) => {},
+      getId: (NotificationEntity object) => object.id,
+      setId: (NotificationEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (NotificationEntity object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final titleOffset = fbb.writeString(object.title);
+        final bodyOffset = fbb.writeString(object.body);
+        final typeOffset = fbb.writeString(object.type);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addOffset(2, titleOffset);
+        fbb.addOffset(3, bodyOffset);
+        fbb.addOffset(4, typeOffset);
+        fbb.addBool(5, object.isRead);
+        fbb.addInt64(6, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.addBool(7, object.pendingRead);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final titleParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final bodyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final isReadParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          false,
+        );
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0) / 1000)
+              .round(),
+          isUtc: true,
+        );
+        final pendingReadParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          false,
+        );
+        final object = NotificationEntity(
+          id: idParam,
+          uuid: uuidParam,
+          title: titleParam,
+          body: bodyParam,
+          type: typeParam,
+          isRead: isReadParam,
+          createdAt: createdAtParam,
+          pendingRead: pendingReadParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -346,5 +580,76 @@ class BookmarkEntity_ {
   /// See [BookmarkEntity.videoUrl].
   static final videoUrl = obx.QueryStringProperty<BookmarkEntity>(
     _entities[0].properties[11],
+  );
+}
+
+/// [ActivityEntity] entity fields to define ObjectBox queries.
+class ActivityEntity_ {
+  /// See [ActivityEntity.id].
+  static final id = obx.QueryIntegerProperty<ActivityEntity>(
+    _entities[1].properties[0],
+  );
+
+  /// See [ActivityEntity.uuid].
+  static final uuid = obx.QueryStringProperty<ActivityEntity>(
+    _entities[1].properties[1],
+  );
+
+  /// See [ActivityEntity.description].
+  static final description = obx.QueryStringProperty<ActivityEntity>(
+    _entities[1].properties[2],
+  );
+
+  /// See [ActivityEntity.type].
+  static final type = obx.QueryStringProperty<ActivityEntity>(
+    _entities[1].properties[3],
+  );
+
+  /// See [ActivityEntity.createdAt].
+  static final createdAt = obx.QueryDateNanoProperty<ActivityEntity>(
+    _entities[1].properties[4],
+  );
+}
+
+/// [NotificationEntity] entity fields to define ObjectBox queries.
+class NotificationEntity_ {
+  /// See [NotificationEntity.id].
+  static final id = obx.QueryIntegerProperty<NotificationEntity>(
+    _entities[2].properties[0],
+  );
+
+  /// See [NotificationEntity.uuid].
+  static final uuid = obx.QueryStringProperty<NotificationEntity>(
+    _entities[2].properties[1],
+  );
+
+  /// See [NotificationEntity.title].
+  static final title = obx.QueryStringProperty<NotificationEntity>(
+    _entities[2].properties[2],
+  );
+
+  /// See [NotificationEntity.body].
+  static final body = obx.QueryStringProperty<NotificationEntity>(
+    _entities[2].properties[3],
+  );
+
+  /// See [NotificationEntity.type].
+  static final type = obx.QueryStringProperty<NotificationEntity>(
+    _entities[2].properties[4],
+  );
+
+  /// See [NotificationEntity.isRead].
+  static final isRead = obx.QueryBooleanProperty<NotificationEntity>(
+    _entities[2].properties[5],
+  );
+
+  /// See [NotificationEntity.createdAt].
+  static final createdAt = obx.QueryDateNanoProperty<NotificationEntity>(
+    _entities[2].properties[6],
+  );
+
+  /// See [NotificationEntity.pendingRead].
+  static final pendingRead = obx.QueryBooleanProperty<NotificationEntity>(
+    _entities[2].properties[7],
   );
 }

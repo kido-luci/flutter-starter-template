@@ -70,7 +70,10 @@ class _NotificationSectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(
+        left: AppSpacing.xs,
+        bottom: AppSpacing.sm,
+      ),
       child: Text(
         label.toUpperCase(),
         style: context.textTheme.labelMedium?.copyWith(
@@ -151,42 +154,17 @@ class _TabEmptyState extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.badgeCount = 0});
+  const _SectionHeader({required this.title});
 
   final String title;
-  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: context.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        if (badgeCount > 0) ...[
-          const SizedBox(width: AppSpacing.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xxs,
-            ),
-            decoration: BoxDecoration(
-              color: context.colorScheme.primary,
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-            ),
-            child: Text(
-              context.l10n.notificationsUnreadCount(badgeCount),
-              style: context.textTheme.labelSmall?.copyWith(
-                color: context.colorScheme.onPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ],
+    return Text(
+      title,
+      style: context.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }

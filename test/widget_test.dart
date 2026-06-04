@@ -21,6 +21,7 @@ import 'test_utils.dart';
 void main() {
   late StreamController<BookmarksSyncStatus> syncStatusController;
   late MockBookmarksSyncController sync;
+  late MockNotificationsSyncController notificationsSync;
   late MockAnalyticsService analytics;
   late AuthBloc authBloc;
   late ThemeBloc themeBloc;
@@ -56,6 +57,14 @@ void main() {
     when(() => sync.start()).thenAnswer((_) async {});
     when(() => sync.stop()).thenAnswer((_) async {});
     when(() => sync.sync()).thenAnswer((_) async {});
+
+    notificationsSync = MockNotificationsSyncController();
+    when(
+      () => notificationsSync.onSynced,
+    ).thenAnswer((_) => const Stream.empty());
+    when(() => notificationsSync.start()).thenAnswer((_) async {});
+    when(() => notificationsSync.stop()).thenAnswer((_) async {});
+    when(() => notificationsSync.sync()).thenAnswer((_) async {});
 
     final bookmarkStats = MockBookmarkStatsReader();
     when(
@@ -99,6 +108,7 @@ void main() {
         authBloc: authBloc,
         themeBloc: themeBloc,
         bookmarksSync: sync,
+        notificationsSync: notificationsSync,
         navigatorObservers: const [],
         videoPlayerService: MockVideoPlayerService(),
       ),

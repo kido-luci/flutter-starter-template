@@ -7,7 +7,9 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../shared/domain/activity_notifier.dart';
 import '../../domain/entities/app_notification.dart';
+import '../../domain/services/notifications_sync_controller.dart';
 import '../../domain/usecases/get_notifications_feed.dart';
+import '../../domain/usecases/get_notifications_feed_local.dart';
 import '../../domain/usecases/mark_notification_read.dart';
 import 'notifications_state.dart';
 
@@ -17,8 +19,10 @@ part 'notifications_event.dart';
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   NotificationsBloc(
     this._getFeed,
+    this._getFeedLocal,
     this._markRead,
     ActivityNotifier activityNotifier,
+    NotificationsSyncController sync,
   ) : super(const NotificationsState()) {
     on<NotificationsLoadRequested>(
       _onLoadRequested,
@@ -28,15 +32,27 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       _onMarkReadRequested,
       transformer: sequential(),
     );
+    on<_NotificationsReloadSilently>(
+      _onReloadSilently,
+      transformer: droppable(),
+    );
 
     _activitySubscription = activityNotifier.onActivityOccurred.listen((_) {
       add(const NotificationsLoadRequested());
     });
+    // Refresh the cached view after every sync cycle so server-side changes
+    // appear without the user pulling-to-refresh.
+    _syncSubscription = sync.onSynced.listen((_) {
+      if (isClosed) return;
+      add(const _NotificationsReloadSilently());
+    });
   }
 
   late final StreamSubscription<void> _activitySubscription;
+  late final StreamSubscription<void> _syncSubscription;
 
   final GetNotificationsFeed _getFeed;
+  final GetNotificationsFeedLocal _getFeedLocal;
   final MarkNotificationRead _markRead;
 
   Future<void> _onLoadRequested(
@@ -78,6 +94,23 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }
   }
 
+  Future<void> _onReloadSilently(
+    _NotificationsReloadSilently event,
+    Emitter<NotificationsState> emit,
+  ) async {
+    // Read the cache only — going through _getFeed() would trigger another
+    // sync, which would emit onSynced again and loop.
+    final result = await _getFeedLocal();
+    if (result case Ok(value: final feed)) {
+      emit(
+        state.copyWith(
+          notifications: feed.notifications,
+          activities: feed.activities,
+        ),
+      );
+    }
+  }
+
   List<AppNotification> _withRead(String id, {required bool isRead}) {
     return state.notifications
         .map((n) => n.id == id ? n.copyWith(isRead: isRead) : n)
@@ -87,6 +120,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   @override
   Future<void> close() {
     _activitySubscription.cancel();
+    _syncSubscription.cancel();
     return super.close();
   }
 }

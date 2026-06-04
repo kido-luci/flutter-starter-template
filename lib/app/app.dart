@@ -13,6 +13,7 @@ import '../features/auth/presentation/auth_session.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/bloc/auth_state.dart';
 import '../features/bookmarks/domain/services/bookmarks_sync_controller.dart';
+import '../features/notifications/domain/services/notifications_sync_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/domain/session.dart';
 import '../shared/presentation/session_scope.dart';
@@ -25,6 +26,7 @@ class App extends StatefulWidget {
     this.authBloc,
     this.themeBloc,
     this.bookmarksSync,
+    this.notificationsSync,
     this.navigatorObservers,
     this.session,
     this.videoPlayerService,
@@ -33,6 +35,7 @@ class App extends StatefulWidget {
   final AuthBloc? authBloc;
   final ThemeBloc? themeBloc;
   final BookmarksSyncController? bookmarksSync;
+  final NotificationsSyncController? notificationsSync;
   final List<NavigatorObserver>? navigatorObservers;
   final Session? session;
   final VideoPlayerService? videoPlayerService;
@@ -48,6 +51,7 @@ class _AppState extends State<App> {
   late final GoRouter _router;
   late final DeepLinkState _deepLink;
   late final BookmarksSyncController _sync;
+  late final NotificationsSyncController _notificationsSync;
   late final VideoPlayerService _videoPlayerService;
   StreamSubscription<AuthState>? _authSub;
 
@@ -64,6 +68,8 @@ class _AppState extends State<App> {
     _router = result.router;
     _deepLink = result.deepLink;
     _sync = widget.bookmarksSync ?? getIt<BookmarksSyncController>();
+    _notificationsSync =
+        widget.notificationsSync ?? getIt<NotificationsSyncController>();
     _videoPlayerService =
         widget.videoPlayerService ?? getIt<VideoPlayerService>();
     _authSub = _authBloc.stream.listen(_onAuthChanged);
@@ -74,8 +80,10 @@ class _AppState extends State<App> {
   void _onAuthChanged(AuthState state) {
     if (state is AuthAuthenticated) {
       _sync.start();
+      _notificationsSync.start();
     } else {
       _sync.stop();
+      _notificationsSync.stop();
     }
   }
 
@@ -83,6 +91,7 @@ class _AppState extends State<App> {
   void dispose() {
     _authSub?.cancel();
     _sync.stop();
+    _notificationsSync.stop();
     _session.dispose();
     _router.dispose();
     super.dispose();
