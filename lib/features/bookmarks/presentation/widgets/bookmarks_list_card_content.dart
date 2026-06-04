@@ -1,49 +1,91 @@
 part of 'bookmarks_list_card.dart';
 
-class _BookmarkCardImage extends StatelessWidget {
-  const _BookmarkCardImage({required this.imagePath});
+/// The card's hero image.
+///
+/// Prefers an uploaded image, then the URL's link-preview image, and finally a
+/// branded gradient with the domain favicon so a card never looks empty.
+class _BookmarkCardHero extends StatelessWidget {
+  const _BookmarkCardHero({required this.bookmark});
 
-  static const double _height = 160;
+  static const double _height = 150;
 
-  final String imagePath;
+  final Bookmark bookmark;
 
   @override
   Widget build(BuildContext context) {
-    final image = imagePath.startsWith('http')
-        ? AppNetworkImage(
-            imageUrl: imagePath,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: _height,
-          )
-        : Image.file(
-            File(imagePath),
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: _height,
-            errorBuilder: (context, _, _) =>
-                const _ImageFallback(height: _height),
-          );
+    final uploaded = bookmark.imageUrls.isNotEmpty
+        ? bookmark.imageUrls.first
+        : null;
 
-    return SizedBox(height: _height, width: double.infinity, child: image);
+    final Widget child;
+    if (uploaded != null) {
+      child = uploaded.startsWith('http')
+          ? AppNetworkImage(
+              imageUrl: uploaded,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: _height,
+              errorWidget: (context, _, _) => _HeroFallback(url: bookmark.url),
+            )
+          : Image.file(
+              File(uploaded),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: _height,
+              errorBuilder: (context, _, _) => _HeroFallback(url: bookmark.url),
+            );
+    } else {
+      child = AppLinkPreviewThumbnail(
+        url: bookmark.url,
+        fallbackBuilder: (context) => _HeroFallback(url: bookmark.url),
+      );
+    }
+
+    return SizedBox(height: _height, width: double.infinity, child: child);
   }
 }
 
-class _ImageFallback extends StatelessWidget {
-  const _ImageFallback({required this.height});
+/// Gradient placeholder shown when no preview or uploaded image is available.
+///
+/// Centers the domain favicon in an app-icon-style tile so the hero still
+/// signals the bookmark's source.
+class _HeroFallback extends StatelessWidget {
+  const _HeroFallback({required this.url});
 
-  final double height;
+  final String url;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      color: context.colorScheme.surfaceContainerHighest,
-      alignment: Alignment.center,
-      child: FaIcon(
-        FontAwesomeIcons.image,
-        size: AppIconSize.lg,
-        color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+    final colorScheme = context.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.primaryContainer.withValues(alpha: 0.55),
+            colorScheme.tertiaryContainer.withValues(alpha: 0.55),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.12),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: _Favicon(url: url, size: 30),
+        ),
       ),
     );
   }
@@ -62,7 +104,7 @@ class _BookmarkCardMeta extends StatelessWidget {
       children: [
         _Favicon(url: bookmark.url),
         const SizedBox(width: AppSpacing.sm),
-        Flexible(
+        Expanded(
           child: Text(
             _displayDomain(bookmark.url),
             maxLines: 1,
@@ -125,24 +167,23 @@ class _CardMenuButton extends StatelessWidget {
 /// Loads the favicon through Google's public favicon service and falls back to
 /// a generic globe glyph when the domain can't be resolved or fetched.
 class _Favicon extends StatelessWidget {
-  const _Favicon({required this.url});
-
-  static const double _size = 18;
+  const _Favicon({required this.url, this.size = 18});
 
   final String url;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final host = Uri.tryParse(url)?.host ?? '';
     final fallback = Container(
-      width: _size,
-      height: _size,
+      width: size,
+      height: size,
       alignment: Alignment.center,
       color: colorScheme.surfaceContainerHighest,
       child: FaIcon(
         FontAwesomeIcons.globe,
-        size: 10,
+        size: size * 0.55,
         color: colorScheme.onSurfaceVariant,
       ),
     );
@@ -158,8 +199,8 @@ class _Favicon extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.xs),
       child: AppNetworkImage(
         imageUrl: 'https://www.google.com/s2/favicons?domain=$host&sz=64',
-        width: _size,
-        height: _size,
+        width: size,
+        height: size,
         placeholder: (_, _) => fallback,
         errorWidget: (_, _, _) => fallback,
       ),

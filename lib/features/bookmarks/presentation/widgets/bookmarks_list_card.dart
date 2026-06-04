@@ -14,7 +14,8 @@ part 'bookmarks_list_card_actions.dart';
 
 /// A bento-style bookmark card used in the responsive bookmarks grid.
 ///
-/// Shows an optional hero image, a domain/meta row, the title, an optional
+/// Shows a hero image (the link preview's image, an uploaded image, or a
+/// gradient + favicon fallback), a domain/meta row, the title, an optional
 /// description, and tag chips. Tapping opens the detail screen; long-pressing
 /// (or the meta-row menu button) opens the share/delete actions.
 class BookmarkCard extends StatelessWidget {
@@ -32,21 +33,25 @@ class BookmarkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final hasImage = bookmark.imageUrls.isNotEmpty;
-    final shadowColor = colorScheme.shadow.withValues(
-      alpha: context.isDark ? 0.35 : 0.08,
-    );
+    final isDark = context.isDark;
 
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor,
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.10),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ],
       ),
       child: Material(
         clipBehavior: Clip.antiAlias,
@@ -54,7 +59,9 @@ class BookmarkCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
           side: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+            color: colorScheme.outlineVariant.withValues(
+              alpha: isDark ? 0.6 : 0.18,
+            ),
           ),
         ),
         child: InkWell(
@@ -63,8 +70,7 @@ class BookmarkCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (hasImage)
-                _BookmarkCardImage(imagePath: bookmark.imageUrls.first),
+              _BookmarkCardHero(bookmark: bookmark),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
