@@ -595,7 +595,10 @@ class _MenuItem extends StatelessWidget {
       children: [
         FaIcon(icon, size: 16, color: color),
         const SizedBox(width: AppSpacing.md),
-        Text(label, style: context.textTheme.bodyMedium?.copyWith(color: color)),
+        Text(
+          label,
+          style: context.textTheme.bodyMedium?.copyWith(color: color),
+        ),
       ],
     );
   }
