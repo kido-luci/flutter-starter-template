@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' show log;
 
 import 'package:architecture/architecture.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -43,22 +44,30 @@ class NotificationsSyncService implements NotificationsSyncController {
   Future<void>? _inflight;
   bool _wasOnline = true;
 
+  /// Bumped on every [start]/[stop] so a [start] that's awaiting async setup
+  /// can detect a [stop] that landed in the meantime and bail out.
+  int _generation = 0;
+
   @override
   Stream<void> get onSynced => _synced.stream;
 
   @override
   Future<void> start() async {
     if (_connectivitySub != null) return;
+    final generation = ++_generation;
     _connectivitySub = _connectivity.onConnectivityChanged.listen(
       _onConnectivity,
     );
     final initial = await _connectivity.checkConnectivity();
+    // If stop() ran while we awaited, don't kick off a sync after teardown.
+    if (_generation != generation) return;
     _wasOnline = _hasNetwork(initial);
     sync().uw();
   }
 
   @override
   Future<void> stop() async {
+    _generation++;
     await _connectivitySub?.cancel();
     _connectivitySub = null;
   }
@@ -83,9 +92,16 @@ class NotificationsSyncService implements NotificationsSyncController {
       await _pull();
       _synced.add(null);
     } on DioException {
-      // Offline/auth error — pending reads stay queued for the next trigger.
-    } on Object {
-      // Swallow; sync is fire-and-forget from callers.
+      // Offline/auth error — expected; pending reads stay queued for retry.
+    } on Object catch (error, stackTrace) {
+      // Unexpected (e.g. a reconciliation/ObjectBox bug). Surface it so it
+      // isn't lost, but keep sync fire-and-forget for callers.
+      log(
+        'Notifications sync failed',
+        name: 'NotificationsSyncService',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -142,8 +158,10 @@ class NotificationsSyncService implements NotificationsSyncController {
         ..body = dto.body
         ..type = dto.type
         ..createdAt = dto.createdAt;
-      // Preserve an unpushed local read; otherwise trust the server.
-      if (!local.pendingRead) local.isRead = dto.isRead;
+      // Read state is monotonic: preserve an unpushed local read, and never
+      // let a stale server `false` flip a read we've already observed back to
+      // unread (a markRead may have cleared pendingRead earlier this cycle).
+      if (!local.pendingRead) local.isRead = local.isRead || dto.isRead;
       await _local.putNotification(local);
     }
 

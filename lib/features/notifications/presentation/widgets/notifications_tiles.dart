@@ -169,68 +169,65 @@ class _ReadNotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
-    return Opacity(
-      opacity: 0.85,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.4),
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.4),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: scheme.surfaceContainerHigh,
-                child: FaIcon(
-                  _notificationIcon(notification.type),
-                  color: scheme.onSurfaceVariant,
-                  size: AppIconSize.sm,
-                ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: scheme.surfaceContainerHigh,
+              child: FaIcon(
+                _notificationIcon(notification.type),
+                color: scheme.onSurfaceVariant,
+                size: AppIconSize.sm,
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            notification.title,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          formatRelativeTime(context, notification.createdAt),
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: scheme.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      notification.body,
-                      style: context.textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        height: 1.4,
                       ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        formatRelativeTime(context, notification.createdAt),
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: scheme.outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    notification.body,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.4,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

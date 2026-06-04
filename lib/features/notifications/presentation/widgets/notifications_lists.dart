@@ -69,17 +69,20 @@ class _NotificationSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: AppSpacing.xs,
-        bottom: AppSpacing.sm,
-      ),
-      child: Text(
-        label.toUpperCase(),
-        style: context.textTheme.labelMedium?.copyWith(
-          color: context.colorScheme.outline,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2,
+    return Semantics(
+      header: true,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: AppSpacing.xs,
+          bottom: AppSpacing.sm,
+        ),
+        child: Text(
+          label.toUpperCase(),
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colorScheme.outline,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
     );

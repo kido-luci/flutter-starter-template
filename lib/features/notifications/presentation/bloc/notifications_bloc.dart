@@ -38,6 +38,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
 
     _activitySubscription = activityNotifier.onActivityOccurred.listen((_) {
+      if (isClosed) return;
       add(const NotificationsLoadRequested());
     });
     // Refresh the cached view after every sync cycle so server-side changes
@@ -104,6 +105,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     if (result case Ok(value: final feed)) {
       emit(
         state.copyWith(
+          failure: null,
           notifications: feed.notifications,
           activities: feed.activities,
         ),
@@ -118,9 +120,9 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   }
 
   @override
-  Future<void> close() {
-    _activitySubscription.cancel();
-    _syncSubscription.cancel();
+  Future<void> close() async {
+    await _activitySubscription.cancel();
+    await _syncSubscription.cancel();
     return super.close();
   }
 }

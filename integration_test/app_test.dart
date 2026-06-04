@@ -147,7 +147,8 @@ void main() {
     expect(authBloc.state, isA<AuthAuthenticated>());
     expect((authBloc.state as AuthAuthenticated).user.username, 'alice');
 
-    // Sync started for the now-authenticated session.
+    // Both sync controllers started for the now-authenticated session.
     verify(() => sync.start()).called(greaterThanOrEqualTo(1));
+    verify(() => notificationsSync.start()).called(greaterThanOrEqualTo(1));
   });
 }
