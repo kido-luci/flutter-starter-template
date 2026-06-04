@@ -675,13 +675,20 @@ class _SubtleButton extends StatelessWidget {
 
 Future<void> _openBookmarkUrl(BuildContext context, Bookmark bookmark) async {
   final uri = Uri.tryParse(bookmark.url);
-  if (uri == null) {
+  if (uri == null || !uri.hasScheme) {
     _toast(context, context.l10n.bookmarkInvalidUrl);
     return;
   }
-  context.read<BookmarkDetailBloc>().add(BookmarkDetailUrlOpened(bookmark));
-  final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-  if (!launched && context.mounted) {
+  final bloc = context.read<BookmarkDetailBloc>();
+  bool launched;
+  try {
+    launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } on Object catch (_) {
+    launched = false;
+  }
+  if (launched) {
+    bloc.add(BookmarkDetailUrlOpened(bookmark));
+  } else if (context.mounted) {
     _toast(context, context.l10n.bookmarkCouldNotOpenUrl);
   }
 }
