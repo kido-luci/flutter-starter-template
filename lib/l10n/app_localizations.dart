@@ -1040,6 +1040,18 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notificationsSection;
 
+  /// No description provided for @notificationsSectionNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get notificationsSectionNew;
+
+  /// No description provided for @notificationsSectionEarlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get notificationsSectionEarlier;
+
   /// No description provided for @notificationsEmptyTitle.
   ///
   /// In en, this message translates to:

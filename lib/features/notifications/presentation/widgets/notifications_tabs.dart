@@ -22,10 +22,7 @@ class _NotificationsTabs extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                _NotificationsList(
-                  notifications: state.notifications,
-                  unreadCount: state.unreadCount,
-                ),
+                _NotificationsList(notifications: state.notifications),
                 _ActivitiesList(activities: state.activities),
               ],
             ),

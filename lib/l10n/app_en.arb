@@ -263,6 +263,8 @@
   "notificationsAppBarTitle": "Notifications",
   "notificationsActivitySection": "Your activity",
   "notificationsSection": "Notifications",
+  "notificationsSectionNew": "New",
+  "notificationsSectionEarlier": "Earlier",
   "notificationsEmptyTitle": "Nothing here yet",
   "notificationsEmptyMessage": "Your notifications and recent activity will appear here.",
   "notificationsNoNotifications": "No notifications yet.",

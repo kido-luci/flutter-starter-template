@@ -30,6 +30,10 @@ class _ActivityTile extends StatelessWidget {
   }
 }
 
+/// A single notification, rendered in one of two visual treatments:
+///
+/// unread notifications get a prominent, elevated card (the "New" section)
+/// while read ones get a quieter, flat bordered card (the "Earlier" section).
 class _NotificationTile extends StatelessWidget {
   const _NotificationTile({required this.notification, required this.onTap});
 
@@ -39,49 +43,195 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _notificationColor(context, notification.type);
-    return Card(
-      elevation: notification.isRead ? 0 : 1,
-      color: notification.isRead
-          ? context.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
-          : context.colorScheme.surface,
-      shape: RoundedRectangleBorder(
+    return notification.isRead
+        ? _ReadNotificationTile(notification: notification, accent: accent)
+        : _UnreadNotificationTile(
+            notification: notification,
+            accent: accent,
+            onTap: onTap,
+          );
+  }
+}
+
+class _UnreadNotificationTile extends StatelessWidget {
+  const _UnreadNotificationTile({
+    required this.notification,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final AppNotification notification;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: accent.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: context.isDark
+                ? Colors.black.withValues(alpha: 0.32)
+                : accent.withValues(alpha: 0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: ListTile(
-        onTap: notification.isRead ? null : onTap,
-        leading: CircleAvatar(
-          backgroundColor: accent.withValues(alpha: 0.15),
-          child: FaIcon(_notificationIcon(notification.type), color: accent),
-        ),
-        title: Text(
-          notification.title,
-          style: TextStyle(
-            fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: accent.withValues(alpha: 0.15),
+                  child: FaIcon(
+                    _notificationIcon(notification.type),
+                    color: accent,
+                    size: AppIconSize.md,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              notification.title,
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            formatRelativeTime(context, notification.createdAt),
+                            style: context.textTheme.labelSmall?.copyWith(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(top: AppSpacing.xs),
+                            decoration: BoxDecoration(
+                              color: scheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        notification.body,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(notification.body),
-            const SizedBox(height: AppSpacing.xxs),
-            Text(
-              formatRelativeTime(context, notification.createdAt),
-              style: context.textTheme.labelSmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+      ),
+    );
+  }
+}
+
+class _ReadNotificationTile extends StatelessWidget {
+  const _ReadNotificationTile({
+    required this.notification,
+    required this.accent,
+  });
+
+  final AppNotification notification;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    return Opacity(
+      opacity: 0.85,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.4),
+          ),
         ),
-        trailing: notification.isRead
-            ? null
-            : Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: accent,
-                  shape: BoxShape.circle,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: scheme.surfaceContainerHigh,
+                child: FaIcon(
+                  _notificationIcon(notification.type),
+                  color: scheme.onSurfaceVariant,
+                  size: AppIconSize.sm,
                 ),
               ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            notification.title,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          formatRelativeTime(context, notification.createdAt),
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: scheme.outline,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      notification.body,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

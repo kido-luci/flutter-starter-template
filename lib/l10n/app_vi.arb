@@ -173,6 +173,8 @@
   "notificationsAppBarTitle": "Thông báo",
   "notificationsActivitySection": "Hoạt động của bạn",
   "notificationsSection": "Thông báo",
+  "notificationsSectionNew": "Mới",
+  "notificationsSectionEarlier": "Trước đó",
   "notificationsEmptyTitle": "Chưa có gì ở đây",
   "notificationsEmptyMessage": "Thông báo và hoạt động gần đây của bạn sẽ hiển thị ở đây.",
   "notificationsNoNotifications": "Chưa có thông báo nào.",
