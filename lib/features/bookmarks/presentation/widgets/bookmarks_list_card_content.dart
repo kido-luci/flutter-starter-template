@@ -86,7 +86,7 @@ class _BookmarkCardMeta extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
         ],
         Text(
-          _relativeLabel(bookmark.createdAt),
+          _relativeLabel(context, bookmark.createdAt),
           style: context.textTheme.labelSmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -232,12 +232,14 @@ String _displayDomain(String url) {
 
 /// A compact, scan-friendly relative time such as `now`, `5m`, `2h`, or `3d`.
 ///
-/// Older timestamps fall back to a locale-aware short date.
-String _relativeLabel(DateTime time) {
+/// Older timestamps fall back to a locale-aware short date drawn from the
+/// active [MaterialLocalizations], which is always initialized for the app's
+/// supported locales.
+String _relativeLabel(BuildContext context, DateTime time) {
   final diff = DateTime.now().difference(time);
   if (diff.inMinutes < 1) return 'now';
   if (diff.inMinutes < 60) return '${diff.inMinutes}m';
   if (diff.inHours < 24) return '${diff.inHours}h';
   if (diff.inDays < 7) return '${diff.inDays}d';
-  return DateFormat.MMMd().format(time);
+  return MaterialLocalizations.of(context).formatShortMonthDay(time);
 }
