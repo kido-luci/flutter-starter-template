@@ -76,10 +76,13 @@ class _CopyableId extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              id,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            Expanded(
+              child: Text(
+                id,
+                maxLines: 1,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
