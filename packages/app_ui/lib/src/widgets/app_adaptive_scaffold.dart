@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -57,12 +59,20 @@ class AppAdaptiveScaffold extends StatelessWidget {
         final width = constraints.maxWidth;
         if (width < AppBreakpoints.medium) {
           return Scaffold(
-            extendBody: true,
-            body: body,
-            bottomNavigationBar: _FloatingBottomBar(
-              destinations: destinations,
-              selectedIndex: selectedIndex,
-              onDestinationSelected: onDestinationSelected,
+            body: Stack(
+              children: [
+                Positioned.fill(child: body),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: _FloatingBottomBar(
+                    destinations: destinations,
+                    selectedIndex: selectedIndex,
+                    onDestinationSelected: onDestinationSelected,
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -139,29 +149,45 @@ class _FloatingBottomBar extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 320),
             child: Material(
-              color: colorScheme.surface,
+              color: Colors.transparent,
               clipBehavior: Clip.antiAlias,
-              shape: const StadiumBorder(),
+              shape: StadiumBorder(
+                side: BorderSide(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
+              ),
               shadowColor: colorScheme.shadow.withValues(alpha: 0.16),
               elevation: 14,
-              child: SizedBox(
-                height: 72,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withValues(alpha: 0.7),
                   ),
-                  child: Row(
-                    children: [
-                      for (var index = 0; index < destinations.length; index++)
-                        Expanded(
-                          child: _BottomBarItem(
-                            destination: destinations[index],
-                            selected: index == selectedIndex,
-                            onTap: () => onDestinationSelected(index),
-                          ),
-                        ),
-                    ],
+                  child: SizedBox(
+                    height: 72,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Row(
+                        children: [
+                          for (
+                            var index = 0;
+                            index < destinations.length;
+                            index++
+                          )
+                            Expanded(
+                              child: _BottomBarItem(
+                                destination: destinations[index],
+                                selected: index == selectedIndex,
+                                onTap: () => onDestinationSelected(index),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
