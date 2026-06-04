@@ -1,6 +1,7 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/extensions/build_context_extensions.dart';
@@ -95,8 +96,12 @@ class BookmarksListMaster extends StatelessWidget {
   }
 }
 
-/// A responsive masonry grid: a single lazy column on phones and 2-3 balanced
-/// columns on wider screens.
+/// A responsive masonry grid: a single lazy column on phones and 2-3
+/// height-balanced columns on wider screens.
+///
+/// Backed by [MasonryGridView.builder] so cards are built lazily and each is
+/// placed in the currently shortest column, keeping variable-height bento
+/// cards balanced.
 class _BookmarksGrid extends StatelessWidget {
   const _BookmarksGrid({
     required this.items,
@@ -128,75 +133,23 @@ class _BookmarksGrid extends StatelessWidget {
         final columns = _columnsFor(constraints.maxWidth);
         return RefreshIndicator(
           onRefresh: onReload,
-          child: columns == 1
-              ? ListView.separated(
-                  padding: _padding,
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: AppSpacing.md),
-                  itemBuilder: (context, index) => BookmarkCard(
-                    bookmark: items[index],
-                    index: index,
-                    onTap: () => onItemTap(items[index]),
-                  ),
-                )
-              : SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: _padding,
-                  child: _MasonryColumns(
-                    columns: columns,
-                    items: items,
-                    onItemTap: onItemTap,
-                  ),
-                ),
-        );
-      },
-    );
-  }
-}
-
-/// Lays cards out across [columns] balanced columns, preserving order.
-class _MasonryColumns extends StatelessWidget {
-  const _MasonryColumns({
-    required this.columns,
-    required this.items,
-    required this.onItemTap,
-  });
-
-  final int columns;
-  final List<Bookmark> items;
-  final ValueChanged<Bookmark> onItemTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final buckets = List.generate(columns, (_) => <Widget>[]);
-    for (var i = 0; i < items.length; i++) {
-      final bookmark = items[i];
-      buckets[i % columns].add(
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: BookmarkCard(
-            bookmark: bookmark,
-            index: i,
-            onTap: () => onItemTap(bookmark),
-          ),
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var column = 0; column < columns; column++) ...[
-          if (column > 0) const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: buckets[column],
+          child: MasonryGridView.builder(
+            padding: _padding,
+            physics: const AlwaysScrollableScrollPhysics(),
+            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+            ),
+            mainAxisSpacing: AppSpacing.md,
+            crossAxisSpacing: AppSpacing.md,
+            itemCount: items.length,
+            itemBuilder: (context, index) => BookmarkCard(
+              bookmark: items[index],
+              index: index,
+              onTap: () => onItemTap(items[index]),
             ),
           ),
-        ],
-      ],
+        );
+      },
     );
   }
 }
