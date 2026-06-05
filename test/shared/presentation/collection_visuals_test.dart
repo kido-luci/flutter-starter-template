@@ -21,6 +21,9 @@ void main() {
 
     expect(gradient, hasLength(2));
     expect(gradient.first, const Color(0xFF6366F1));
-    expect(gradient.last, isNot(equals(gradient.first)));
+    expect(
+      gradient.last.computeLuminance(),
+      lessThan(gradient.first.computeLuminance()),
+    );
   });
 }
