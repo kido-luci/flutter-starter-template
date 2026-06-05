@@ -61,7 +61,7 @@ dependencies:
 
   # Declarative routing with deep-linking and auth-redirect support.
   # Pairs with go_router_builder for typed routes.
-  go_router: ^17.2.3
+  go_router: ^17.3.0
 
   # Material/Cupertino/Widgets localization delegates required by the
   # i18n pipeline (generate: true + ARB files under lib/l10n/).

@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   architecture: ^0.1.0
-  firebase_analytics: ^12.4.1
+  firebase_analytics: ^12.4.2
   injectable: ^3.0.0
 
 dev_dependencies:
