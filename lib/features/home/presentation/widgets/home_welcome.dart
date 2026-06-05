@@ -331,112 +331,51 @@ class _SuggestedBookmarkCard extends StatelessWidget {
 }
 
 class _FeaturedCollectionsSection extends StatelessWidget {
-  const _FeaturedCollectionsSection({required this.items});
+  const _FeaturedCollectionsSection({required this.collections});
 
-  final List<BookmarkSummary> items;
+  final List<CollectionSummary> collections;
 
   @override
   Widget build(BuildContext context) {
-    final collections = _collections(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionHeader(
           title: context.l10n.homeFeaturedCollections,
-          actionLabel: context.l10n.homeViewAllBookmarks,
-          onActionPressed: () => const BookmarksListRoute().push<void>(context),
+          actionLabel: collections.isEmpty
+              ? context.l10n.homeCreateCollection
+              : context.l10n.homeViewAllBookmarks,
+          onActionPressed: collections.isEmpty
+              ? () => const CollectionNewRoute().push<void>(context)
+              : () => const CollectionsListRoute().push<void>(context),
         ),
         const SizedBox(height: AppSpacing.md),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          child: Row(
-            children: [
-              for (final (index, collection) in collections.indexed) ...[
-                if (index > 0) const SizedBox(width: AppSpacing.md),
-                _CollectionCard(collection: collection),
+        if (collections.isEmpty)
+          _CollectionCreateCard(
+            onTap: () => const CollectionNewRoute().push<void>(context),
+          )
+        else
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: Row(
+              children: [
+                for (final (index, collection) in collections.indexed) ...[
+                  if (index > 0) const SizedBox(width: AppSpacing.md),
+                  _CollectionCard(collection: collection),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
       ],
     );
   }
-
-  List<_CollectionData> _collections(BuildContext context) {
-    final tagCounts = <String, int>{};
-    for (final item in items) {
-      for (final tag in item.tags) {
-        final normalized = tag.trim();
-        if (normalized.isNotEmpty) {
-          tagCounts.update(normalized, (value) => value + 1, ifAbsent: () => 1);
-        }
-      }
-    }
-
-    final tagCollections = tagCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    final fromTags = tagCollections.take(3).map((entry) {
-      return _CollectionData(
-        title: entry.key,
-        icon: FontAwesomeIcons.hashtag,
-        colors: [
-          context.colorScheme.primaryContainer,
-          context.colorScheme.primary,
-        ],
-      );
-    }).toList();
-
-    if (fromTags.length >= 3) return fromTags;
-
-    return [
-      ...fromTags,
-      _CollectionData(
-        title: context.l10n.homeFilterDesign,
-        icon: FontAwesomeIcons.palette,
-        colors: [
-          context.colorScheme.primary,
-          context.colorScheme.tertiary,
-        ],
-      ),
-      _CollectionData(
-        title: context.l10n.homeFilterArticles,
-        icon: FontAwesomeIcons.bookOpen,
-        colors: [
-          context.colorScheme.tertiaryContainer,
-          context.colorScheme.tertiary,
-        ],
-      ),
-      _CollectionData(
-        title: context.l10n.homeFilterTools,
-        icon: FontAwesomeIcons.screwdriverWrench,
-        colors: [
-          context.colorScheme.secondary,
-          context.colorScheme.inverseSurface,
-        ],
-      ),
-    ].take(3).toList();
-  }
-}
-
-class _CollectionData {
-  const _CollectionData({
-    required this.title,
-    required this.icon,
-    required this.colors,
-  });
-
-  final String title;
-  final FaIconData icon;
-  final List<Color> colors;
 }
 
 class _CollectionCard extends StatelessWidget {
   const _CollectionCard({required this.collection});
 
-  final _CollectionData collection;
+  final CollectionSummary collection;
 
   @override
   Widget build(BuildContext context) {
@@ -453,34 +392,93 @@ class _CollectionCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: collection.colors,
+            colors: collectionGradientFor(collection.color),
           ),
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: InkWell(
-          onTap: () => const BookmarksListRoute().push<void>(context),
+          onTap: () => CollectionDetailRoute(collection.id).push<void>(context),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FaIcon(
-                  collection.icon,
-                  color: context.colorScheme.onPrimary,
-                  size: AppIconSize.md,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FaIcon(
+                      collectionIconFor(collection.icon),
+                      color: Colors.white,
+                      size: AppIconSize.md,
+                    ),
+                    Text(
+                      '${collection.itemCount}',
+                      style: context.textTheme.labelLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
                 const Spacer(),
                 Text(
-                  collection.title,
+                  collection.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colorScheme.onPrimary,
+                    color: Colors.white,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CollectionCreateCard extends StatelessWidget {
+  const _CollectionCreateCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      clipBehavior: Clip.antiAlias,
+      color: context.colorScheme.surfaceContainerHighest,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              FaIcon(
+                FontAwesomeIcons.layerGroup,
+                color: context.colorScheme.onSurfaceVariant,
+                size: AppIconSize.md,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  context.l10n.collectionsEmptyMessage,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              FaIcon(
+                FontAwesomeIcons.plus,
+                color: context.colorScheme.primary,
+                size: AppIconSize.sm,
+              ),
+            ],
           ),
         ),
       ),

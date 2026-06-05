@@ -160,10 +160,71 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:6914250643421223724",
+      "lastPropertyId": "10:5607791206085802444",
+      "name": "CollectionEntity",
+      "properties": [
+        {
+          "id": "1:2023590956800309880",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2727045548820643396",
+          "name": "uuid",
+          "indexId": "4:5110644076683273229",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:7163441175278767034",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:6568231165468057271",
+          "name": "icon",
+          "type": 9
+        },
+        {
+          "id": "5:7202019221580211710",
+          "name": "color",
+          "type": 6
+        },
+        {
+          "id": "6:8485286719118650298",
+          "name": "bookmarkIds",
+          "type": 30
+        },
+        {
+          "id": "7:7311607500392150555",
+          "name": "createdAt",
+          "type": 12
+        },
+        {
+          "id": "8:7855977241027702413",
+          "name": "updatedAt",
+          "type": 12
+        },
+        {
+          "id": "9:2362733061684217003",
+          "name": "serverUpdatedAt",
+          "type": 12
+        },
+        {
+          "id": "10:5607791206085802444",
+          "name": "syncStateCode",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:1349722681213321324",
-  "lastIndexId": "3:7678540160299865532",
+  "lastEntityId": "4:6914250643421223724",
+  "lastIndexId": "4:5110644076683273229",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

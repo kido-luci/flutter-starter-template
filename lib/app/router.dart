@@ -11,6 +11,9 @@ import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/bookmarks/presentation/screens/bookmark_detail_screen.dart';
 import '../features/bookmarks/presentation/screens/bookmark_form_screen.dart';
 import '../features/bookmarks/presentation/screens/bookmarks_list_screen.dart';
+import '../features/collections/presentation/screens/collection_detail_screen.dart';
+import '../features/collections/presentation/screens/collection_form_screen.dart';
+import '../features/collections/presentation/screens/collections_list_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/notifications/presentation/screens/notifications_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
@@ -196,6 +199,60 @@ class BookmarkEditRoute extends GoRouteData with $BookmarkEditRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       BookmarkFormScreen(id: id);
+}
+
+/// Route data for the standalone collections browser.
+@TypedGoRoute<CollectionsListRoute>(path: '/collections', name: 'collections')
+class CollectionsListRoute extends GoRouteData with $CollectionsListRoute {
+  const CollectionsListRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CollectionsListScreen();
+}
+
+/// Route data for creating a collection. Declared above the `:id` route so the
+/// literal `new` segment matches first.
+@TypedGoRoute<CollectionNewRoute>(
+  path: '/collections/new',
+  name: 'collection_new',
+)
+class CollectionNewRoute extends GoRouteData with $CollectionNewRoute {
+  const CollectionNewRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const CollectionFormScreen();
+}
+
+/// Route data for the collection detail, shown full-screen (no shell).
+@TypedGoRoute<CollectionDetailRoute>(
+  path: '/collections/:id',
+  name: 'collection_detail',
+)
+class CollectionDetailRoute extends GoRouteData with $CollectionDetailRoute {
+  const CollectionDetailRoute(this.id);
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      CollectionDetailScreen(id: id);
+}
+
+/// Route data for editing a collection, shown full-screen (no shell).
+@TypedGoRoute<CollectionEditRoute>(
+  path: '/collections/:id/edit',
+  name: 'collection_edit',
+)
+class CollectionEditRoute extends GoRouteData with $CollectionEditRoute {
+  const CollectionEditRoute(this.id);
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      CollectionFormScreen(id: id);
 }
 
 /// Tracks deep-link targets and splash-screen completion so the redirect can

@@ -225,5 +225,54 @@
         "example": "2"
       }
     }
-  }
+  },
+  "collectionsTitle": "Bộ sưu tập",
+  "collectionsEmptyTitle": "Chưa có bộ sưu tập",
+  "collectionsEmptyMessage": "Nhóm các dấu trang liên quan vào bộ sưu tập.",
+  "collectionsLoadError": "Không tải được bộ sưu tập. Kéo để làm mới hoặc thử lại.",
+  "collectionsCreate": "Bộ sưu tập mới",
+  "collectionsCreateTitle": "Bộ sưu tập mới",
+  "collectionsEditTitle": "Sửa bộ sưu tập",
+  "collectionNameLabel": "Tên",
+  "collectionNameHint": "ví dụ: Cảm hứng thiết kế",
+  "collectionNameRequired": "Vui lòng nhập tên",
+  "collectionAppearanceLabel": "Biểu tượng & màu sắc",
+  "collectionSave": "Lưu",
+  "collectionDeleteAction": "Xóa bộ sưu tập",
+  "collectionDeleteDialogTitle": "Xóa bộ sưu tập?",
+  "collectionDeleteDialogMessage": "\"{name}\" sẽ bị xóa. Các dấu trang của bạn vẫn được giữ lại.",
+  "@collectionDeleteDialogMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Cảm hứng thiết kế"
+      }
+    }
+  },
+  "collectionNotFound": "Không tìm thấy bộ sưu tập.",
+  "collectionItemsCount": "{count, plural, =0{Chưa có dấu trang} =1{1 dấu trang} other{{count} dấu trang}}",
+  "@collectionItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "collectionAddBookmarks": "Thêm dấu trang",
+  "collectionRemoveBookmark": "Xóa khỏi bộ sưu tập",
+  "collectionEmptyBookmarks": "Bộ sưu tập này chưa có dấu trang nào.",
+  "collectionPickerEmpty": "Tất cả dấu trang đã có trong bộ sưu tập này.",
+  "collectionPickerAddCount": "Thêm {count}",
+  "@collectionPickerAddCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "addToCollectionTitle": "Thêm vào bộ sưu tập",
+  "addToCollectionEmpty": "Bạn chưa tạo bộ sưu tập nào.",
+  "homeCreateCollection": "Tạo bộ sưu tập"
 }

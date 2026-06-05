@@ -6,6 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../app/router.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
 import '../../../../shared/domain/bookmark_stats.dart';
+import '../../../../shared/domain/collections.dart';
+import '../../../../shared/presentation/collection_visuals.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_state.dart';
 part 'home_welcome.dart';
@@ -104,7 +106,7 @@ class _HomeBodyState extends State<HomeBody> {
                         ).animateFadeIn(delay: 320.ms),
                         const SizedBox(height: AppSpacing.xl),
                         _FeaturedCollectionsSection(
-                          items: state.recentItems,
+                          collections: state.collections,
                         ).animateFadeIn(delay: 380.ms),
                         const SizedBox(height: AppSpacing.xl),
                         _RecentBookmarksSection(

@@ -9,6 +9,7 @@ import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_st
 import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
+import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:storage/storage.dart';
@@ -23,6 +24,7 @@ void main() {
 
   late StreamController<BookmarksSyncStatus> syncStatusController;
   late MockBookmarksSyncController sync;
+  late MockCollectionsSyncController collectionsSync;
   late MockNotificationsSyncController notificationsSync;
   late MockAnalyticsService analytics;
   late AuthBloc authBloc;
@@ -58,6 +60,11 @@ void main() {
     when(() => sync.stop()).thenAnswer((_) async {});
     when(() => sync.sync()).thenAnswer((_) async {});
 
+    collectionsSync = MockCollectionsSyncController();
+    when(() => collectionsSync.start()).thenAnswer((_) async {});
+    when(() => collectionsSync.stop()).thenAnswer((_) async {});
+    when(() => collectionsSync.sync()).thenAnswer((_) async {});
+
     notificationsSync = MockNotificationsSyncController();
     when(
       () => notificationsSync.onSynced,
@@ -71,6 +78,11 @@ void main() {
       bookmarkStats.call,
     ).thenAnswer((_) async => const Ok(BookmarkStats()));
 
+    final collectionsReader = MockCollectionsReader();
+    when(
+      collectionsReader.call,
+    ).thenAnswer((_) async => const Ok<List<CollectionSummary>>([]));
+
     authBloc = AuthBloc(
       signIn: signIn,
       register: MockRegister(),
@@ -81,7 +93,7 @@ void main() {
     themeBloc = ThemeBloc(await SharedPreferences.getInstance(), analytics);
 
     getIt.registerFactory<HomeBloc>(() {
-      final bloc = HomeBloc(bookmarkStats);
+      final bloc = HomeBloc(bookmarkStats, collectionsReader);
       homeBloc = bloc;
       return bloc;
     });
@@ -113,6 +125,7 @@ void main() {
         authBloc: authBloc,
         themeBloc: themeBloc,
         bookmarksSync: sync,
+        collectionsSync: collectionsSync,
         notificationsSync: notificationsSync,
         navigatorObservers: const [],
         videoPlayerService: MockVideoPlayerService(),

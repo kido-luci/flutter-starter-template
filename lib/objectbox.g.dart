@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'features/bookmarks/data/local/bookmark_entity.dart';
+import 'features/collections/data/local/collection_entity.dart';
 import 'features/notifications/data/local/activity_entity.dart';
 import 'features/notifications/data/local/notification_entity.dart';
 
@@ -204,6 +205,77 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(4, 6914250643421223724),
+    name: 'CollectionEntity',
+    lastPropertyId: const obx_int.IdUid(10, 5607791206085802444),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2023590956800309880),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2727045548820643396),
+        name: 'uuid',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(4, 5110644076683273229),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7163441175278767034),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6568231165468057271),
+        name: 'icon',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 7202019221580211710),
+        name: 'color',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8485286719118650298),
+        name: 'bookmarkIds',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 7311607500392150555),
+        name: 'createdAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 7855977241027702413),
+        name: 'updatedAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 2362733061684217003),
+        name: 'serverUpdatedAt',
+        type: 12,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 5607791206085802444),
+        name: 'syncStateCode',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -249,8 +321,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 1349722681213321324),
-    lastIndexId: const obx_int.IdUid(3, 7678540160299865532),
+    lastEntityId: const obx_int.IdUid(4, 6914250643421223724),
+    lastIndexId: const obx_int.IdUid(4, 5110644076683273229),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -515,6 +587,111 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    CollectionEntity: obx_int.EntityDefinition<CollectionEntity>(
+      model: _entities[3],
+      toOneRelations: (CollectionEntity object) => [],
+      toManyRelations: (CollectionEntity object) => {},
+      getId: (CollectionEntity object) => object.id,
+      setId: (CollectionEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (CollectionEntity object, fb.Builder fbb) {
+        final uuidOffset = fbb.writeString(object.uuid);
+        final nameOffset = fbb.writeString(object.name);
+        final iconOffset = fbb.writeString(object.icon);
+        final bookmarkIdsOffset = fbb.writeList(
+          object.bookmarkIds.map(fbb.writeString).toList(growable: false),
+        );
+        fbb.startTable(11);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, uuidOffset);
+        fbb.addOffset(2, nameOffset);
+        fbb.addOffset(3, iconOffset);
+        fbb.addInt64(4, object.color);
+        fbb.addOffset(5, bookmarkIdsOffset);
+        fbb.addInt64(6, object.createdAt.microsecondsSinceEpoch * 1000);
+        fbb.addInt64(7, object.updatedAt.microsecondsSinceEpoch * 1000);
+        fbb.addInt64(
+          8,
+          object.serverUpdatedAt == null
+              ? null
+              : object.serverUpdatedAt!.microsecondsSinceEpoch * 1000,
+        );
+        fbb.addInt64(9, object.syncStateCode);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final serverUpdatedAtValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final iconParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final colorParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final bookmarkIdsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGet(buffer, rootOffset, 14, []);
+        final createdAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0) / 1000)
+              .round(),
+          isUtc: true,
+        );
+        final updatedAtParam = DateTime.fromMicrosecondsSinceEpoch(
+          (const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0) / 1000)
+              .round(),
+          isUtc: true,
+        );
+        final serverUpdatedAtParam = serverUpdatedAtValue == null
+            ? null
+            : DateTime.fromMicrosecondsSinceEpoch(
+                (serverUpdatedAtValue / 1000).round(),
+                isUtc: true,
+              );
+        final syncStateCodeParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          22,
+          0,
+        );
+        final object = CollectionEntity(
+          id: idParam,
+          uuid: uuidParam,
+          name: nameParam,
+          icon: iconParam,
+          color: colorParam,
+          bookmarkIds: bookmarkIdsParam,
+          createdAt: createdAtParam,
+          updatedAt: updatedAtParam,
+          serverUpdatedAt: serverUpdatedAtParam,
+          syncStateCode: syncStateCodeParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -651,5 +828,58 @@ class NotificationEntity_ {
   /// See [NotificationEntity.pendingRead].
   static final pendingRead = obx.QueryBooleanProperty<NotificationEntity>(
     _entities[2].properties[7],
+  );
+}
+
+/// [CollectionEntity] entity fields to define ObjectBox queries.
+class CollectionEntity_ {
+  /// See [CollectionEntity.id].
+  static final id = obx.QueryIntegerProperty<CollectionEntity>(
+    _entities[3].properties[0],
+  );
+
+  /// See [CollectionEntity.uuid].
+  static final uuid = obx.QueryStringProperty<CollectionEntity>(
+    _entities[3].properties[1],
+  );
+
+  /// See [CollectionEntity.name].
+  static final name = obx.QueryStringProperty<CollectionEntity>(
+    _entities[3].properties[2],
+  );
+
+  /// See [CollectionEntity.icon].
+  static final icon = obx.QueryStringProperty<CollectionEntity>(
+    _entities[3].properties[3],
+  );
+
+  /// See [CollectionEntity.color].
+  static final color = obx.QueryIntegerProperty<CollectionEntity>(
+    _entities[3].properties[4],
+  );
+
+  /// See [CollectionEntity.bookmarkIds].
+  static final bookmarkIds = obx.QueryStringVectorProperty<CollectionEntity>(
+    _entities[3].properties[5],
+  );
+
+  /// See [CollectionEntity.createdAt].
+  static final createdAt = obx.QueryDateNanoProperty<CollectionEntity>(
+    _entities[3].properties[6],
+  );
+
+  /// See [CollectionEntity.updatedAt].
+  static final updatedAt = obx.QueryDateNanoProperty<CollectionEntity>(
+    _entities[3].properties[7],
+  );
+
+  /// See [CollectionEntity.serverUpdatedAt].
+  static final serverUpdatedAt = obx.QueryDateNanoProperty<CollectionEntity>(
+    _entities[3].properties[8],
+  );
+
+  /// See [CollectionEntity.syncStateCode].
+  static final syncStateCode = obx.QueryIntegerProperty<CollectionEntity>(
+    _entities[3].properties[9],
   );
 }

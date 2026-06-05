@@ -1,13 +1,14 @@
 import 'package:architecture/architecture.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
+import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../../../../test_utils.dart';
 
 void main() {
   group('HomeBloc', () {
     test('initial state is default', () async {
-      final bloc = HomeBloc(MockBookmarkStatsReader());
+      final bloc = HomeBloc(MockBookmarkStatsReader(), _emptyCollections());
 
       expect(bloc.state.totalBookmarks, 0);
       expect(bloc.state.recentBookmarks, 0);
@@ -33,7 +34,7 @@ void main() {
           ),
         ],
       );
-      final bloc = HomeBloc(_reader(const Ok(stats)));
+      final bloc = HomeBloc(_reader(const Ok(stats)), _emptyCollections());
 
       bloc.add(const HomeLoadRequested());
       await bloc.stream.firstWhere((state) => !state.isLoading);
@@ -47,7 +48,10 @@ void main() {
     });
 
     test('handles empty stats', () async {
-      final bloc = HomeBloc(_reader(const Ok(BookmarkStats())));
+      final bloc = HomeBloc(
+        _reader(const Ok(BookmarkStats())),
+        _emptyCollections(),
+      );
       bloc.add(const HomeLoadRequested());
       await bloc.stream.firstWhere((state) => !state.isLoading);
 
@@ -59,7 +63,7 @@ void main() {
 
     test('stores failure when stats load fails', () async {
       const failure = UnknownFailure('Failed');
-      final bloc = HomeBloc(_reader(const Err(failure)));
+      final bloc = HomeBloc(_reader(const Err(failure)), _emptyCollections());
 
       bloc.add(const HomeLoadRequested());
       await bloc.stream.firstWhere((state) => !state.isLoading);
@@ -75,5 +79,13 @@ void main() {
 MockBookmarkStatsReader _reader(Result<BookmarkStats> result) {
   final reader = MockBookmarkStatsReader();
   when(reader.call).thenAnswer((_) async => result);
+  return reader;
+}
+
+MockCollectionsReader _emptyCollections() {
+  final reader = MockCollectionsReader();
+  when(reader.call).thenAnswer(
+    (_) async => const Ok<List<CollectionSummary>>([]),
+  );
   return reader;
 }

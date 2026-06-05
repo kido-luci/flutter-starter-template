@@ -14,11 +14,13 @@ import 'package:flutter_starter_template/features/bookmarks/domain/usecases/get_
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_local_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/update_bookmark.dart';
+import 'package:flutter_starter_template/features/collections/domain/services/collections_sync_controller.dart';
 import 'package:flutter_starter_template/features/notifications/domain/services/notifications_sync_controller.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
+import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_starter_template/shared/domain/entities/auth_user.dart';
 import 'package:flutter_starter_template/shared/domain/session.dart';
 import 'package:test_utils/test_utils.dart';
@@ -44,6 +46,11 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 class MockListBookmarks extends Mock implements ListBookmarks {}
 
 class MockBookmarkStatsReader extends Mock implements BookmarkStatsReader {}
+
+class MockCollectionsReader extends Mock implements CollectionsReader {}
+
+class MockCollectionsSyncController extends Mock
+    implements CollectionsSyncController {}
 
 class MockListLocalBookmarks extends Mock implements ListLocalBookmarks {}
 

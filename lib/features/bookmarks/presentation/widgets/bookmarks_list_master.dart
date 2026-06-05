@@ -5,6 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/extensions/build_context_extensions.dart';
+import '../../../collections/presentation/widgets/collections_list_view.dart';
 import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import '../bloc/bookmarks_list/bookmarks_list_state.dart';
@@ -13,8 +14,9 @@ import 'bookmarks_list_card.dart';
 
 /// The bookmark browsing tabs shown above the grid.
 ///
-/// [collections] has no backing data model yet and renders a "coming soon"
-/// placeholder; [recent] filters to bookmarks created within the last week.
+/// [collections] embeds the collections feature's self-contained list view (a
+/// single-consumer capability); [recent] filters to bookmarks created within
+/// the last week.
 enum BookmarkTab { all, recent, collections }
 
 /// How recent a bookmark must be to appear under [BookmarkTab.recent].
@@ -53,6 +55,12 @@ class BookmarksListMaster extends StatelessWidget {
         Expanded(
           child: BlocBuilder<BookmarksListBloc, BookmarksListState>(
             builder: (context, state) {
+              // The collections tab owns its own data/state, so it short-
+              // circuits before the bookmark loading/error guards below.
+              if (activeTab == BookmarkTab.collections) {
+                return const CollectionsListView();
+              }
+
               if (state.isLoading && state.items.isEmpty) {
                 return const AppSkeletonList(hasLeading: false);
               }
@@ -63,10 +71,6 @@ class BookmarksListMaster extends StatelessWidget {
                     const BookmarksListLoadRequested(),
                   ),
                 );
-              }
-
-              if (activeTab == BookmarkTab.collections) {
-                return _CollectionsComingSoon();
               }
 
               final visible = _itemsForTab(state.visibleItems, activeTab);
@@ -273,17 +277,6 @@ class _BookmarksSearchField extends StatelessWidget {
         ),
       ),
     ).animateSlideDown(duration: 300.ms);
-  }
-}
-
-class _CollectionsComingSoon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return AppEmptyView(
-      icon: FontAwesomeIcons.layerGroup,
-      title: context.l10n.bookmarksCollectionsComingSoonTitle,
-      message: context.l10n.bookmarksCollectionsComingSoonMessage,
-    );
   }
 }
 

@@ -583,4 +583,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String timeDaysAgo(int days) {
     return '${days}d ago';
   }
+
+  @override
+  String get collectionsTitle => 'Collections';
+
+  @override
+  String get collectionsEmptyTitle => 'No collections yet';
+
+  @override
+  String get collectionsEmptyMessage =>
+      'Group related bookmarks into collections.';
+
+  @override
+  String get collectionsLoadError =>
+      'Couldn\'t load your collections. Pull to refresh or try again.';
+
+  @override
+  String get collectionsCreate => 'New collection';
+
+  @override
+  String get collectionsCreateTitle => 'New collection';
+
+  @override
+  String get collectionsEditTitle => 'Edit collection';
+
+  @override
+  String get collectionNameLabel => 'Name';
+
+  @override
+  String get collectionNameHint => 'e.g. Design inspiration';
+
+  @override
+  String get collectionNameRequired => 'Name is required';
+
+  @override
+  String get collectionAppearanceLabel => 'Icon & color';
+
+  @override
+  String get collectionSave => 'Save';
+
+  @override
+  String get collectionDeleteAction => 'Delete collection';
+
+  @override
+  String get collectionDeleteDialogTitle => 'Delete collection?';
+
+  @override
+  String collectionDeleteDialogMessage(String name) {
+    return '\"$name\" will be removed. Your bookmarks stay.';
+  }
+
+  @override
+  String get collectionNotFound => 'Collection not found.';
+
+  @override
+  String collectionItemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bookmarks',
+      one: '1 bookmark',
+      zero: 'No bookmarks',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get collectionAddBookmarks => 'Add bookmarks';
+
+  @override
+  String get collectionRemoveBookmark => 'Remove from collection';
+
+  @override
+  String get collectionEmptyBookmarks => 'No bookmarks in this collection yet.';
+
+  @override
+  String get collectionPickerEmpty =>
+      'All your bookmarks are already in this collection.';
+
+  @override
+  String collectionPickerAddCount(int count) {
+    return 'Add $count';
+  }
+
+  @override
+  String get addToCollectionTitle => 'Add to collection';
+
+  @override
+  String get addToCollectionEmpty =>
+      'You haven\'t created any collections yet.';
+
+  @override
+  String get homeCreateCollection => 'Create collection';
 }

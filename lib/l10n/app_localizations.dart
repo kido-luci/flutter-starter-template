@@ -1165,6 +1165,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{days}d ago'**
   String timeDaysAgo(int days);
+
+  /// No description provided for @collectionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get collectionsTitle;
+
+  /// No description provided for @collectionsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No collections yet'**
+  String get collectionsEmptyTitle;
+
+  /// No description provided for @collectionsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Group related bookmarks into collections.'**
+  String get collectionsEmptyMessage;
+
+  /// No description provided for @collectionsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your collections. Pull to refresh or try again.'**
+  String get collectionsLoadError;
+
+  /// No description provided for @collectionsCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'New collection'**
+  String get collectionsCreate;
+
+  /// No description provided for @collectionsCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New collection'**
+  String get collectionsCreateTitle;
+
+  /// No description provided for @collectionsEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit collection'**
+  String get collectionsEditTitle;
+
+  /// No description provided for @collectionNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get collectionNameLabel;
+
+  /// No description provided for @collectionNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Design inspiration'**
+  String get collectionNameHint;
+
+  /// No description provided for @collectionNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get collectionNameRequired;
+
+  /// No description provided for @collectionAppearanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon & color'**
+  String get collectionAppearanceLabel;
+
+  /// No description provided for @collectionSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get collectionSave;
+
+  /// No description provided for @collectionDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete collection'**
+  String get collectionDeleteAction;
+
+  /// No description provided for @collectionDeleteDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete collection?'**
+  String get collectionDeleteDialogTitle;
+
+  /// No description provided for @collectionDeleteDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" will be removed. Your bookmarks stay.'**
+  String collectionDeleteDialogMessage(String name);
+
+  /// No description provided for @collectionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection not found.'**
+  String get collectionNotFound;
+
+  /// No description provided for @collectionItemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No bookmarks} =1{1 bookmark} other{{count} bookmarks}}'**
+  String collectionItemsCount(int count);
+
+  /// No description provided for @collectionAddBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Add bookmarks'**
+  String get collectionAddBookmarks;
+
+  /// No description provided for @collectionRemoveBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from collection'**
+  String get collectionRemoveBookmark;
+
+  /// No description provided for @collectionEmptyBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks in this collection yet.'**
+  String get collectionEmptyBookmarks;
+
+  /// No description provided for @collectionPickerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'All your bookmarks are already in this collection.'**
+  String get collectionPickerEmpty;
+
+  /// No description provided for @collectionPickerAddCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {count}'**
+  String collectionPickerAddCount(int count);
+
+  /// No description provided for @addToCollectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to collection'**
+  String get addToCollectionTitle;
+
+  /// No description provided for @addToCollectionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t created any collections yet.'**
+  String get addToCollectionEmpty;
+
+  /// No description provided for @homeCreateCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Create collection'**
+  String get homeCreateCollection;
 }
 
 class _AppLocalizationsDelegate

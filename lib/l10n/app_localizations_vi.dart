@@ -584,4 +584,96 @@ class AppLocalizationsVi extends AppLocalizations {
   String timeDaysAgo(int days) {
     return '$days ngày trước';
   }
+
+  @override
+  String get collectionsTitle => 'Bộ sưu tập';
+
+  @override
+  String get collectionsEmptyTitle => 'Chưa có bộ sưu tập';
+
+  @override
+  String get collectionsEmptyMessage =>
+      'Nhóm các dấu trang liên quan vào bộ sưu tập.';
+
+  @override
+  String get collectionsLoadError =>
+      'Không tải được bộ sưu tập. Kéo để làm mới hoặc thử lại.';
+
+  @override
+  String get collectionsCreate => 'Bộ sưu tập mới';
+
+  @override
+  String get collectionsCreateTitle => 'Bộ sưu tập mới';
+
+  @override
+  String get collectionsEditTitle => 'Sửa bộ sưu tập';
+
+  @override
+  String get collectionNameLabel => 'Tên';
+
+  @override
+  String get collectionNameHint => 'ví dụ: Cảm hứng thiết kế';
+
+  @override
+  String get collectionNameRequired => 'Vui lòng nhập tên';
+
+  @override
+  String get collectionAppearanceLabel => 'Biểu tượng & màu sắc';
+
+  @override
+  String get collectionSave => 'Lưu';
+
+  @override
+  String get collectionDeleteAction => 'Xóa bộ sưu tập';
+
+  @override
+  String get collectionDeleteDialogTitle => 'Xóa bộ sưu tập?';
+
+  @override
+  String collectionDeleteDialogMessage(String name) {
+    return '\"$name\" sẽ bị xóa. Các dấu trang của bạn vẫn được giữ lại.';
+  }
+
+  @override
+  String get collectionNotFound => 'Không tìm thấy bộ sưu tập.';
+
+  @override
+  String collectionItemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dấu trang',
+      one: '1 dấu trang',
+      zero: 'Chưa có dấu trang',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get collectionAddBookmarks => 'Thêm dấu trang';
+
+  @override
+  String get collectionRemoveBookmark => 'Xóa khỏi bộ sưu tập';
+
+  @override
+  String get collectionEmptyBookmarks =>
+      'Bộ sưu tập này chưa có dấu trang nào.';
+
+  @override
+  String get collectionPickerEmpty =>
+      'Tất cả dấu trang đã có trong bộ sưu tập này.';
+
+  @override
+  String collectionPickerAddCount(int count) {
+    return 'Thêm $count';
+  }
+
+  @override
+  String get addToCollectionTitle => 'Thêm vào bộ sưu tập';
+
+  @override
+  String get addToCollectionEmpty => 'Bạn chưa tạo bộ sưu tập nào.';
+
+  @override
+  String get homeCreateCollection => 'Tạo bộ sưu tập';
 }

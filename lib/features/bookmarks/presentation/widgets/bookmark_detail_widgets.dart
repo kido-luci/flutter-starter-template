@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/di/injection.dart';
 import '../../../../app/router.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
+import '../../../collections/presentation/widgets/add_to_collection_sheet.dart';
 import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmark_detail/bookmark_detail_bloc.dart';
 import '../bloc/bookmark_detail/bookmark_detail_state.dart';
@@ -100,6 +101,11 @@ class BookmarkDetailView extends StatelessWidget {
                       context.read<BookmarkDetailBloc>().add(
                         BookmarkDetailShareRequested(state.bookmark),
                       );
+                    case _DetailAction.addToCollection:
+                      AddToCollectionSheet.show(
+                        context,
+                        bookmarkId: state.bookmark.id,
+                      );
                     case _DetailAction.edit:
                       _openEditor(context);
                     case _DetailAction.delete:
@@ -112,6 +118,13 @@ class BookmarkDetailView extends StatelessWidget {
                     child: _MenuItem(
                       icon: FontAwesomeIcons.shareNodes,
                       label: l10n.commonShare,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _DetailAction.addToCollection,
+                    child: _MenuItem(
+                      icon: FontAwesomeIcons.layerGroup,
+                      label: l10n.addToCollectionTitle,
                     ),
                   ),
                   PopupMenuItem(
@@ -578,7 +591,7 @@ class _DetailCard extends StatelessWidget {
 }
 
 /// Overflow-menu actions on the detail app bar.
-enum _DetailAction { share, edit, delete }
+enum _DetailAction { share, addToCollection, edit, delete }
 
 /// A single row in the app-bar overflow menu: leading icon + label.
 class _MenuItem extends StatelessWidget {

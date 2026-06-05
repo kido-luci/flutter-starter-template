@@ -315,5 +315,54 @@
         "example": "2"
       }
     }
-  }
+  },
+  "collectionsTitle": "Collections",
+  "collectionsEmptyTitle": "No collections yet",
+  "collectionsEmptyMessage": "Group related bookmarks into collections.",
+  "collectionsLoadError": "Couldn't load your collections. Pull to refresh or try again.",
+  "collectionsCreate": "New collection",
+  "collectionsCreateTitle": "New collection",
+  "collectionsEditTitle": "Edit collection",
+  "collectionNameLabel": "Name",
+  "collectionNameHint": "e.g. Design inspiration",
+  "collectionNameRequired": "Name is required",
+  "collectionAppearanceLabel": "Icon & color",
+  "collectionSave": "Save",
+  "collectionDeleteAction": "Delete collection",
+  "collectionDeleteDialogTitle": "Delete collection?",
+  "collectionDeleteDialogMessage": "\"{name}\" will be removed. Your bookmarks stay.",
+  "@collectionDeleteDialogMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Design inspiration"
+      }
+    }
+  },
+  "collectionNotFound": "Collection not found.",
+  "collectionItemsCount": "{count, plural, =0{No bookmarks} =1{1 bookmark} other{{count} bookmarks}}",
+  "@collectionItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "collectionAddBookmarks": "Add bookmarks",
+  "collectionRemoveBookmark": "Remove from collection",
+  "collectionEmptyBookmarks": "No bookmarks in this collection yet.",
+  "collectionPickerEmpty": "All your bookmarks are already in this collection.",
+  "collectionPickerAddCount": "Add {count}",
+  "@collectionPickerAddCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "addToCollectionTitle": "Add to collection",
+  "addToCollectionEmpty": "You haven't created any collections yet.",
+  "homeCreateCollection": "Create collection"
 }

@@ -1,14 +1,22 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_starter_template/app/di/injection.dart';
 import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_state.dart';
 import 'package:flutter_starter_template/features/bookmarks/presentation/widgets/bookmarks_list_widgets.dart';
+import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_bloc.dart';
+import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_state.dart';
 import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../test_utils.dart';
 
 class MockBookmarksListBloc extends Mock implements BookmarksListBloc {}
+
+class MockCollectionsListBloc
+    extends MockBloc<CollectionsListEvent, CollectionsListState>
+    implements CollectionsListBloc {}
 
 void main() {
   late MockBookmarksListBloc listBloc;
@@ -18,7 +26,15 @@ void main() {
     final state = BookmarksListState(items: [testBookmark, testBookmark2]);
     when(() => listBloc.state).thenReturn(state);
     when(() => listBloc.stream).thenAnswer((_) => Stream.value(state));
+
+    // The Collections tab embeds the collections feature's list view, which
+    // resolves its bloc from getIt. Register an empty one.
+    final collectionsBloc = MockCollectionsListBloc();
+    when(() => collectionsBloc.state).thenReturn(const CollectionsListState());
+    getIt.registerFactory<CollectionsListBloc>(() => collectionsBloc);
   });
+
+  tearDown(getIt.reset);
 
   Future<void> pumpList(WidgetTester tester, double width) async {
     tester.view.physicalSize = Size(width, 900);
@@ -66,15 +82,15 @@ void main() {
       expect(find.text('Collections'), findsOneWidget);
     });
 
-    testWidgets('Collections tab shows the coming-soon placeholder', (
-      tester,
-    ) async {
+    testWidgets('Collections tab shows the collections list', (tester) async {
       await pumpList(tester, 500);
 
       await tester.tap(find.text('Collections'));
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('Collections coming soon'), findsOneWidget);
+      // With no collections, the embedded collections view shows its empty
+      // state instead of the bookmarks grid.
+      expect(find.text('No collections yet'), findsOneWidget);
       expect(find.text('Flutter'), findsNothing);
     });
 
