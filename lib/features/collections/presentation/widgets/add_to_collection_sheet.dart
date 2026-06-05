@@ -68,6 +68,30 @@ class _AddToCollectionBody extends StatelessWidget {
                   padding: EdgeInsets.all(AppSpacing.xxl),
                   child: AppLoading(),
                 )
+              else if (state.failure != null && state.collections.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xxl),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        context.l10n.collectionsLoadError,
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppButton(
+                        label: context.l10n.commonRetry,
+                        variant: AppButtonVariant.tonal,
+                        onPressed: () => context
+                            .read<AddToCollectionCubit>()
+                            .load(bookmarkId),
+                      ),
+                    ],
+                  ),
+                )
               else if (state.collections.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.xxl),

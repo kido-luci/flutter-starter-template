@@ -141,26 +141,31 @@ class _PalettePicker extends StatelessWidget {
       runSpacing: AppSpacing.md,
       children: [
         for (final (index, option) in collectionPalette.indexed)
-          GestureDetector(
-            onTap: () => onSelected(index),
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: collectionGradientFor(option.color.toARGB32()),
+          Semantics(
+            button: true,
+            selected: index == selectedIndex,
+            label: '${context.l10n.collectionAppearanceLabel} ${index + 1}',
+            child: GestureDetector(
+              onTap: () => onSelected(index),
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: collectionGradientFor(option.color.toARGB32()),
+                  ),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  border: index == selectedIndex
+                      ? Border.all(
+                          color: context.colorScheme.onSurface,
+                          width: 3,
+                        )
+                      : null,
                 ),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
-                border: index == selectedIndex
-                    ? Border.all(
-                        color: context.colorScheme.onSurface,
-                        width: 3,
-                      )
-                    : null,
+                child: FaIcon(option.icon, color: Colors.white, size: 22),
               ),
-              child: FaIcon(option.icon, color: Colors.white, size: 22),
             ),
           ),
       ],

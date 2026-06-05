@@ -44,9 +44,10 @@ class AddToCollectionCubit extends Cubit<AddToCollectionState> {
   /// Adds or removes [bookmarkId] from the collection with [collectionId].
   Future<void> toggle(String collectionId, String bookmarkId) async {
     if (state.busyIds.contains(collectionId)) return;
-    final collection = state.collections.firstWhere(
-      (c) => c.id == collectionId,
-    );
+    final index = state.collections.indexWhere((c) => c.id == collectionId);
+    // The collection may have disappeared between render and tap.
+    if (index == -1) return;
+    final collection = state.collections[index];
     final isMember = state.memberOf.contains(collectionId);
     final nextIds = isMember
         ? collection.bookmarkIds.where((id) => id != bookmarkId).toList()

@@ -162,6 +162,7 @@ void main() {
 
     // Both sync controllers started for the now-authenticated session.
     verify(() => sync.start()).called(greaterThanOrEqualTo(1));
+    verify(() => collectionsSync.start()).called(greaterThanOrEqualTo(1));
     verify(() => notificationsSync.start()).called(greaterThanOrEqualTo(1));
   });
 }

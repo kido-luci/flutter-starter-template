@@ -61,7 +61,7 @@ class CollectionDetailCubit extends Cubit<CollectionDetailState> {
   /// Deletes the whole collection.
   Future<void> delete() async {
     final current = state.collection;
-    if (current == null) return;
+    if (current == null || state.isUpdating) return;
     emit(state.copyWith(isUpdating: true, failure: null));
     final result = await _delete(current.id);
     switch (result) {
@@ -81,6 +81,7 @@ class CollectionDetailCubit extends Cubit<CollectionDetailState> {
   }
 
   Future<void> _persist(Collection current, List<String> bookmarkIds) async {
+    if (state.isUpdating) return;
     emit(state.copyWith(isUpdating: true, failure: null));
     final result = await _update(
       UpdateCollectionParams(
