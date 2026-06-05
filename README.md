@@ -50,7 +50,7 @@ To enable seamless local development and testing, this template is paired with a
 | 🔔 **Notifications**      | On‑device scheduling + tap‑to‑navigate |
 | 💉 **DI**                 | `get_it` + `injectable` code‑gen — zero manual wiring |
 | 📡 **REST**               | `Retrofit` + `Dio` typed clients with auth interceptor |
-| ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark CRUD |
+| ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark & collection CRUD, uploads |
 | 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude, Cursor, Codex, Command Code, and Antigravity |
 | 🚀 **Release CI**         | Fastlane lanes — iOS → TestFlight, Android → Play — flavor‑aware, wired to GitHub Actions |
 
@@ -82,6 +82,7 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── features/
 │   │   ├── auth/                     # Sign-in, sign-out, session restore
 │   │   ├── bookmarks/                # CRUD, offline sync, list/detail/form
+│   │   ├── collections/              # Group bookmarks into folders, offline sync
 │   │   ├── home/                     # Home dashboard
 │   │   ├── notifications/            # Notification and activity feed
 │   │   ├── profile/                  # User info + account actions
@@ -205,18 +206,28 @@ cd simple_backend_server
 go run .                    # → http://localhost:8080
 ```
 
-| Method   | Endpoint                   | Description               |
-|----------|----------------------------|---------------------------|
-| `GET`    | `/health`                  | Health check              |
-| `POST`   | `/api/auth/sign-in`        | Sign in                   |
-| `POST`   | `/api/auth/refresh`        | Refresh access token      |
-| `POST`   | `/api/auth/sign-out`       | Revoke refresh token      |
-| `GET`    | `/api/auth/me`             | Current user              |
-| `GET`    | `/api/bookmarks`           | List bookmarks            |
-| `POST`   | `/api/bookmarks`           | Create bookmark           |
-| `GET`    | `/api/bookmarks/:id`       | Get bookmark              |
-| `PUT`    | `/api/bookmarks/:id`       | Update bookmark           |
-| `DELETE` | `/api/bookmarks/:id`       | Delete bookmark           |
+| Method   | Endpoint                      | Description               |
+|----------|-------------------------------|---------------------------|
+| `GET`    | `/health`                     | Health check              |
+| `POST`   | `/api/auth/register`          | Register a new account    |
+| `POST`   | `/api/auth/sign-in`           | Sign in                   |
+| `POST`   | `/api/auth/refresh`           | Refresh access token      |
+| `POST`   | `/api/auth/sign-out`          | Revoke refresh token      |
+| `GET`    | `/api/auth/me`                | Current user              |
+| `POST`   | `/api/auth/change-password`   | Change password           |
+| `POST`   | `/api/upload`                 | Upload an attachment      |
+| `GET`    | `/api/bookmarks`              | List bookmarks            |
+| `POST`   | `/api/bookmarks`              | Create bookmark           |
+| `GET`    | `/api/bookmarks/:id`          | Get bookmark              |
+| `PUT`    | `/api/bookmarks/:id`          | Update bookmark           |
+| `DELETE` | `/api/bookmarks/:id`          | Delete bookmark           |
+| `GET`    | `/api/collections`            | List collections          |
+| `POST`   | `/api/collections`            | Create collection         |
+| `GET`    | `/api/collections/:id`        | Get collection            |
+| `PUT`    | `/api/collections/:id`        | Update collection         |
+| `DELETE` | `/api/collections/:id`        | Delete collection         |
+| `GET`    | `/api/notifications`          | List notifications        |
+| `GET`    | `/api/activity`               | List activity feed        |
 
 > 💡 **Tip** — Any username + password works during development.
 
