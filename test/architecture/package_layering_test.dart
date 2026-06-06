@@ -30,7 +30,7 @@ import 'package:flutter_test/flutter_test.dart';
 const _layers = <String, int>{
   // 0 — pure-Dart foundation; depends on nothing in the workspace.
   'architecture': 0,
-
+  'sync': 0, // offline-first sync engine; pure Dart, no workspace deps
   // 1 — primitives: no workspace deps, or only on architecture.
   'config': 1, // firebase_remote_config wrapper
   'storage': 1, // shared_preferences / secure storage

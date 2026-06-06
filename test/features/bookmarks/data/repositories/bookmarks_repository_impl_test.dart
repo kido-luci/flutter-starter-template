@@ -5,6 +5,7 @@ import 'package:flutter_starter_template/features/bookmarks/data/repositories/bo
 import 'package:flutter_starter_template/features/bookmarks/domain/entities/bookmark.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sync/sync.dart';
 import 'package:test_utils/test_utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -254,12 +255,12 @@ void main() {
         syncStateCode: SyncState.pendingCreate.code,
       );
       when(() => mockLocal.getByUuid('b-1')).thenAnswer((_) async => entity);
-      when(() => mockLocal.hardDelete(42)).thenAnswer((_) async {});
+      when(() => mockLocal.hardDelete(any())).thenAnswer((_) async {});
 
       final result = await repository.delete('b-1');
 
       expect(result, isA<Ok<void>>());
-      verify(() => mockLocal.hardDelete(42)).called(1);
+      verify(() => mockLocal.hardDelete(entity)).called(1);
       verifyNever(() => mockSync.sync());
     });
 

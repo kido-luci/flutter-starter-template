@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:8542772984841996240",
-      "lastPropertyId": "12:2425304307927444286",
+      "lastPropertyId": "13:1030815829066033616",
       "name": "BookmarkEntity",
       "properties": [
         {
@@ -70,6 +70,11 @@
           "id": "12:2425304307927444286",
           "name": "videoUrl",
           "type": 9
+        },
+        {
+          "id": "13:1030815829066033616",
+          "name": "rev",
+          "type": 6
         }
       ],
       "relations": []
@@ -221,10 +226,36 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "5:7251944359262926434",
+      "lastPropertyId": "3:7189263519970957346",
+      "name": "SyncCursorEntity",
+      "properties": [
+        {
+          "id": "1:4099947973977249183",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8892158510897589292",
+          "name": "resource",
+          "indexId": "5:3983229944700575413",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:7189263519970957346",
+          "name": "rev",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "4:6914250643421223724",
-  "lastIndexId": "4:5110644076683273229",
+  "lastEntityId": "5:7251944359262926434",
+  "lastIndexId": "5:3983229944700575413",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

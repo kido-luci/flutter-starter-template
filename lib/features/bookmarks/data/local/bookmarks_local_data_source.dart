@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart' hide Order;
+import 'package:sync/sync.dart';
 
 import '../../../../objectbox.g.dart' hide SyncState;
 import 'bookmark_entity.dart';
@@ -8,27 +9,18 @@ import 'bookmark_entity.dart';
 /// async-friendly.
 ///
 /// Identity at this layer is the string [BookmarkEntity.uuid]. The integer
-/// `id` is an internal ObjectBox PK that callers never see.
-abstract interface class BookmarksLocalDataSource {
+/// `id` is an internal ObjectBox PK that callers never see. Implements
+/// [SyncLocalStore] so the generic sync engine can drive it.
+abstract interface class BookmarksLocalDataSource
+    implements SyncLocalStore<BookmarkEntity> {
   /// All non-tombstoned bookmarks, newest-first.
   Future<List<BookmarkEntity>> listVisible();
 
-  /// Includes tombstoned (pendingDelete) rows. Used by the sync service.
+  /// Includes tombstoned (pendingDelete) rows.
   Future<List<BookmarkEntity>> listAll();
-
-  Future<BookmarkEntity?> getByUuid(String uuid);
-
-  /// Rows with any non-synced state, ordered by [BookmarkEntity.updatedAt].
-  Future<List<BookmarkEntity>> listPending();
 
   /// Inserts a new row in [SyncState.pendingCreate].
   Future<BookmarkEntity> putNew(BookmarkEntity entity);
-
-  /// Persists changes to an existing row. Caller owns sync state changes.
-  Future<void> put(BookmarkEntity entity);
-
-  /// Hard-removes by internal PK. Used after a successful pendingDelete push.
-  Future<void> hardDelete(int pk);
 }
 
 @LazySingleton(as: BookmarksLocalDataSource)
@@ -78,8 +70,16 @@ class ObjectBoxBookmarksDataSource implements BookmarksLocalDataSource {
 
   @override
   Future<List<BookmarkEntity>> listPending() async {
+    // Only the active push-queue states — conflicted/failed rows await user
+    // action and must not be re-pushed.
     final query = _box
-        .query(BookmarkEntity_.syncStateCode.notEquals(SyncState.synced.code))
+        .query(
+          BookmarkEntity_.syncStateCode.oneOf([
+            SyncState.pendingCreate.code,
+            SyncState.pendingUpdate.code,
+            SyncState.pendingDelete.code,
+          ]),
+        )
         .order(BookmarkEntity_.updatedAt)
         .build();
     try {
@@ -101,7 +101,7 @@ class ObjectBoxBookmarksDataSource implements BookmarksLocalDataSource {
   }
 
   @override
-  Future<void> hardDelete(int pk) async {
-    _box.remove(pk);
+  Future<void> hardDelete(BookmarkEntity entity) async {
+    _box.remove(entity.id);
   }
 }

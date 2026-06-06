@@ -10,6 +10,8 @@ class Bookmark {
     this.imageUrls = const [],
     this.videoUrl,
     this.isPendingSync = false,
+    this.isConflicted = false,
+    this.isFailed = false,
   });
 
   final String id;
@@ -25,6 +27,14 @@ class Bookmark {
   /// `true` when this bookmark has local changes that haven't been pushed
   /// to the server yet. UI surfaces a badge for these.
   final bool isPendingSync;
+
+  /// `true` when the server changed this bookmark underneath an unsynced local
+  /// edit. Needs user resolution before it can sync again.
+  final bool isConflicted;
+
+  /// `true` when the server rejected the last push for a non-retryable reason
+  /// (e.g. validation). Surfaced so the user can fix or discard it.
+  final bool isFailed;
 }
 
 extension BookmarkShareText on Bookmark {

@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'core/data/sync/sync_cursor_entity.dart';
 import 'features/bookmarks/data/local/bookmark_entity.dart';
 import 'features/collections/data/local/collection_entity.dart';
 import 'features/notifications/data/local/activity_entity.dart';
@@ -25,7 +26,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 8542772984841996240),
     name: 'BookmarkEntity',
-    lastPropertyId: const obx_int.IdUid(12, 2425304307927444286),
+    lastPropertyId: const obx_int.IdUid(13, 1030815829066033616),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -99,6 +100,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(12, 2425304307927444286),
         name: 'videoUrl',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 1030815829066033616),
+        name: 'rev',
+        type: 6,
         flags: 0,
       ),
     ],
@@ -276,6 +283,35 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(5, 7251944359262926434),
+    name: 'SyncCursorEntity',
+    lastPropertyId: const obx_int.IdUid(3, 7189263519970957346),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 4099947973977249183),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8892158510897589292),
+        name: 'resource',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(5, 3983229944700575413),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7189263519970957346),
+        name: 'rev',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -321,8 +357,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(4, 6914250643421223724),
-    lastIndexId: const obx_int.IdUid(4, 5110644076683273229),
+    lastEntityId: const obx_int.IdUid(5, 7251944359262926434),
+    lastIndexId: const obx_int.IdUid(5, 3983229944700575413),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -357,7 +393,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final videoUrlOffset = object.videoUrl == null
             ? null
             : fbb.writeString(object.videoUrl!);
-        fbb.startTable(13);
+        fbb.startTable(14);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addOffset(2, urlOffset);
@@ -375,6 +411,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(9, object.syncStateCode);
         fbb.addOffset(10, imageUrlsOffset);
         fbb.addOffset(11, videoUrlOffset);
+        fbb.addInt64(12, object.rev);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -430,6 +467,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           22,
           0,
         );
+        final revParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          28,
+          0,
+        );
         final imageUrlsParam = const fb.ListReader<String>(
           fb.StringReader(asciiOptimization: true),
           lazy: false,
@@ -448,6 +491,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           updatedAt: updatedAtParam,
           serverUpdatedAt: serverUpdatedAtParam,
           syncStateCode: syncStateCodeParam,
+          rev: revParam,
           imageUrls: imageUrlsParam,
           videoUrl: videoUrlParam,
         );
@@ -692,6 +736,50 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    SyncCursorEntity: obx_int.EntityDefinition<SyncCursorEntity>(
+      model: _entities[4],
+      toOneRelations: (SyncCursorEntity object) => [],
+      toManyRelations: (SyncCursorEntity object) => {},
+      getId: (SyncCursorEntity object) => object.id,
+      setId: (SyncCursorEntity object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SyncCursorEntity object, fb.Builder fbb) {
+        final resourceOffset = fbb.writeString(object.resource);
+        fbb.startTable(4);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, resourceOffset);
+        fbb.addInt64(2, object.rev);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final resourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final revParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final object = SyncCursorEntity(
+          resource: resourceParam,
+          rev: revParam,
+          id: idParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -757,6 +845,11 @@ class BookmarkEntity_ {
   /// See [BookmarkEntity.videoUrl].
   static final videoUrl = obx.QueryStringProperty<BookmarkEntity>(
     _entities[0].properties[11],
+  );
+
+  /// See [BookmarkEntity.rev].
+  static final rev = obx.QueryIntegerProperty<BookmarkEntity>(
+    _entities[0].properties[12],
   );
 }
 
@@ -881,5 +974,23 @@ class CollectionEntity_ {
   /// See [CollectionEntity.syncStateCode].
   static final syncStateCode = obx.QueryIntegerProperty<CollectionEntity>(
     _entities[3].properties[9],
+  );
+}
+
+/// [SyncCursorEntity] entity fields to define ObjectBox queries.
+class SyncCursorEntity_ {
+  /// See [SyncCursorEntity.id].
+  static final id = obx.QueryIntegerProperty<SyncCursorEntity>(
+    _entities[4].properties[0],
+  );
+
+  /// See [SyncCursorEntity.resource].
+  static final resource = obx.QueryStringProperty<SyncCursorEntity>(
+    _entities[4].properties[1],
+  );
+
+  /// See [SyncCursorEntity.rev].
+  static final rev = obx.QueryIntegerProperty<SyncCursorEntity>(
+    _entities[4].properties[2],
   );
 }

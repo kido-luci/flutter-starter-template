@@ -47,6 +47,7 @@ dependencies:
   network: ^0.1.0
   app_platform: ^0.1.0
   storage: ^0.1.0
+  sync: ^0.1.0
   theme: ^0.1.0
 
   flutter:

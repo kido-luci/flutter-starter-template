@@ -12,11 +12,11 @@ void main() {
   tearDown(() => connectivity.dispose());
 
   SyncScheduler scheduler(Future<SyncOutcome> Function() body) => SyncScheduler(
-        body,
-        connectivity,
-        const Duration(milliseconds: 10),
-        const Duration(milliseconds: 40),
-      );
+    body,
+    connectivity,
+    const Duration(milliseconds: 10),
+    const Duration(milliseconds: 40),
+  );
 
   test('start runs an initial sync and idles on success', () async {
     var runs = 0;
@@ -33,24 +33,26 @@ void main() {
     await s.dispose();
   });
 
-  test('concurrent sync calls share one in-flight run (single-flight)',
-      () async {
-    final gate = Completer<void>();
-    var runs = 0;
-    final s = scheduler(() async {
-      runs++;
-      await gate.future;
-      return SyncOutcome.ok;
-    });
+  test(
+    'concurrent sync calls share one in-flight run (single-flight)',
+    () async {
+      final gate = Completer<void>();
+      var runs = 0;
+      final s = scheduler(() async {
+        runs++;
+        await gate.future;
+        return SyncOutcome.ok;
+      });
 
-    final a = s.sync();
-    final b = s.sync();
-    expect(runs, 1);
-    gate.complete();
-    await Future.wait([a, b]);
-    expect(runs, 1);
-    await s.dispose();
-  });
+      final a = s.sync();
+      final b = s.sync();
+      expect(runs, 1);
+      gate.complete();
+      await Future.wait([a, b]);
+      expect(runs, 1);
+      await s.dispose();
+    },
+  );
 
   test('an offline→online transition triggers a sync', () async {
     connectivity.online = false;

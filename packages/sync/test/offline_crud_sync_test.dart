@@ -58,37 +58,44 @@ void main() {
       expect((await store.getByUuid('a'))!.syncState, SyncState.failed);
     });
 
-    test('a transient failure leaves the row pending and reports failures',
-        () async {
-      adapter.transientOnCreate.add('a');
-      await store.put(FakeRow('a', 'x', SyncState.pendingCreate));
+    test(
+      'a transient failure leaves the row pending and reports failures',
+      () async {
+        adapter.transientOnCreate.add('a');
+        await store.put(FakeRow('a', 'x', SyncState.pendingCreate));
 
-      final outcome = await engine.run();
+        final outcome = await engine.run();
 
-      expect(outcome, SyncOutcome.hadFailures);
-      expect((await store.getByUuid('a'))!.syncState, SyncState.pendingCreate);
-    });
+        expect(outcome, SyncOutcome.hadFailures);
+        expect(
+          (await store.getByUuid('a'))!.syncState,
+          SyncState.pendingCreate,
+        );
+      },
+    );
 
-    test('lost-update guard: a concurrent edit during push stays pending',
-        () async {
-      await store.put(FakeRow('a', 'v1', SyncState.pendingCreate));
-      // Simulate the user editing the row while the create is in flight.
-      adapter.onCreate = (row) async {
-        final inFlight = await store.getByUuid(row.uuid);
-        inFlight!
-          ..value = 'v2'
-          ..updatedAt = row.updatedAt.add(const Duration(seconds: 1));
-        await store.put(inFlight);
-      };
+    test(
+      'lost-update guard: a concurrent edit during push stays pending',
+      () async {
+        await store.put(FakeRow('a', 'v1', SyncState.pendingCreate));
+        // Simulate the user editing the row while the create is in flight.
+        adapter.onCreate = (row) async {
+          final inFlight = await store.getByUuid(row.uuid);
+          inFlight!
+            ..value = 'v2'
+            ..updatedAt = row.updatedAt.add(const Duration(seconds: 1));
+          await store.put(inFlight);
+        };
 
-      await engine.run();
+        await engine.run();
 
-      final row = await store.getByUuid('a');
-      // The ack must NOT clobber the newer edit. The create succeeded
-      // server-side, so the row is re-queued as an update carrying v2.
-      expect(row!.syncState, SyncState.pendingUpdate);
-      expect(row.value, 'v2');
-    });
+        final row = await store.getByUuid('a');
+        // The ack must NOT clobber the newer edit. The create succeeded
+        // server-side, so the row is re-queued as an update carrying v2.
+        expect(row!.syncState, SyncState.pendingUpdate);
+        expect(row.value, 'v2');
+      },
+    );
 
     test('a pending delete is pushed and hard-deleted locally', () async {
       adapter.server['a'] = ServerRow(rev: 2, value: 'x');
@@ -112,16 +119,19 @@ void main() {
       expect(row.rev, 5);
     });
 
-    test('overwrites a synced local row when the server rev is newer', () async {
-      await store.put(FakeRow('a', 'old', SyncState.synced, rev: 1));
-      adapter.server['a'] = ServerRow(rev: 4, value: 'new');
+    test(
+      'overwrites a synced local row when the server rev is newer',
+      () async {
+        await store.put(FakeRow('a', 'old', SyncState.synced, rev: 1));
+        adapter.server['a'] = ServerRow(rev: 4, value: 'new');
 
-      await engine.run();
+        await engine.run();
 
-      final row = await store.getByUuid('a');
-      expect(row!.value, 'new');
-      expect(row.rev, 4);
-    });
+        final row = await store.getByUuid('a');
+        expect(row!.value, 'new');
+        expect(row.rev, 4);
+      },
+    );
 
     test('a tombstone removes a synced local row', () async {
       await store.put(FakeRow('a', 'x', SyncState.synced, rev: 1));

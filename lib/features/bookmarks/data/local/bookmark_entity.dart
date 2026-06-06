@@ -1,34 +1,13 @@
-import 'package:objectbox/objectbox.dart';
+import 'package:objectbox/objectbox.dart' hide SyncState;
+import 'package:sync/sync.dart';
 
 import '../../domain/entities/bookmark.dart';
-
-/// Sync lifecycle for a local row. Stored as int via [SyncState.code] so
-/// ObjectBox doesn't need a converter.
-enum SyncState {
-  synced(0),
-  pendingCreate(1),
-  pendingUpdate(2),
-  pendingDelete(3);
-
-  const SyncState(this.code);
-
-  final int code;
-
-  static SyncState fromCode(int code) {
-    for (final s in SyncState.values) {
-      if (s.code == code) return s;
-    }
-    return SyncState.synced;
-  }
-
-  bool get isPending => this != SyncState.synced;
-}
 
 /// ObjectBox row for a bookmark. Mutable by necessity — ObjectBox writes back
 /// into instances during property loading, so this cannot be a Freezed/sealed
 /// class.
 @Entity()
-class BookmarkEntity {
+class BookmarkEntity implements Syncable {
   BookmarkEntity({
     this.id = 0,
     required this.uuid,
@@ -40,6 +19,7 @@ class BookmarkEntity {
     required this.updatedAt,
     this.serverUpdatedAt,
     this.syncStateCode = 0,
+    this.rev = 0,
     this.imageUrls = const [],
     this.videoUrl,
   });
@@ -52,6 +32,7 @@ class BookmarkEntity {
   /// Stable string ID used by the domain layer and by the server. Generated
   /// client-side at create time so the row has a meaningful id before the
   /// first successful sync.
+  @override
   @Unique()
   String uuid;
 
@@ -67,8 +48,9 @@ class BookmarkEntity {
   @Property(type: PropertyType.dateNanoUtc)
   DateTime createdAt;
 
-  /// Local mutation time — bumped on any local change. Compared against
-  /// [serverUpdatedAt] on pull to implement last-write-wins.
+  /// Local mutation time — bumped on any local change. The sync engine compares
+  /// it before/after a push to detect a concurrent edit (the lost-update guard).
+  @override
   @Property(type: PropertyType.dateNanoUtc)
   DateTime updatedAt;
 
@@ -77,11 +59,18 @@ class BookmarkEntity {
   @Property(type: PropertyType.dateNanoUtc)
   DateTime? serverUpdatedAt;
 
+  /// The server revision this row was last reconciled to. Drives delta sync and
+  /// conflict detection. 0 until first acknowledged by the server.
+  @override
+  int rev;
+
   /// Stored form of [syncState]. Use the [syncState] getter/setter instead.
   int syncStateCode;
 
+  @override
   @Transient()
   SyncState get syncState => SyncState.fromCode(syncStateCode);
+  @override
   set syncState(SyncState value) => syncStateCode = value.code;
 
   Bookmark toDomain() => Bookmark(
@@ -95,6 +84,8 @@ class BookmarkEntity {
     createdAt: createdAt,
     updatedAt: updatedAt,
     isPendingSync: syncState.isPending,
+    isConflicted: syncState == SyncState.conflicted,
+    isFailed: syncState == SyncState.failed,
   );
 
   /// Mutates this entity from a [BookmarkInput] for create/update flows.

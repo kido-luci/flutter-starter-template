@@ -1,5 +1,6 @@
 import 'package:architecture/architecture.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sync/sync.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/bookmark.dart';
@@ -71,9 +72,10 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
     }
     final normalized = _normalize(input);
     existing.applyInput(normalized, now: DateTime.now().toUtc());
-    // pendingCreate stays pendingCreate (still need the initial POST);
-    // synced flips to pendingUpdate.
-    if (existing.syncState == SyncState.synced) {
+    // pendingCreate stays pendingCreate (still needs the initial POST). Every
+    // other state — synced, an existing pendingUpdate, or a conflicted/failed
+    // row the user is re-editing — becomes a pendingUpdate to (re)push.
+    if (existing.syncState != SyncState.pendingCreate) {
       existing.syncState = SyncState.pendingUpdate;
     }
     await _local.put(existing);
@@ -90,7 +92,7 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
     // A pendingCreate that's never been synced can be dropped outright —
     // the server has never seen it, so there's nothing to tell it.
     if (existing.syncState == SyncState.pendingCreate) {
-      await _local.hardDelete(existing.id);
+      await _local.hardDelete(existing);
       return const Ok(null);
     }
     existing.syncState = SyncState.pendingDelete;
