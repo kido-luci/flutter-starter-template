@@ -1,0 +1,15 @@
+name: sync
+description: >-
+  Reusable offline-first sync engine for the Flutter starter template: a
+  connectivity-driven scheduler plus a generic push-queue / delta pull-reconciler
+  built on a server revision (rev) cursor with conflict detection.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dev_dependencies:
+  test: ^1.31.0

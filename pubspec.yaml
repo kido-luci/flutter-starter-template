@@ -29,6 +29,7 @@ workspace:
   - packages/network
   - packages/app_platform
   - packages/storage
+  - packages/sync
   - packages/theme
   - packages/test_utils
 
