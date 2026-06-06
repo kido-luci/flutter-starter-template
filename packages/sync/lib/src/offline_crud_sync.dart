@@ -156,6 +156,12 @@ class OfflineCrudSync<T extends Syncable> {
       return;
     }
 
+    // A pendingCreate appearing on the server is just our own create landing
+    // (the uuid is client-minted and unique to us) — typically a create whose
+    // response was lost. It is NOT a conflict: leave it queued so the push
+    // retry finalizes it (the retried POST gets a 409 → superseded → synced).
+    if (local.syncState == SyncState.pendingCreate) return;
+
     // An unsynced local edit wins until pushed — unless the server has moved
     // past the revision it was based on, which is a conflict.
     if (local.syncState.isPending) {

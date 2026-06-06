@@ -222,11 +222,11 @@ go run .                    # → http://localhost:8080
 | `GET`    | `/api/bookmarks/:id`          | Get bookmark              |
 | `PUT`    | `/api/bookmarks/:id`          | Update bookmark (`X-Expected-Rev` → `409`) |
 | `DELETE` | `/api/bookmarks/:id`          | Delete bookmark (soft‑delete tombstone) |
-| `GET`    | `/api/collections`            | List collections          |
+| `GET`    | `/api/collections`            | List collections (`?since=<rev>` for delta sync) |
 | `POST`   | `/api/collections`            | Create collection         |
 | `GET`    | `/api/collections/:id`        | Get collection            |
-| `PUT`    | `/api/collections/:id`        | Update collection         |
-| `DELETE` | `/api/collections/:id`        | Delete collection         |
+| `PUT`    | `/api/collections/:id`        | Update collection (`X-Expected-Rev` → `409`) |
+| `DELETE` | `/api/collections/:id`        | Delete collection (soft‑delete tombstone) |
 | `GET`    | `/api/notifications`          | List notifications        |
 | `GET`    | `/api/activity`               | List activity feed        |
 

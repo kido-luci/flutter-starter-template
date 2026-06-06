@@ -97,6 +97,25 @@ void main() {
       },
     );
 
+    test(
+      'a transient create whose row already landed stays pendingCreate, not '
+      'conflicted',
+      () async {
+        await store.put(FakeRow('a', 'v1', SyncState.pendingCreate));
+        // The create reached the server but the response was lost (transient),
+        // so the server now lists the row while it is still pendingCreate.
+        adapter.transientOnCreate.add('a');
+        adapter.server['a'] = ServerRow(rev: 5, value: 'v1');
+
+        final outcome = await engine.run();
+
+        final row = await store.getByUuid('a');
+        expect(outcome, SyncOutcome.hadFailures);
+        // Must not dead-end as conflicted; the next push 409→supersedes it.
+        expect(row!.syncState, SyncState.pendingCreate);
+      },
+    );
+
     test('a pending delete is pushed and hard-deleted locally', () async {
       adapter.server['a'] = ServerRow(rev: 2, value: 'x');
       await store.put(FakeRow('a', 'x', SyncState.pendingDelete, rev: 2));

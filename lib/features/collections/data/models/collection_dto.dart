@@ -13,7 +13,7 @@ abstract class CollectionDto with _$CollectionDto {
     @JsonKey(name: 'bookmark_ids') @Default([]) List<String> bookmarkIds,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @Default(0) int rev,
+    required int rev,
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
   }) = _CollectionDto;
 

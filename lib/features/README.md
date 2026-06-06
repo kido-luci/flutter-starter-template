@@ -65,7 +65,7 @@ The repository persists to ObjectBox, stamps a sync state, then fires a
 fire‑and‑forget `sync()`. The caller never waits on the server. Each row carries
 its lifecycle as an int code so ObjectBox needs no converter:
 
-```
+```text
 synced(0) · pendingCreate(1) · pendingUpdate(2) · pendingDelete(3) · conflicted(4) · failed(5)
 ```
 

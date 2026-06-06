@@ -89,6 +89,7 @@ class SyncScheduler {
   }
 
   Future<void> _run() async {
+    final generation = _generation;
     _retryTimer?.cancel();
     _emit(SyncStatus.syncing);
     SyncOutcome outcome;
@@ -97,6 +98,9 @@ class SyncScheduler {
     } on Object {
       outcome = SyncOutcome.error;
     }
+    // A stop() (or restart) that landed while the body was in flight bumps the
+    // generation; don't emit status or arm a retry timer after teardown.
+    if (generation != _generation) return;
     if (outcome == SyncOutcome.ok) {
       _backoffAttempt = 0;
       _emit(SyncStatus.idle);

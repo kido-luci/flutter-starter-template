@@ -123,6 +123,15 @@ void main() {
       verify(() => remote.delete('c-1', 3)).called(1);
     });
 
+    test('a 404 delete is PushGone', () async {
+      when(() => remote.delete(any(), any())).thenThrow(_dioError(404));
+
+      expect(
+        await adapter.delete(_entity(rev: 3)),
+        isA<PushGone<CollectionEntity>>(),
+      );
+    });
+
     test('passes the cursor and maps tombstones to deleted records', () async {
       when(() => remote.list(since: any(named: 'since'))).thenAnswer(
         (_) async => [_dto(rev: 4, deletedAt: DateTime(2026, 2))],

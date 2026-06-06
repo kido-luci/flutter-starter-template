@@ -90,6 +90,25 @@ void main() {
     await s.dispose();
   });
 
+  test('a stop during an in-flight run cancels the would-be retry', () async {
+    final gate = Completer<void>();
+    var runs = 0;
+    final s = scheduler(() async {
+      runs++;
+      await gate.future;
+      return SyncOutcome.error;
+    });
+
+    final inflight = s.sync(); // starts the run, then blocks on the gate
+    await s.stop(); // stop lands while the body is still in flight
+    gate.complete(); // body now completes with an error, post-stop
+    await inflight;
+
+    await Future<void>.delayed(const Duration(milliseconds: 30));
+    expect(runs, 1, reason: 'no retry should be armed after stop mid-run');
+    await s.dispose();
+  });
+
   test('stop cancels the pending retry', () async {
     var runs = 0;
     final s = scheduler(() async {
