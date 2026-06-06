@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:developer' show log;
 
-import 'package:architecture/architecture.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
 import 'package:network/network.dart';
+import 'package:sync/sync.dart';
 
 import '../../domain/services/notifications_sync_controller.dart';
 import '../datasources/notifications_remote_data_source.dart';
@@ -16,83 +15,57 @@ import '../models/user_activity_dto.dart';
 
 /// Reconciles the local notification/activity cache with the remote API.
 ///
-/// Triggers:
-/// - [sync] is called explicitly on app start (post-auth) and after every
-///   local read-mark.
-/// - Connectivity transitions from offline → online.
+/// Notifications are read-mostly, so unlike bookmarks/collections this is not a
+/// full CRUD sync: there is no revision cursor, just a read-state push followed
+/// by a full refresh. It therefore keeps its own body but runs it on the shared
+/// [SyncScheduler], which provides connectivity-driven triggers, single-flight,
+/// the start/stop generation guard, and backoff — the machinery this feature
+/// used to hand-roll.
 ///
-/// Strategy (notifications are read-mostly, so there is no create/update/delete
-/// queue):
-/// 1. **Push**: flush every [NotificationEntity.pendingRead] row to the server,
-///    clearing the flag on success. A failure leaves it queued for the next
-///    trigger.
+/// Strategy:
+/// 1. **Push**: flush every pending read-mark to the server, clearing the flag
+///    on success. A failure leaves it queued for the next trigger.
 /// 2. **Pull**: GET both lists and reconcile by uuid — insert server-only rows,
 ///    refresh existing ones (preserving any unpushed read-mark), and drop local
 ///    rows the server no longer has.
-///
-/// Concurrent calls collapse into one in-flight sync (single-flight).
 @LazySingleton(as: NotificationsSyncController)
 class NotificationsSyncService implements NotificationsSyncController {
-  NotificationsSyncService(this._local, this._remote, this._connectivity);
+  NotificationsSyncService(
+    this._local,
+    this._remote,
+    ConnectivitySource connectivity,
+  ) {
+    _scheduler = SyncScheduler(_run, connectivity);
+  }
 
   final NotificationsLocalDataSource _local;
   final NotificationsRemoteDataSource _remote;
-  final Connectivity _connectivity;
+  late final SyncScheduler _scheduler;
 
   final _synced = StreamController<void>.broadcast();
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
-  Future<void>? _inflight;
-  bool _wasOnline = true;
-
-  /// Bumped on every [start]/[stop] so a [start] that's awaiting async setup
-  /// can detect a [stop] that landed in the meantime and bail out.
-  int _generation = 0;
 
   @override
   Stream<void> get onSynced => _synced.stream;
 
   @override
-  Future<void> start() async {
-    if (_connectivitySub != null) return;
-    final generation = ++_generation;
-    _connectivitySub = _connectivity.onConnectivityChanged.listen(
-      _onConnectivity,
-    );
-    final initial = await _connectivity.checkConnectivity();
-    // If stop() ran while we awaited, don't kick off a sync after teardown.
-    if (_generation != generation) return;
-    _wasOnline = _hasNetwork(initial);
-    sync().uw();
-  }
+  Future<void> start() => _scheduler.start();
 
   @override
-  Future<void> stop() async {
-    _generation++;
-    await _connectivitySub?.cancel();
-    _connectivitySub = null;
-  }
-
-  void _onConnectivity(List<ConnectivityResult> result) {
-    final online = _hasNetwork(result);
-    if (online && !_wasOnline) sync().uw();
-    _wasOnline = online;
-  }
-
-  bool _hasNetwork(List<ConnectivityResult> result) =>
-      result.any((r) => r != ConnectivityResult.none);
+  Future<void> stop() => _scheduler.stop();
 
   @override
-  Future<void> sync() {
-    return _inflight ??= _run()..whenComplete(() => _inflight = null);
-  }
+  Future<void> sync() => _scheduler.sync();
 
-  Future<void> _run() async {
+  Future<SyncOutcome> _run() async {
     try {
       await _pushReads();
       await _pull();
-      _synced.add(null);
+      if (!_synced.isClosed) _synced.add(null);
+      return SyncOutcome.ok;
     } on DioException {
-      // Offline/auth error — expected; pending reads stay queued for retry.
+      // Offline/auth error — expected; pending reads stay queued. Reported as
+      // an error so the scheduler retries it with backoff.
+      return SyncOutcome.error;
     } on Object catch (error, stackTrace) {
       // Unexpected (e.g. a reconciliation/ObjectBox bug). Surface it so it
       // isn't lost, but keep sync fire-and-forget for callers.
@@ -102,6 +75,7 @@ class NotificationsSyncService implements NotificationsSyncController {
         error: error,
         stackTrace: stackTrace,
       );
+      return SyncOutcome.error;
     }
   }
 
