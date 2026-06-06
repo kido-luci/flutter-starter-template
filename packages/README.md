@@ -15,6 +15,7 @@ place.
 | `analytics` | Firebase-backed analytics service + route observer |
 | `config` | Environment config + Firebase Remote Config |
 | `storage` | `SharedPreferences` provisioning + iOS Keychain reinstall reset |
+| `sync` | Offline-first sync engine — scheduler + revision-based delta CRUD with conflict detection (pure Dart) |
 | `app_platform` | Device integrations — media, notifications, permissions, share |
 | `theme` | `ThemeBloc` + persisted theme state |
 | `test_utils` | Shared `mocktail` export, cross-package mocks/fakes, test images |

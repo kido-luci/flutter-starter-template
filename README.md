@@ -41,7 +41,7 @@ To enable seamless local development and testing, this template is paired with a
 |---------------------------|----------------------------|
 | 🏛 **Clean Architecture** | Data / domain / presentation layers with full dependency inversion |
 | 🧩 **BLoC + Freezed**     | Bloc pattern with sealed state unions and exhaustive `when` |
-| 📶 **Offline‑First**      | ObjectBox local writes → bidirectional sync on reconnect → share → link previews |
+| 📶 **Offline‑First**      | Reusable `sync` engine — ObjectBox local writes → revision‑based delta sync → tombstones → conflict detection |
 | 🔐 **JWT Auth**           | Access + refresh tokens, auto‑refresh interceptor, secure storage |
 | 🧭 **Declarative Routing**| `go_router` with typed routes, auth guards, Universal Links & App Links |
 | 🎨 **Theming**            | Material 3, `FlexColorScheme`, Google Fonts (Inter), true black OLED dark mode |
@@ -98,6 +98,7 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── network/                 # Dio, Retrofit, retry/performance interceptors
 │   ├── app_platform/                # Camera, picker, permissions, notifications, share
 │   ├── storage/                 # SharedPreferences and secure storage helpers
+│   ├── sync/                     # Reusable offline-first sync engine (scheduler + delta CRUD)
 │   ├── theme/                   # ThemeBloc and persisted theme state
 │   └── test_utils/                   # Shared mocks, images, and mocktail export
 ├── test/                             # Root app tests only
@@ -216,11 +217,11 @@ go run .                    # → http://localhost:8080
 | `GET`    | `/api/auth/me`                | Current user              |
 | `POST`   | `/api/auth/change-password`   | Change password           |
 | `POST`   | `/api/upload`                 | Upload an attachment      |
-| `GET`    | `/api/bookmarks`              | List bookmarks            |
+| `GET`    | `/api/bookmarks`              | List bookmarks (`?since=<rev>` for delta sync) |
 | `POST`   | `/api/bookmarks`              | Create bookmark           |
 | `GET`    | `/api/bookmarks/:id`          | Get bookmark              |
-| `PUT`    | `/api/bookmarks/:id`          | Update bookmark           |
-| `DELETE` | `/api/bookmarks/:id`          | Delete bookmark           |
+| `PUT`    | `/api/bookmarks/:id`          | Update bookmark (`X-Expected-Rev` → `409`) |
+| `DELETE` | `/api/bookmarks/:id`          | Delete bookmark (soft‑delete tombstone) |
 | `GET`    | `/api/collections`            | List collections          |
 | `POST`   | `/api/collections`            | Create collection         |
 | `GET`    | `/api/collections/:id`        | Get collection            |
@@ -230,6 +231,11 @@ go run .                    # → http://localhost:8080
 | `GET`    | `/api/activity`               | List activity feed        |
 
 > 💡 **Tip** — Any username + password works during development.
+
+> 🔄 **Sync protocol** — Bookmarks and collections carry a per‑owner `rev`
+> (monotonic revision) and `deleted_at` tombstones. Clients pull deltas with
+> `?since=<rev>` and send `X-Expected-Rev` on writes for optimistic‑concurrency
+> conflict detection (`409`). See [Offline‑First Sync](#-offlinefirst-sync).
 
 ### 📱 Launch App
 
@@ -448,61 +454,80 @@ Setup steps and the full list of required secrets live in
 
 Writes commit to the local **ObjectBox** store first and the UI updates
 immediately — the network is reconciled in the background, so the app stays
-fully usable offline. `bookmarks` is the canonical implementation; `collections`
-reuses the same push‑queue + pull‑reconciler shape, and `notifications` uses a
-read‑state‑only variant.
+fully usable offline. The sync machinery is a single reusable engine in the
+**`sync` package** (`packages/sync`); `bookmarks` and `collections` drive it
+through a thin per‑feature adapter, and `notifications` is a read‑state variant
+that reuses only the scheduler.
+
+### 🧩 One shared engine
+
+`package:sync` is pure Dart (no Flutter/Dio/ObjectBox), so it is unit‑tested in
+isolation. A feature plugs in by implementing three small contracts:
+
+- **`SyncLocalStore<T>`** — the local store (the ObjectBox data source).
+- **`SyncRemoteAdapter<T>`** — maps DTOs ↔ rows, sends requests, and translates
+  HTTP errors into the engine's outcomes. The one bookmarks‑specific piece
+  (`BookmarksSyncAdapter`) also checkpoints media uploads before a push.
+- **`Syncable`** — the row exposes `uuid`, `updatedAt`, `rev`, and `syncState`.
+
+The composition root for a feature is ~5 lines:
+`SyncScheduler(OfflineCrudSync(localStore, adapter, cursorStore).run)`.
 
 ### ✍️ Local‑first writes
 
-`BookmarksRepositoryImpl` persists to ObjectBox, stamps a sync state, then fires
-a fire‑and‑forget `sync()`. The caller never waits on the server.
-
-| Operation | Local effect | Sync state |
-|-----------|--------------|------------|
-| **Create** | Insert row | `pendingCreate` |
-| **Update** | Apply edit; bump `updatedAt` | `synced → pendingUpdate` (a still‑unsynced `pendingCreate` stays `pendingCreate`) |
-| **Delete** | Unsynced create → hard‑delete outright; otherwise tombstone | `pendingDelete` |
-| **Read** | Return local rows instantly via `listLocal()` | — (triggers a background refresh) |
-
-Each row carries its lifecycle as an int code so ObjectBox needs no converter:
+The repository persists to ObjectBox, stamps a sync state, then fires a
+fire‑and‑forget `sync()`. The caller never waits on the server. Each row carries
+its lifecycle as an int code so ObjectBox needs no converter:
 
 ```
-synced(0) · pendingCreate(1) · pendingUpdate(2) · pendingDelete(3)
+synced(0) · pendingCreate(1) · pendingUpdate(2) · pendingDelete(3) · conflicted(4) · failed(5)
 ```
 
-`listVisible()` hides `pendingDelete` tombstones from the UI; `listPending()`
-(everything ≠ `synced`) feeds the push queue.
+`listPending()` feeds the push queue with only the three active states —
+`conflicted`/`failed` rows hold until the user acts.
 
-### 🔄 The sync loop
+### 🔄 The scheduler
 
-`BookmarksSyncService` listens to `connectivity_plus` and runs **push → pull**,
-emitting a `syncing → idle/error` status stream that drives the AppBar
-indicator.
+`SyncScheduler` owns the cross‑cutting machinery every resource shares:
+connectivity (via a `ConnectivitySource`), an **offline→online** re‑sync,
+single‑flight (concurrent `sync()` callers share one run), a start/stop
+generation guard, and **exponential backoff** — a run that fails or leaves rows
+pending is retried on a timer, not just on the next user action.
 
-- Re‑syncs on an **offline→online transition** (the "sync on reconnect").
-- Concurrent `sync()` callers share one in‑flight future.
-- A failed row keeps its pending state and is retried on the next trigger.
+### ⬆️ Push (with conflict detection)
 
-**Push** (`BookmarksPushQueue`) drains pending rows, each isolated so one
-rejected row can't block the queue. The client‑generated `uuid` is the stable
-identity across both sides, which makes lost‑response retries idempotent:
+`OfflineCrudSync` drains the pending rows, each isolated so one bad row can't
+block the queue. The client‑generated `uuid` is the stable identity across both
+sides; every update/delete echoes the row's **server revision (`rev`)** so the
+server can reject a stale write:
 
-| State | Action | Idempotent edge case |
-|-------|--------|----------------------|
-| `pendingCreate` | Checkpoint media uploads, `POST` | **409** → already created server‑side; mark `synced` |
-| `pendingUpdate` | `PUT` | — |
-| `pendingDelete` | `DELETE`, then hard‑delete locally | **404** → already gone; treat as success |
+| State | Action | Edge cases |
+|-------|--------|------------|
+| `pendingCreate` | `beforePush` (media), `POST` | **409** → already created → `synced` |
+| `pendingUpdate` | `PUT` with base `rev` | **409** → server moved → `conflicted`; **404** → `conflicted` |
+| `pendingDelete` | `DELETE` with base `rev`, then hard‑delete | **404** → already gone → success; **409** → `conflicted` |
 
-**Pull** (`BookmarksPullReconciler`) fetches the server list and reconciles by
-`uuid` — **timestamp last‑write‑wins, with local‑pending priority**:
+Two correctness guards: a **lost‑update guard** re‑reads the row after a push and
+leaves it queued if it was edited mid‑flight (so a concurrent edit is never
+clobbered by the ack), and errors are **classified** — non‑retryable `4xx` mark
+the row `failed` and surface it, while `5xx`/network/timeout stay pending for
+backoff retry.
 
-- Server row not present locally → insert as `synced`.
-- Local row is **pending** → skipped (unsynced local edits always win until pushed).
-- Server `updatedAt` newer → overwrite local fields.
-- `synced` local row absent from server → another device deleted it → hard‑delete locally.
+### ⬇️ Pull (delta + tombstones)
 
-There is no field‑level merge: conflicts resolve by `updatedAt`, and any local
-change you haven't pushed yet is never clobbered by a pull.
+Pull is **incremental**: it sends the highest `rev` it has seen
+(`GET …?since=<rev>`) and the server returns only newer rows — including
+**tombstones** for deletes. There is no full‑table scan and deletions are never
+inferred from absence. Reconciliation by `uuid`:
+
+- Server row absent locally → insert as `synced`.
+- Tombstone over a `synced` row → hard‑delete; over a pending edit → `conflicted`.
+- Server `rev` newer than a `synced` row → overwrite local fields.
+- Local row is **pending** → kept; if the server moved past its base `rev`, it's
+  flagged `conflicted` for the user to resolve.
+
+Conflicts are **detected and surfaced**, not silently merged — and any local
+change you haven't pushed is never clobbered by a pull.
 
 <br>
 
@@ -602,6 +627,7 @@ because they are tied to bookmark attachment behavior.
 | **Networking**     | `network` (`Dio` · `Retrofit`)                                                                |
 | **Code Gen**       | `build_runner` · `freezed` · `json_serializable` · `retrofit_generator` · `injectable_generator` · `go_router_builder` · `flutter_gen_runner` · `objectbox_generator` |
 | **Local DB**       | `ObjectBox` (`objectbox` · `objectbox_flutter_libs`)                                               |
+| **Offline Sync**   | `sync` (revision delta engine, scheduler, conflict detection) · `connectivity_plus`               |
 | **Secure Storage** | `storage` (`flutter_secure_storage` · `shared_preferences`)                                    |
 | **Auth**           | JWT — access + refresh tokens                                                                      |
 | **Theming**        | `theme` · Material 3 · `flex_color_scheme` · `google_fonts` (Inter)                           |
