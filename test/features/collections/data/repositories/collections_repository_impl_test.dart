@@ -5,6 +5,7 @@ import 'package:flutter_starter_template/features/collections/data/repositories/
 import 'package:flutter_starter_template/features/collections/domain/entities/collection.dart';
 import 'package:flutter_starter_template/features/collections/domain/services/collections_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sync/sync.dart';
 import 'package:test_utils/test_utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -159,12 +160,12 @@ void main() {
         syncStateCode: SyncState.pendingCreate.code,
       );
       when(() => mockLocal.getByUuid('c-1')).thenAnswer((_) async => entity);
-      when(() => mockLocal.hardDelete(42)).thenAnswer((_) async {});
+      when(() => mockLocal.hardDelete(any())).thenAnswer((_) async {});
 
       final result = await repository.delete('c-1');
 
       expect(result, isA<Ok<void>>());
-      verify(() => mockLocal.hardDelete(42)).called(1);
+      verify(() => mockLocal.hardDelete(entity)).called(1);
       verifyNever(() => mockSync.sync());
     });
 

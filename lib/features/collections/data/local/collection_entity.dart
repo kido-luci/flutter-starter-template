@@ -1,38 +1,13 @@
 import 'package:objectbox/objectbox.dart' hide SyncState;
+import 'package:sync/sync.dart';
 
 import '../../domain/entities/collection.dart';
-
-/// Sync lifecycle for a local row. Stored as int via [SyncState.code] so
-/// ObjectBox doesn't need a converter.
-///
-/// Kept local to the collections feature (mirroring the bookmarks feature)
-/// so the data layer stays self-contained rather than reaching across the
-/// feature boundary for a shared enum.
-enum SyncState {
-  synced(0),
-  pendingCreate(1),
-  pendingUpdate(2),
-  pendingDelete(3);
-
-  const SyncState(this.code);
-
-  final int code;
-
-  static SyncState fromCode(int code) {
-    for (final s in SyncState.values) {
-      if (s.code == code) return s;
-    }
-    return SyncState.synced;
-  }
-
-  bool get isPending => this != SyncState.synced;
-}
 
 /// ObjectBox row for a collection. Mutable by necessity — ObjectBox writes
 /// back into instances during property loading, so this cannot be a
 /// Freezed/sealed class.
 @Entity()
-class CollectionEntity {
+class CollectionEntity implements Syncable {
   CollectionEntity({
     this.id = 0,
     required this.uuid,
@@ -44,6 +19,7 @@ class CollectionEntity {
     required this.updatedAt,
     this.serverUpdatedAt,
     this.syncStateCode = 0,
+    this.rev = 0,
   });
 
   /// ObjectBox primary key. Internal — never exposed to the domain layer.
@@ -54,6 +30,7 @@ class CollectionEntity {
   /// Stable string ID used by the domain layer and by the server. Generated
   /// client-side at create time so the row has a meaningful id before the
   /// first successful sync.
+  @override
   @Unique()
   String uuid;
 
@@ -67,8 +44,9 @@ class CollectionEntity {
   @Property(type: PropertyType.dateNanoUtc)
   DateTime createdAt;
 
-  /// Local mutation time — bumped on any local change. Compared against
-  /// [serverUpdatedAt] on pull to implement last-write-wins.
+  /// Local mutation time — bumped on any local change. The sync engine compares
+  /// it before/after a push to detect a concurrent edit (the lost-update guard).
+  @override
   @Property(type: PropertyType.dateNanoUtc)
   DateTime updatedAt;
 
@@ -77,11 +55,18 @@ class CollectionEntity {
   @Property(type: PropertyType.dateNanoUtc)
   DateTime? serverUpdatedAt;
 
+  /// The server revision this row was last reconciled to. Drives delta sync and
+  /// conflict detection. 0 until first acknowledged by the server.
+  @override
+  int rev;
+
   /// Stored form of [syncState]. Use the [syncState] getter/setter instead.
   int syncStateCode;
 
+  @override
   @Transient()
   SyncState get syncState => SyncState.fromCode(syncStateCode);
+  @override
   set syncState(SyncState value) => syncStateCode = value.code;
 
   Collection toDomain() => Collection(
@@ -93,6 +78,8 @@ class CollectionEntity {
     createdAt: createdAt,
     updatedAt: updatedAt,
     isPendingSync: syncState.isPending,
+    isConflicted: syncState == SyncState.conflicted,
+    isFailed: syncState == SyncState.failed,
   );
 
   /// Mutates this entity from a [CollectionInput] for create/update flows.

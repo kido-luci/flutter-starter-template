@@ -215,7 +215,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(4, 6914250643421223724),
     name: 'CollectionEntity',
-    lastPropertyId: const obx_int.IdUid(10, 5607791206085802444),
+    lastPropertyId: const obx_int.IdUid(11, 2305123718041712993),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -276,6 +276,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(10, 5607791206085802444),
         name: 'syncStateCode',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 2305123718041712993),
+        name: 'rev',
         type: 6,
         flags: 0,
       ),
@@ -646,7 +652,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final bookmarkIdsOffset = fbb.writeList(
           object.bookmarkIds.map(fbb.writeString).toList(growable: false),
         );
-        fbb.startTable(11);
+        fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, uuidOffset);
         fbb.addOffset(2, nameOffset);
@@ -662,6 +668,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               : object.serverUpdatedAt!.microsecondsSinceEpoch * 1000,
         );
         fbb.addInt64(9, object.syncStateCode);
+        fbb.addInt64(10, object.rev);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -720,6 +727,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           22,
           0,
         );
+        final revParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          24,
+          0,
+        );
         final object = CollectionEntity(
           id: idParam,
           uuid: uuidParam,
@@ -731,6 +744,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           updatedAt: updatedAtParam,
           serverUpdatedAt: serverUpdatedAtParam,
           syncStateCode: syncStateCodeParam,
+          rev: revParam,
         );
 
         return object;
@@ -974,6 +988,11 @@ class CollectionEntity_ {
   /// See [CollectionEntity.syncStateCode].
   static final syncStateCode = obx.QueryIntegerProperty<CollectionEntity>(
     _entities[3].properties[9],
+  );
+
+  /// See [CollectionEntity.rev].
+  static final rev = obx.QueryIntegerProperty<CollectionEntity>(
+    _entities[3].properties[10],
   );
 }
 

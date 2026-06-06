@@ -10,8 +10,11 @@ abstract class CollectionsRemoteDataSource {
   factory CollectionsRemoteDataSource(Dio dio, {String baseUrl}) =
       _CollectionsRemoteDataSource;
 
+  /// Lists collections. With [since], returns the delta (changed rows including
+  /// tombstones) whose server revision is greater than it; without it, the full
+  /// live list.
   @GET('/api/collections')
-  Future<List<CollectionDto>> list();
+  Future<List<CollectionDto>> list({@Query('since') int? since});
 
   @POST('/api/collections')
   Future<CollectionDto> create(@Body() CollectionRequest body);
@@ -20,8 +23,12 @@ abstract class CollectionsRemoteDataSource {
   Future<CollectionDto> update(
     @Path('id') String id,
     @Body() CollectionRequest body,
+    @Header('X-Expected-Rev') int? expectedRev,
   );
 
   @DELETE('/api/collections/{id}')
-  Future<void> delete(@Path('id') String id);
+  Future<void> delete(
+    @Path('id') String id,
+    @Header('X-Expected-Rev') int? expectedRev,
+  );
 }

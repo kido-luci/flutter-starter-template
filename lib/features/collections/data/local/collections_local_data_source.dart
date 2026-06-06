@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart' hide Order;
+import 'package:sync/sync.dart';
 
 import '../../../../objectbox.g.dart' hide SyncState;
 import 'collection_entity.dart';
@@ -8,27 +9,18 @@ import 'collection_entity.dart';
 /// async-friendly.
 ///
 /// Identity at this layer is the string [CollectionEntity.uuid]. The integer
-/// `id` is an internal ObjectBox PK that callers never see.
-abstract interface class CollectionsLocalDataSource {
+/// `id` is an internal ObjectBox PK that callers never see. Implements
+/// [SyncLocalStore] so the generic sync engine can drive it.
+abstract interface class CollectionsLocalDataSource
+    implements SyncLocalStore<CollectionEntity> {
   /// All non-tombstoned collections, newest-first.
   Future<List<CollectionEntity>> listVisible();
 
-  /// Includes tombstoned (pendingDelete) rows. Used by the sync service.
+  /// Includes tombstoned (pendingDelete) rows.
   Future<List<CollectionEntity>> listAll();
-
-  Future<CollectionEntity?> getByUuid(String uuid);
-
-  /// Rows with any non-synced state, ordered by [CollectionEntity.updatedAt].
-  Future<List<CollectionEntity>> listPending();
 
   /// Inserts a new row in [SyncState.pendingCreate].
   Future<CollectionEntity> putNew(CollectionEntity entity);
-
-  /// Persists changes to an existing row. Caller owns sync state changes.
-  Future<void> put(CollectionEntity entity);
-
-  /// Hard-removes by internal PK. Used after a successful pendingDelete push.
-  Future<void> hardDelete(int pk);
 }
 
 @LazySingleton(as: CollectionsLocalDataSource)
@@ -80,8 +72,16 @@ class ObjectBoxCollectionsDataSource implements CollectionsLocalDataSource {
 
   @override
   Future<List<CollectionEntity>> listPending() async {
+    // Only the active push-queue states — conflicted/failed rows await user
+    // action and must not be re-pushed.
     final query = _box
-        .query(CollectionEntity_.syncStateCode.notEquals(SyncState.synced.code))
+        .query(
+          CollectionEntity_.syncStateCode.oneOf([
+            SyncState.pendingCreate.code,
+            SyncState.pendingUpdate.code,
+            SyncState.pendingDelete.code,
+          ]),
+        )
         .order(CollectionEntity_.updatedAt)
         .build();
     try {
@@ -103,7 +103,7 @@ class ObjectBoxCollectionsDataSource implements CollectionsLocalDataSource {
   }
 
   @override
-  Future<void> hardDelete(int pk) async {
-    _box.remove(pk);
+  Future<void> hardDelete(CollectionEntity entity) async {
+    _box.remove(entity.id);
   }
 }
