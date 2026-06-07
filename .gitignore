@@ -93,6 +93,7 @@ Thumbs.db
 # user-global ~/.config/git/ignore so the rules travel with the repo)
 # -------------------------------------------------------------------------
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 .cursor/
 
 # -------------------------------------------------------------------------
