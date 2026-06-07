@@ -59,9 +59,7 @@ void main() {
       find.descendant(of: find.byType(AppBar), matching: find.text('Home')),
       findsOneWidget,
     );
-    final authBloc = tester
-        .element(find.byType(MaterialApp))
-        .read<AuthBloc>();
+    final authBloc = tester.element(find.byType(MaterialApp)).read<AuthBloc>();
     expect(authBloc.state, isA<AuthAuthenticated>());
     expect((authBloc.state as AuthAuthenticated).user.username, email);
 
