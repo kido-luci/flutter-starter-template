@@ -116,10 +116,21 @@ jobs:
             fi
           done
 
-      # Integration tests boot the real App widget tree with mocked use-cases
-      # so they run headless without a device or emulator.
+      # Integration tests boot the real assembled App (with mocked use-cases),
+      # which `flutter test integration_test` always runs against an actual
+      # platform target — never the headless flutter_tester used for plain
+      # widget tests. Linux desktop is the natural fit for an Ubuntu runner.
+      - name: Install Linux desktop build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev
+
+      - name: Enable Linux desktop
+        run: flutter config --enable-linux-desktop
+
       - name: Run integration tests
-        run: flutter test integration_test
+        run: flutter test integration_test -d linux
 
       - name: Upload coverage artifact
         if: always()
