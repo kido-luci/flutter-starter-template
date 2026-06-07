@@ -100,7 +100,7 @@ void main() {
     await _openBookmarkDetail(tester, bookmarkTitle);
     expect(find.text(bookmarkTitle), findsWidgets);
 
-    await tester.tap(find.byType(PopupMenuButton).first);
+    await tester.tap(_popupMenuButton().first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
@@ -264,7 +264,7 @@ void main() {
     await _openBookmarkDetail(tester, editedBookmarkTitle);
     await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
 
-    await tester.tap(find.byType(PopupMenuButton).first);
+    await tester.tap(_popupMenuButton().first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
@@ -333,6 +333,12 @@ Future<void> _openBookmarkDetail(WidgetTester tester, String title) async {
   );
   await E2eApp.pumpUntil(tester, detailTitle);
   expect(detailTitle, findsOneWidget);
+  await E2eApp.pumpUntil(tester, _popupMenuButton());
+  expect(_popupMenuButton(), findsWidgets);
+}
+
+Finder _popupMenuButton() {
+  return find.byWidgetPredicate((widget) => widget is PopupMenuButton);
 }
 
 Future<void> _login(
