@@ -40,19 +40,24 @@ void main() {
     final bookmarkTitle = 'E2E Bookmark $runId';
     final collectionName = 'E2E Collection $runId';
 
-    // ---- Register a fresh user --------------------------------------------
+    // ---- Form validation before auth ---------------------------------------
     await E2eApp.waitForLoginScreen(tester);
+
+    await tester.tap(find.text('Log In'));
+    await tester.pumpAndSettle();
+    expect(find.text('Required'), findsWidgets);
 
     await tester.tap(find.text('Create an account'));
     await tester.pumpAndSettle();
     await E2eApp.pumpUntil(tester, find.text('Join Flutter Starter'));
     expect(find.text('Join Flutter Starter'), findsWidgets);
 
-    await tester.enterText(find.byType(TextFormField).at(0), email);
-    await tester.enterText(find.byType(TextFormField).at(1), password);
     await tester.tap(find.text('Join Flutter Starter').last);
-    await E2eApp.settle(tester);
     await tester.pumpAndSettle();
+    expect(find.text('Required'), findsWidgets);
+
+    // ---- Register a fresh user --------------------------------------------
+    await _register(tester, email: email, password: password);
 
     await E2eApp.pumpUntil(tester, find.text('Home'));
     expect(
@@ -216,4 +221,16 @@ void main() {
     await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
     expect(find.text('Welcome Back'), findsOneWidget);
   });
+}
+
+Future<void> _register(
+  WidgetTester tester, {
+  required String email,
+  required String password,
+}) async {
+  await tester.enterText(find.byType(TextFormField).at(0), email);
+  await tester.enterText(find.byType(TextFormField).at(1), password);
+  await tester.tap(find.text('Join Flutter Starter').last);
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
 }
