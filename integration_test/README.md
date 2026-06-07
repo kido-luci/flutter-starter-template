@@ -1,81 +1,81 @@
 # Integration tests
 
-These tests boot the real, assembled `App` widget tree — router, DI-resolved
-blocs, theming, the bottom-nav shell — and drive it through `WidgetTester` like
-a user would: filling in forms, tapping nav destinations, scrolling, asserting
-on rendered text. They run **headless**, with no backend, Firebase, or native
-storage: every plugin boundary (auth use-cases, sync controllers, analytics,
-package info, image picker, share, video player, …) is mocked via `App`'s
-nullable constructor overrides and `getIt` factory registrations.
+This suite boots the real, assembled `App` widget tree — router, DI-resolved
+blocs, theming, the bottom-nav shell, **real Firebase, and the real local
+backend** (`simple_backend_server`, `http://localhost:8080` by default) — and
+drives it through `WidgetTester` like a user would: filling in forms, tapping
+nav destinations, scrolling, asserting on rendered text.
 
-This catches wiring regressions that isolated unit/widget/bloc tests miss —
-router misconfiguration, missing DI registrations, session-gating bugs,
-bloc↔screen integration — without the cost or flakiness of running on a real
-device or emulator.
+Unlike the project's unit/widget/bloc tests, **nothing here is mocked**. The
+single journey in `e2e_test.dart` registers a fresh user, then walks every
+feature end-to-end through the real Dio client → repositories → use cases →
+backend → SQLite, proving the assembled app actually talks to a real backend —
+not just that each screen renders against a stub.
 
 ## Running
 
 ```bash
-fvm flutter test integration_test                              # whole suite
-fvm flutter test integration_test/bookmarks_flow_test.dart     # one file
+tool/run_e2e.sh                 # one shot: reset + start backend, run, tear down
+tool/run_e2e.sh <device-id>     # target a specific `flutter devices` id
 ```
 
-Unlike plain widget tests, `flutter test integration_test` boots the real
-assembled `App` and always runs it against an actual platform target — never
-the headless `flutter_tester` surface widget tests use. Locally that means it
-builds and launches a real desktop app window (e.g. macOS), so you need a
-desktop platform enabled (`flutter config --enable-macos-desktop` or the
-equivalent for your OS).
+The script resets `simple_backend_server/data.db`, starts the backend, waits
+for `/health`, runs the suite against a connected iOS Simulator with
+`--dart-define=API_BASE_URL=...`, then stops the backend.
 
-**This suite intentionally does not run in CI** — the Ubuntu runner has no
-platform target set up for it (no Linux/web desktop scaffold, no
-emulator/simulator), and wiring one up is significant infrastructure (native
-toolchains, build dependencies, platform-specific flakiness) for a test suite
-whose job is to catch wiring regressions, not run on every push. Run it
-locally — and **always before cutting a release** — as the final check that
-the assembled app actually boots, navigates, and wires its features together
-correctly.
+To run manually (e.g. against a backend you're already running):
+
+```bash
+cd simple_backend_server && go run .   # in one terminal
+
+fvm flutter test integration_test/e2e_test.dart \
+  -d <device-id> \
+  --dart-define=API_BASE_URL=http://localhost:8080 \
+  --dart-define=FLAVOR=dev
+```
+
+`flutter test integration_test` always runs against a real platform target —
+never the headless `flutter_tester` surface widget tests use — so you need a
+platform enabled. We target the **iOS Simulator** specifically: it reaches the
+backend at `localhost` directly, and (unlike macOS, in this repo) ships a
+`GoogleService-Info.plist`, so the real Firebase bootstrap succeeds.
+
+**This suite intentionally does not run in CI** — it needs a running backend, a
+booted simulator, and emits real Firebase telemetry. Run it locally — and
+**always before cutting a release** — as the final check that the assembled app
+actually boots, registers, persists data through a real backend, and wires its
+features together correctly.
 
 ## Layout
 
-- **`support/harness.dart`** — `AppHarness`, the shared test harness. Each test
-  file creates one in `setUp`, calls `harness.setUp()`, optionally registers
-  additional feature blocs in `getIt`, then drives the UI with `pumpApp` /
-  `signInToHome` / `settle` / `pumpUntil`. `harness.tearDown()` closes every
-  bloc and resets `getIt`. See the doc comment on `AppHarness` for the full
-  usage pattern.
-- **`app_test.dart`** — the original end-to-end smoke test: unauthenticated →
-  splash → login → home, asserting the sync controllers start once signed in.
-  Predates the harness extraction; kept as a self-contained reference for the
-  full boot sequence.
-- **`auth_flow_test.dart`** — login failure (wrong credentials surface
-  `l10n.errorUnknown` and stay on the login screen) and Login → Register
-  navigation.
-- **`bookmarks_flow_test.dart`** — list renders fixture bookmarks, the FAB opens
-  the create form, and tapping a card opens the detail screen (verifying
-  `GetBookmark` is invoked).
-- **`collections_flow_test.dart`** — list renders the fixture collection (via
-  the home screen's "Featured Collections" → "View all"), the FAB opens the
-  create form, and tapping a collection opens its detail screen.
-- **`notifications_flow_test.dart`** — the Notifications tab renders the feed
-  and activity sections, an unread notification appears, and tapping it invokes
-  `MarkNotificationRead`.
-- **`profile_flow_test.dart`** — the Profile screen shows the Appearance and
-  Account sections, and signing out returns to the login screen and stops all
-  three sync controllers.
+- **`support/e2e_app.dart`** — `E2eApp`, the bootstrap helper. Mirrors
+  `lib/main.dart`'s production startup (`configureDependencies()`, real
+  Firebase/RemoteConfig/Notifications init) once per suite via
+  `E2eApp.bootstrap()`, then `E2eApp.pumpApp` boots `const App()` with **no
+  constructor overrides** — every dependency resolves through `getIt` to its
+  real implementation. Also provides the UI-driving helpers `settle`,
+  `pumpUntil`, and `waitForLoginScreen` (splash → login, including its
+  2-second minimum-display guard).
+- **`e2e_test.dart`** — the one journey: register a unique user → reach Home →
+  create a bookmark and open its detail → create a collection and open its
+  detail → check the Notifications tab → sign out from Profile, back to login.
+  Each run uses a timestamp-unique email/username, so it's order-independent
+  and self-cleaning — no DB pre-seed, no teardown, safe to re-run against the
+  same `data.db`.
 
-## Why a shared harness
+## Why one journey, not one file per feature
 
-Booting the app for an integration test means wiring a lot of things that have
-nothing to do with any one feature: `getIt.reset()`, `SharedPreferences` mock
-values, `PackageInfo` stubs, the auth/session/sync-controller mocks, `AuthBloc`
-and `ThemeBloc`, plus the splash → login → home sign-in sequence (which is
-timing-sensitive — it has to wait out the splash screen's minimum-display guard
-and poll for the home screen to appear). `AppHarness` extracts all of that once
-so each feature file only registers the blocs and use-case mocks it actually
-cares about, then calls `harness.signInToHome(tester)` and starts asserting.
+A previous version of this suite had a shared mock harness (`AppHarness`) and
+one file per feature, each independently signing in as a stubbed user and
+asserting against hardcoded fixtures. That caught wiring regressions cheaply,
+but proved nothing about the app talking to a real backend, and running it
+meant several independent app boots. Folding everything into a single
+real-backend journey means **one run** exercises every feature against the real
+stack, in the order a user would actually encounter them — register once, then
+carry that authenticated session through bookmarks, collections, notifications,
+and sign-out.
 
-## Gotchas worth knowing before editing these tests
+## Gotchas worth knowing before editing this test
 
 - **Lazy sliver building**: `ListView`/`SliverList` only build elements that
   are within (or near) the visible viewport — even for the plain
@@ -84,11 +84,11 @@ cares about, then calls `harness.signInToHome(tester)` and starts asserting.
   `tester.scrollUntilVisible(finder, delta)` it into view. A `pumpUntil` that
   "times out" on such a finder looks identical to one that "succeeds" unless
   you check its result — see the next point.
-- **`AppHarness.pumpUntil` doesn't distinguish success from timeout**: its loop
+- **`E2eApp.pumpUntil` doesn't distinguish success from timeout**: its loop
   condition is `i < maxTries && finder.evaluate().isEmpty`, which exits on
   *either* the finder becoming non-empty *or* `maxTries` being exhausted. Don't
   assume a `pumpUntil` that "returned" means the finder was found — follow it
-  with an `expect(finder, findsOneWidget)` (as every test here does).
+  with an `expect(finder, findsOneWidget)` (as the journey does at each step).
 - **Floating bottom-nav pill overlap**: `AppAdaptiveScaffold`'s floating pill
   bar is an overlay docked to the bottom of the screen. At the integration test
   viewport size it can visually cover the last item in scrollable content (e.g.
@@ -102,3 +102,8 @@ cares about, then calls `harness.signInToHome(tester)` and starts asserting.
   a `Flexible`, which breaks ancestor-finder traversal from the label up to the
   button. Use a bare `find.text(...)` or look the button up directly by type
   when it's the only one of its kind on the screen.
+- **Real network calls are slower and more variable than mocks** — they're
+  subject to actual latency, JSON (de)serialization, and SQLite writes on the
+  backend. `E2eApp.pumpUntil` defaults to a longer budget
+  (100 tries × 200 ms = 20 s) than the old mock-tuned harness; raise it further
+  for steps that round-trip more (e.g. registration, which also hits bcrypt).
