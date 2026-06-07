@@ -38,6 +38,7 @@ void main() {
     final email = 'e2e+$runId@example.com';
     const password = 'TestPass123';
     final bookmarkTitle = 'E2E Bookmark $runId';
+    final editedBookmarkTitle = 'E2E Bookmark Updated $runId';
     final collectionName = 'E2E Collection $runId';
 
     // ---- Form validation before auth ---------------------------------------
@@ -103,6 +104,24 @@ void main() {
       ),
     );
     expect(find.text(bookmarkTitle), findsWidgets);
+
+    await tester.tap(find.byType(PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text('Edit bookmark'));
+
+    await tester.enterText(
+      find.byType(TextFormField).at(1),
+      editedBookmarkTitle,
+    );
+    await tester.tap(find.text('Save'));
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    expect(find.text(editedBookmarkTitle), findsWidgets);
+    expect(find.text(bookmarkTitle), findsNothing);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -177,8 +196,8 @@ void main() {
 
     await tester.tap(find.byTooltip('Bookmarks'));
     await tester.pumpAndSettle();
-    await E2eApp.pumpUntil(tester, find.text(bookmarkTitle));
-    expect(find.text(bookmarkTitle), findsWidgets);
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    expect(find.text(editedBookmarkTitle), findsWidgets);
 
     await tester.tap(find.byTooltip('Home'));
     await tester.pumpAndSettle();
@@ -189,6 +208,24 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Bookmarks'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    await tester.tap(find.text(editedBookmarkTitle).first);
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+
+    await tester.tap(find.byType(PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text('Delete bookmark?'));
+    await tester.tap(find.text('Delete').last);
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+    expect(find.text(editedBookmarkTitle), findsNothing);
+
     await _signOut(tester);
   });
 }
