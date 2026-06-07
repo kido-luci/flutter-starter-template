@@ -124,7 +124,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y clang cmake ninja-build pkg-config \
-            libgtk-3-dev liblzma-dev
+            libgtk-3-dev liblzma-dev libsecret-1-dev
 
       - name: Enable Linux desktop
         run: flutter config --enable-linux-desktop
