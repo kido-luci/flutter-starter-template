@@ -40,6 +40,7 @@ void main() {
     final bookmarkTitle = 'E2E Bookmark $runId';
     final editedBookmarkTitle = 'E2E Bookmark Updated $runId';
     final collectionName = 'E2E Collection $runId';
+    final editedCollectionName = 'E2E Collection Updated $runId';
 
     // ---- Form validation before auth ---------------------------------------
     await E2eApp.waitForLoginScreen(tester);
@@ -187,8 +188,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(editedBookmarkTitle), findsNothing);
 
+    await tester.tap(find.byTooltip('Edit collection'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text('Edit collection'));
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      editedCollectionName,
+    );
+    await tester.tap(find.text('Save'));
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
     await tester.pageBack();
     await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await _expectHome(tester);
+    await _openCollectionsListFromHome(tester);
+    await E2eApp.pumpUntil(tester, find.text(editedCollectionName));
+    expect(find.text(editedCollectionName), findsWidgets);
+    expect(find.text(collectionName), findsNothing);
+
     await tester.pageBack();
     await tester.pumpAndSettle();
 
@@ -220,8 +241,25 @@ void main() {
     await tester.pumpAndSettle();
     await _expectHome(tester);
     await _openCollectionsListFromHome(tester);
-    await E2eApp.pumpUntil(tester, find.text(collectionName));
-    expect(find.text(collectionName), findsWidgets);
+    await E2eApp.pumpUntil(tester, find.text(editedCollectionName));
+    expect(find.text(editedCollectionName), findsWidgets);
+
+    await tester.tap(find.text(editedCollectionName).first);
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text(editedCollectionName));
+    await tester.tap(find.byTooltip('Delete collection'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text('Delete collection'));
+    await tester.tap(find.text('Delete collection').last);
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await _expectHome(tester);
+    await _openCollectionsListFromHome(tester);
+    await E2eApp.settle(tester);
+    expect(find.text(editedCollectionName), findsNothing);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
