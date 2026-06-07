@@ -110,15 +110,24 @@ void main() {
       find.byType(TextFormField).at(1),
       editedBookmarkTitle,
     );
-    await tester.tap(find.text('Save'));
+    await tester.tap(find.text('Save').last, warnIfMissed: false);
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
 
+    await E2eApp.pumpUntil(
+      tester,
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Bookmark Details'),
+      ),
+    );
     await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
     expect(find.text(editedBookmarkTitle), findsWidgets);
     expect(find.text(bookmarkTitle), findsNothing);
 
     await _goToBookmarksList(tester, find.text(editedBookmarkTitle).first);
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    expect(find.text(editedBookmarkTitle), findsWidgets);
 
     // ---- Collections: create one through the real backend ------------------
     await tester.tap(find.byTooltip('Home'));
