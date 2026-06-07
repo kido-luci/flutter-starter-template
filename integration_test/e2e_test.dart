@@ -59,11 +59,7 @@ void main() {
     // ---- Register a fresh user --------------------------------------------
     await _register(tester, email: email, password: password);
 
-    await E2eApp.pumpUntil(tester, find.text('Home'));
-    expect(
-      find.descendant(of: find.byType(AppBar), matching: find.text('Home')),
-      findsOneWidget,
-    );
+    await _expectHome(tester);
     final authBloc = tester.element(find.byType(MaterialApp)).read<AuthBloc>();
     expect(authBloc.state, isA<AuthAuthenticated>());
     expect((authBloc.state as AuthAuthenticated).user.username, email);
@@ -145,24 +141,7 @@ void main() {
     // stays stale (still showing "no collections yet"). Push the collections
     // list route directly to verify the new collection actually round-tripped
     // through the real backend, rather than asserting against stale UI state.
-    final homeAppBarTitle = find.descendant(
-      of: find.byType(AppBar),
-      matching: find.text('Home'),
-    );
-    await E2eApp.pumpUntil(tester, homeAppBarTitle);
-    // `GoRouter.of` resolves an `InheritedWidget` scoped *below* the `Router`
-    // that `MaterialApp.router` builds — `MaterialApp`'s own element sits
-    // above it, so it can't see the router. Use an element from inside the
-    // routed screen instead (the Home AppBar title we just located).
-    //
-    // `push` also returns a Future that only completes once the route is
-    // popped — don't await it here, or the test would deadlock waiting for a
-    // pop that hasn't happened yet.
-    unawaited(
-      const CollectionsListRoute().push<void>(tester.element(homeAppBarTitle)),
-    );
-    await E2eApp.settle(tester);
-    await tester.pumpAndSettle();
+    await _openCollectionsListFromHome(tester);
 
     await E2eApp.pumpUntil(tester, find.text(collectionName));
     expect(find.text(collectionName), findsWidgets);
@@ -190,37 +169,99 @@ void main() {
     expect(find.text('Your activity'), findsWidgets);
 
     // ---- Profile: sign out, returning to login -----------------------------
-    await tester.tap(find.byTooltip('Profile'));
-    await tester.pumpAndSettle();
-    await E2eApp.pumpUntil(
-      tester,
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Profile'),
-      ),
-    );
-    expect(find.text('Appearance'), findsWidgets);
-    expect(find.text('Account'), findsWidgets);
+    await _signOut(tester);
 
-    // The "Sign out" button sits below the initial viewport (lazy sliver
-    // building) and under the floating bottom-nav pill once scrolled into
-    // view, so a coordinate tap lands on the pill — invoke its callback
-    // directly, bypassing hit-testing (see integration_test/README.md).
-    await tester.scrollUntilVisible(find.text('Sign out'), 200);
-    await tester.pumpAndSettle();
-    final signOutButton = tester.widget<FilledButton>(
-      find.byType(FilledButton),
-    );
-    signOutButton.onPressed!();
-    await tester.pumpAndSettle();
+    // ---- Existing user login preserves backend data ------------------------
+    await _login(tester, email: email, password: password);
+    await _expectHome(tester);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Sign out'));
-    await E2eApp.settle(tester);
+    await tester.tap(find.byTooltip('Bookmarks'));
     await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text(bookmarkTitle));
+    expect(find.text(bookmarkTitle), findsWidgets);
 
-    await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
-    expect(find.text('Welcome Back'), findsOneWidget);
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
+    await _expectHome(tester);
+    await _openCollectionsListFromHome(tester);
+    await E2eApp.pumpUntil(tester, find.text(collectionName));
+    expect(find.text(collectionName), findsWidgets);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await _signOut(tester);
   });
+}
+
+Future<void> _expectHome(WidgetTester tester) async {
+  final homeTitle = find.descendant(
+    of: find.byType(AppBar),
+    matching: find.text('Home'),
+  );
+  await E2eApp.pumpUntil(tester, homeTitle);
+  expect(homeTitle, findsOneWidget);
+}
+
+Future<void> _openCollectionsListFromHome(WidgetTester tester) async {
+  final homeAppBarTitle = find.descendant(
+    of: find.byType(AppBar),
+    matching: find.text('Home'),
+  );
+  await E2eApp.pumpUntil(tester, homeAppBarTitle);
+  // `GoRouter.of` resolves an `InheritedWidget` scoped *below* the `Router`
+  // that `MaterialApp.router` builds — `MaterialApp`'s own element sits
+  // above it, so it can't see the router. Use an element from inside the
+  // routed screen instead (the Home AppBar title we just located).
+  //
+  // `push` also returns a Future that only completes once the route is
+  // popped — don't await it here, or the test would deadlock waiting for a
+  // pop that hasn't happened yet.
+  unawaited(
+    const CollectionsListRoute().push<void>(tester.element(homeAppBarTitle)),
+  );
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _login(
+  WidgetTester tester, {
+  required String email,
+  required String password,
+}) async {
+  await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
+  await tester.enterText(find.byType(TextFormField).at(0), email);
+  await tester.enterText(find.byType(TextFormField).at(1), password);
+  await tester.tap(find.text('Log In'));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _signOut(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Profile'));
+  await tester.pumpAndSettle();
+  await E2eApp.pumpUntil(
+    tester,
+    find.descendant(of: find.byType(AppBar), matching: find.text('Profile')),
+  );
+  expect(find.text('Appearance'), findsWidgets);
+  expect(find.text('Account'), findsWidgets);
+
+  // The "Sign out" button sits below the initial viewport (lazy sliver
+  // building) and under the floating bottom-nav pill once scrolled into
+  // view, so a coordinate tap lands on the pill — invoke its callback
+  // directly, bypassing hit-testing (see integration_test/README.md).
+  await tester.scrollUntilVisible(find.text('Sign out'), 200);
+  await tester.pumpAndSettle();
+  final signOutButton = tester.widget<FilledButton>(find.byType(FilledButton));
+  signOutButton.onPressed!();
+  await tester.pumpAndSettle();
+
+  await tester.tap(find.widgetWithText(TextButton, 'Sign out'));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+
+  await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
+  expect(find.text('Welcome Back'), findsOneWidget);
 }
 
 Future<void> _register(
