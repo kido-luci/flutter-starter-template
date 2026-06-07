@@ -37,6 +37,7 @@ void main() {
     final runId = DateTime.now().millisecondsSinceEpoch;
     final email = 'e2e+$runId@example.com';
     const password = 'TestPass123';
+    const changedPassword = 'ChangedPass123';
     final bookmarkTitle = 'E2E Bookmark $runId';
     final editedBookmarkTitle = 'E2E Bookmark Updated $runId';
     final collectionName = 'E2E Collection $runId';
@@ -281,6 +282,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(editedBookmarkTitle), findsNothing);
 
+    // ---- Change password: old password fails, new password works -----------
+    await _changePassword(
+      tester,
+      currentPassword: password,
+      newPassword: changedPassword,
+    );
+    await _signOut(tester);
+    await _expectLoginFailure(tester, email: email, password: password);
+    await _login(tester, email: email, password: changedPassword);
+    await _expectHome(tester);
     await _signOut(tester);
   });
 }
@@ -354,6 +365,49 @@ Future<void> _signOut(WidgetTester tester) async {
 
   await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
   expect(find.text('Welcome Back'), findsOneWidget);
+}
+
+Future<void> _changePassword(
+  WidgetTester tester, {
+  required String currentPassword,
+  required String newPassword,
+}) async {
+  await tester.tap(find.byTooltip('Profile'));
+  await tester.pumpAndSettle();
+  await E2eApp.pumpUntil(tester, find.text('Change Password'));
+  await tester.scrollUntilVisible(find.text('Change Password'), 200);
+  await tester.tap(find.text('Change Password'));
+  await tester.pumpAndSettle();
+  await E2eApp.pumpUntil(tester, find.text('Update Password'));
+
+  await tester.enterText(find.byType(TextFormField).at(0), currentPassword);
+  await tester.enterText(find.byType(TextFormField).at(1), newPassword);
+  await tester.enterText(find.byType(TextFormField).at(2), newPassword);
+  await tester.tap(find.text('Update Password'));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+
+  await E2eApp.pumpUntil(
+    tester,
+    find.descendant(of: find.byType(AppBar), matching: find.text('Profile')),
+  );
+  expect(find.text('Profile'), findsWidgets);
+}
+
+Future<void> _expectLoginFailure(
+  WidgetTester tester, {
+  required String email,
+  required String password,
+}) async {
+  await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
+  await tester.enterText(find.byType(TextFormField).at(0), email);
+  await tester.enterText(find.byType(TextFormField).at(1), password);
+  await tester.tap(find.text('Log In'));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+
+  expect(find.text('Welcome Back'), findsOneWidget);
+  expect(find.text('Please enter a username and password.'), findsWidgets);
 }
 
 Future<void> _register(
