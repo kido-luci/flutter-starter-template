@@ -228,16 +228,14 @@ void main() {
 
     // ---- Existing user login preserves backend data ------------------------
     await _login(tester, email: email, password: password);
-    await _expectHome(tester);
+    await _goHome(tester);
 
     await tester.tap(find.byTooltip('Bookmarks'));
     await tester.pumpAndSettle();
     await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
     expect(find.text(editedBookmarkTitle), findsWidgets);
 
-    await tester.tap(find.byTooltip('Home'));
-    await tester.pumpAndSettle();
-    await _expectHome(tester);
+    await _goHome(tester);
     await _openCollectionsListFromHome(tester);
     await E2eApp.pumpUntil(tester, find.text(editedCollectionName));
     expect(find.text(editedCollectionName), findsWidgets);
@@ -287,7 +285,7 @@ void main() {
     await _signOut(tester);
     await _expectLoginFailure(tester, email: email, password: password);
     await _login(tester, email: email, password: changedPassword);
-    await _expectHome(tester);
+    await _goHome(tester);
     await _signOut(tester);
   });
 }
@@ -299,6 +297,12 @@ Future<void> _expectHome(WidgetTester tester) async {
   );
   await E2eApp.pumpUntil(tester, homeTitle);
   expect(homeTitle, findsOneWidget);
+}
+
+Future<void> _goHome(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Home'));
+  await tester.pumpAndSettle();
+  await _expectHome(tester);
 }
 
 Future<void> _openCollectionsListFromHome(WidgetTester tester) async {
