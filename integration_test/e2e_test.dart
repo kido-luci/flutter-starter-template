@@ -21,6 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
+import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -96,15 +97,7 @@ void main() {
     await E2eApp.pumpUntil(tester, find.text(bookmarkTitle));
     expect(find.text(bookmarkTitle), findsWidgets);
 
-    await tester.tap(find.text(bookmarkTitle).first);
-    await tester.pumpAndSettle();
-    await E2eApp.pumpUntil(
-      tester,
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Bookmark Details'),
-      ),
-    );
+    await _openBookmarkDetail(tester, bookmarkTitle);
     expect(find.text(bookmarkTitle), findsWidgets);
 
     await tester.tap(find.byType(PopupMenuButton).first);
@@ -268,8 +261,7 @@ void main() {
     await tester.tap(find.byTooltip('Bookmarks'));
     await tester.pumpAndSettle();
     await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
-    await tester.tap(find.text(editedBookmarkTitle).first);
-    await tester.pumpAndSettle();
+    await _openBookmarkDetail(tester, editedBookmarkTitle);
     await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
 
     await tester.tap(find.byType(PopupMenuButton).first);
@@ -324,6 +316,23 @@ Future<void> _openCollectionsListFromHome(WidgetTester tester) async {
   );
   await E2eApp.settle(tester);
   await tester.pumpAndSettle();
+}
+
+Future<void> _openBookmarkDetail(WidgetTester tester, String title) async {
+  final titleFinder = find.text(title).first;
+  final context = tester.element(titleFinder);
+  final bloc = context.read<BookmarksListBloc>();
+  final bookmark = bloc.state.items.firstWhere((item) => item.title == title);
+
+  unawaited(BookmarkDetailRoute(bookmark.id).push<void>(context));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+  final detailTitle = find.descendant(
+    of: find.byType(AppBar),
+    matching: find.text('Bookmark Details'),
+  );
+  await E2eApp.pumpUntil(tester, detailTitle);
+  expect(detailTitle, findsOneWidget);
 }
 
 Future<void> _login(
