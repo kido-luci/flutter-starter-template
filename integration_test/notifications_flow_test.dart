@@ -71,16 +71,16 @@ void main() {
       await tester.tap(find.byTooltip('Notifications'));
       await tester.pumpAndSettle();
       await harness.pumpUntil(tester, find.text('New bookmark added'));
+      verifyNever(() => harness.markRead(any()));
 
       // Tap the unread notification to mark it read.
       await tester.tap(find.text('New bookmark added').first);
       await harness.settle(tester);
       await tester.pumpAndSettle();
 
-      // MarkNotificationRead was called with the unread notification's id.
-      verify(
-        () => harness.markRead(testUnreadNotification.id),
-      ).called(greaterThanOrEqualTo(1));
+      // MarkNotificationRead was called exactly once, with the unread
+      // notification's id, as a direct result of the tap above.
+      verify(() => harness.markRead(testUnreadNotification.id)).called(1);
     },
   );
 }

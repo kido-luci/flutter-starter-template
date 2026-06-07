@@ -32,6 +32,7 @@ void main() {
   late AuthBloc authBloc;
   late ThemeBloc themeBloc;
   HomeBloc? homeBloc;
+  NotificationsBloc? notificationsBloc;
 
   setUp(() async {
     await getIt.reset();
@@ -116,15 +117,17 @@ void main() {
     when(() => activityNotifier.onActivityOccurred).thenAnswer(
       (_) => const Stream.empty(),
     );
-    getIt.registerLazySingleton<NotificationsBloc>(
-      () => NotificationsBloc(
+    getIt.registerLazySingleton<NotificationsBloc>(() {
+      final bloc = NotificationsBloc(
         getFeed,
         getFeedLocal,
         markRead,
         activityNotifier,
         notificationsSync,
-      ),
-    );
+      );
+      notificationsBloc = bloc;
+      return bloc;
+    });
   });
 
   tearDown(() async {
@@ -132,6 +135,10 @@ void main() {
     final bloc = homeBloc;
     if (bloc != null && !bloc.isClosed) {
       await bloc.close();
+    }
+    final nBloc = notificationsBloc;
+    if (nBloc != null && !nBloc.isClosed) {
+      await nBloc.close();
     }
     await themeBloc.close();
     await authBloc.close();
