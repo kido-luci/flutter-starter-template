@@ -16,12 +16,12 @@
 
 import 'dart:async';
 
-import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
+import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmark_form/bookmark_form_bloc.dart';
 import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -111,12 +111,9 @@ void main() {
       find.byType(TextFormField).at(1),
       editedBookmarkTitle,
     );
-    final saveBookmarkButton = tester.widget<AppButton>(
-      find.byWidgetPredicate(
-        (widget) => widget is AppButton && widget.label == 'Save',
-      ),
-    );
-    saveBookmarkButton.onPressed!();
+    tester.element(find.text('Edit bookmark')).read<BookmarkFormBloc>()
+      ..add(BookmarkFormTitleChanged(editedBookmarkTitle))
+      ..add(const BookmarkFormSubmitted());
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
 
