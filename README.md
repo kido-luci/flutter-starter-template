@@ -7,6 +7,12 @@
   <a href="https://luci-studio.com"><img alt="Luci" src="https://img.shields.io/badge/built_by-Luci_Studio-FF6B6B?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjIiIHJ5PSIyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjIiLz48bGluZSB4MT0iMTIuMSIgeTE9IjkuMSIgeDI9IjE1IiB5Mj0iMTUiLz48L3N2Zz4="></a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/kido-luci/flutter-starter-template/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kido-luci/flutter-starter-template/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/kido-luci/flutter-starter-template/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/kido-luci/flutter-starter-template/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/kido-luci/flutter-starter-template/actions/workflows/release.yml"><img alt="Release" src="https://github.com/kido-luci/flutter-starter-template/actions/workflows/release.yml/badge.svg"></a>
+</p>
+
 <h1 align="center">
   <br>
   <img src="assets/icons/logo.png" alt="App Logo" width="150">
@@ -28,6 +34,32 @@
 **Flutter Starter Template**, built by [Luci Studio](https://luci-studio.com), is an enterprise-grade mobile boilerplate engineered for building scalable, high-performance cross-platform applications. It solves the complex challenges of bootstrapping new projects by providing a production-ready structure out of the box. This template features strict Clean Architecture layers, robust offline-first synchronization, secure JWT credential lifecycle management, and pre-configured Firebase integrations.
 
 To enable seamless local development and testing, this template is paired with a companion SQLite-backed backend server written in Go, allowing you to test authentication flows, CRUD operations, and sync conflict resolution under real network conditions.
+
+<br>
+
+<details>
+<summary><b>📑 Table of Contents</b></summary>
+<br>
+
+- [✨ What's Inside](#-whats-inside)
+- [📸 Screenshots](#-screenshots)
+- [🧬 Architecture](#-architecture)
+  - [📁 Feature Slice (Clean Architecture)](#-feature-slice-clean-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [🧪 Testing & Code Quality](#-testing--code-quality)
+- [🔄 Git Workflow & PRs](#-git-workflow--prs)
+- [🔥 Firebase](#-firebase)
+- [🍦 Flavors & Environment](#-flavors--environment)
+- [🚀 Release (Fastlane)](#-release-fastlane)
+- [📶 Offline‑First Sync](#-offlinefirst-sync)
+- [🔗 Deep Linking](#-deep-linking)
+- [🧩 UI Widgets](#-ui-widgets)
+- [🧰 Tech Stack](#-tech-stack)
+- [🤖 AI‑Native Workflow](#-ainative-workflow)
+- [🔄 Code Generation](#-code-generation)
+- [🌐 Localization (i18n)](#-localization-i18n)
+
+</details>
 
 <br>
 
@@ -53,6 +85,32 @@ To enable seamless local development and testing, this template is paired with a
 | ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark & collection CRUD, uploads |
 | 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude, Cursor, Codex, Command Code, and Antigravity |
 | 🚀 **Release CI**         | Fastlane lanes — iOS → TestFlight, Android → Play — flavor‑aware, wired to GitHub Actions |
+
+<br>
+
+---
+
+<br>
+
+## 📸 Screenshots
+
+<p align="center"><i>📷 Screenshots coming soon.</i></p>
+
+<!-- Screenshot gallery — uncomment once doc/screenshots/*.png are captured.
+<p align="center">
+  <img src="doc/screenshots/sign_in.png" alt="Sign in" width="240">
+  <img src="doc/screenshots/home.png" alt="Home" width="240">
+  <img src="doc/screenshots/bookmarks.png" alt="Bookmarks" width="240">
+</p>
+<p align="center">
+  <img src="doc/screenshots/bookmark_detail.png" alt="Bookmark detail" width="240">
+  <img src="doc/screenshots/collections.png" alt="Collections" width="240">
+  <img src="doc/screenshots/profile_dark.png" alt="Profile (dark)" width="240">
+</p>
+
+<p align="center"><sub>Light & true‑black OLED dark themes · Material 3 · responsive master/detail</sub></p>
+-->
+
 
 <br>
 
@@ -320,71 +378,19 @@ fvm dart format .
 
 ## 🔄 Git Workflow & PRs
 
-The `main` branch is protected. Direct pushes to `main` are disabled, and all changes must be merged via Pull Requests.
+The `main` branch is protected — all changes land through Pull Requests, with
+**CodeRabbit** AI review and **CodeQL** security scanning on every PR.
 
-### 1. Create a Branch
-Branch names should follow conventions:
-* `feat/your-feature-name` or `feature/your-feature-name`
-* `fix/bug-description`
-* `docs/documentation-update`
+The full contributor workflow — branch naming, the local verification gate, the
+pre-push hook, opening a PR, and the AI review / security tooling — lives in
+[**`CONTRIBUTING.md`**](CONTRIBUTING.md).
 
-### 2. Verify Locally
-Before pushing your branch, run local checks to ensure the CI will pass:
 ```bash
+# The local gate CI enforces — run before pushing
 fvm dart format .
 fvm flutter analyze
 fvm flutter test --exclude-tags golden
-
-for package in packages/*; do
-  if [ -d "$package/test" ]; then
-    (cd "$package" && fvm flutter test --exclude-tags golden)
-  fi
-done
 ```
-
-To run the formatting and analyzer gates automatically on every `git push`,
-enable the repo's pre-push hook once per clone:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-The hook (`.githooks/pre-push`) runs the same `dart format` and
-`flutter analyze` checks CI enforces, so a formatting slip can't reach CI.
-Bypass in an emergency with `git push --no-verify`.
-
-### 3. Open a Pull Request
-Push your branch to the remote and create a Pull Request (PR) targeting `main`.
-* The **`Analyze & Test`** GitHub Actions workflow will run automatically.
-* **CodeRabbit** posts an AI review automatically (see below).
-* Once the checks pass, the PR can be merged.
-
-### 4. Cleanup
-After merging, delete the remote branch. You can prune your local tracking branches with:
-```bash
-git fetch --prune
-```
-
-### 🐰 AI Code Review (CodeRabbit)
-
-Every PR targeting `main` is reviewed automatically by
-[CodeRabbit](https://coderabbit.ai) — free for this public repo. It posts a
-high‑level summary plus inline, line‑by‑line suggestions, and you can chat with
-it directly in PR comments.
-
-Behavior is configured in [`.coderabbit.yaml`](.coderabbit.yaml): generated and
-vendored files are skipped, and the reviewer is fed this project's
-`core` / `shared` / `features` layering rules so feedback respects the
-architecture. Reviews use the `chill` profile to avoid style nitpicks already
-covered by `dart format` + `very_good_analysis`.
-
-| Comment in a PR        | Action                              |
-|------------------------|-------------------------------------|
-| `@coderabbitai review` | Re‑run the review                   |
-| `@coderabbitai summary`| Regenerate the PR summary           |
-| `@coderabbitai pause`  | Pause reviews on the PR             |
-| `@coderabbitai resume` | Resume reviews on the PR            |
-| `@coderabbitai help`   | List all commands                   |
 
 <br>
 
