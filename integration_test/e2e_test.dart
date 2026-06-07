@@ -170,6 +170,23 @@ void main() {
     await E2eApp.pumpUntil(tester, find.text(collectionName));
     expect(find.text(collectionName), findsWidgets);
 
+    await tester.tap(find.text('Add bookmarks'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    await tester.tap(find.text(editedBookmarkTitle).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add 1'));
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
+    await E2eApp.pumpUntil(tester, find.text(editedBookmarkTitle));
+    expect(find.text(editedBookmarkTitle), findsWidgets);
+
+    await tester.tap(find.byTooltip('Remove from collection'));
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+    expect(find.text(editedBookmarkTitle), findsNothing);
+
     await tester.pageBack();
     await tester.pumpAndSettle();
     await tester.pageBack();
