@@ -20,8 +20,21 @@ fvm flutter test integration_test                              # whole suite
 fvm flutter test integration_test/bookmarks_flow_test.dart     # one file
 ```
 
-CI runs the whole suite on the host VM (`flutter test integration_test`) — see
-`.github/workflows/ci.yml`.
+Unlike plain widget tests, `flutter test integration_test` boots the real
+assembled `App` and always runs it against an actual platform target — never
+the headless `flutter_tester` surface widget tests use. Locally that means it
+builds and launches a real desktop app window (e.g. macOS), so you need a
+desktop platform enabled (`flutter config --enable-macos-desktop` or the
+equivalent for your OS).
+
+**This suite intentionally does not run in CI** — the Ubuntu runner has no
+platform target set up for it (no Linux/web desktop scaffold, no
+emulator/simulator), and wiring one up is significant infrastructure (native
+toolchains, build dependencies, platform-specific flakiness) for a test suite
+whose job is to catch wiring regressions, not run on every push. Run it
+locally — and **always before cutting a release** — as the final check that
+the assembled app actually boots, navigates, and wires its features together
+correctly.
 
 ## Layout
 
