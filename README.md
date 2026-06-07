@@ -280,6 +280,27 @@ macOS while CI runs on Ubuntu.
 Refer to the [test/README.md](test/README.md) file for detailed testing
 guidelines and patterns.
 
+### 🧭 End-to-End Testing
+
+Unlike the unit/widget/bloc suites above — which mock every boundary —
+`integration_test/` runs a single real-backend journey: it boots the actual
+assembled `App` (real DI, real Firebase, **no mocks**) against the local
+`simple_backend_server` and walks one self-seeded user through every feature —
+register, bookmarks, collections, notifications, sign-out — proving the real
+Dio client → repositories → use cases → backend → SQLite all wire together.
+
+```bash
+tool/run_e2e.sh                 # one shot: reset + start backend, run, tear down
+tool/run_e2e.sh <device-id>     # target a specific `flutter devices` id
+```
+
+It needs a booted **iOS Simulator** (not macOS — only `ios/` ships a
+`GoogleService-Info.plist`) and isn't run in CI, since it requires a live
+backend and emits real Firebase telemetry. Run it locally before cutting a
+release. See [integration_test/README.md](integration_test/README.md) for
+details, gotchas, and how to run it manually against an already-running
+backend.
+
 ### 🔍 Static Analysis & Linting
 
 Verify lint rules, formatting, and type safety before committing:
