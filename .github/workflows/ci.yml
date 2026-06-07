@@ -84,9 +84,7 @@ jobs:
       # Golden tests are excluded: Flutter goldens are not guaranteed to match
       # across operating systems, and baselines are generated on macOS while
       # this runner is Ubuntu. They run locally as a regression check (see
-      # dart_test.yaml). Integration tests under integration_test/ also do not
-      # run here — `flutter test` only picks up the test/ directory, and they
-      # require a connected device/emulator.
+      # dart_test.yaml).
       - name: Run tests
         run: |
           flutter test --coverage --exclude-tags golden
@@ -117,6 +115,11 @@ jobs:
                 "$package/coverage/lcov.info" >> coverage/lcov.info
             fi
           done
+
+      # Integration tests boot the real App widget tree with mocked use-cases
+      # so they run headless without a device or emulator.
+      - name: Run integration tests
+        run: flutter test integration_test
 
       - name: Upload coverage artifact
         if: always()

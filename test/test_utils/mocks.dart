@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_starter_template/features/auth/domain/repositories/auth_repository.dart';
+import 'package:flutter_starter_template/features/auth/domain/usecases/change_password.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/delete_account.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/register.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/restore_session.dart';
@@ -14,12 +15,23 @@ import 'package:flutter_starter_template/features/bookmarks/domain/usecases/get_
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_local_bookmarks.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/usecases/update_bookmark.dart';
+import 'package:flutter_starter_template/features/collections/domain/entities/collection.dart';
 import 'package:flutter_starter_template/features/collections/domain/services/collections_sync_controller.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/create_collection.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/delete_collection.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/get_collection.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/list_collections.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/list_local_collections.dart';
+import 'package:flutter_starter_template/features/collections/domain/usecases/update_collection.dart';
 import 'package:flutter_starter_template/features/notifications/domain/services/notifications_sync_controller.dart';
+import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed.dart';
+import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed_local.dart';
+import 'package:flutter_starter_template/features/notifications/domain/usecases/mark_notification_read.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
+import 'package:flutter_starter_template/shared/domain/bookmark_summaries.dart';
 import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_starter_template/shared/domain/entities/auth_user.dart';
 import 'package:flutter_starter_template/shared/domain/session.dart';
@@ -69,6 +81,38 @@ class MockNotificationsSyncController extends Mock
     implements NotificationsSyncController {}
 
 class FakeBookmarkInput extends Fake implements BookmarkInput {}
+
+class FakeCollectionInput extends Fake implements CollectionInput {}
+
+class FakeUpdateCollectionParams extends Fake
+    implements UpdateCollectionParams {}
+
+// Notifications use-cases
+class MockGetNotificationsFeed extends Mock implements GetNotificationsFeed {}
+
+class MockGetNotificationsFeedLocal extends Mock
+    implements GetNotificationsFeedLocal {}
+
+class MockMarkNotificationRead extends Mock implements MarkNotificationRead {}
+
+// Collections use-cases
+class MockListCollections extends Mock implements ListCollections {}
+
+class MockListLocalCollections extends Mock implements ListLocalCollections {}
+
+class MockDeleteCollection extends Mock implements DeleteCollection {}
+
+class MockGetCollection extends Mock implements GetCollection {}
+
+class MockCreateCollection extends Mock implements CreateCollection {}
+
+class MockUpdateCollection extends Mock implements UpdateCollection {}
+
+class MockBookmarkSummariesReader extends Mock
+    implements BookmarkSummariesReader {}
+
+// Auth use-cases (additional)
+class MockChangePassword extends Mock implements ChangePassword {}
 
 /// In-memory [Session] double for widget tests.
 class FakeSession extends ChangeNotifier implements Session {

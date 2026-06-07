@@ -8,6 +8,8 @@ import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bl
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
+import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
+import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
 import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -97,6 +99,32 @@ void main() {
       homeBloc = bloc;
       return bloc;
     });
+
+    // AppShell.initState() resolves NotificationsBloc from getIt; register it
+    // so the authenticated home screen doesn't throw a StateError.
+    final getFeed = MockGetNotificationsFeed();
+    when(getFeed.call).thenAnswer(
+      (_) async => const Ok(NotificationsFeed.empty),
+    );
+    final getFeedLocal = MockGetNotificationsFeedLocal();
+    when(getFeedLocal.call).thenAnswer(
+      (_) async => const Ok(NotificationsFeed.empty),
+    );
+    final markRead = MockMarkNotificationRead();
+    when(() => markRead(any())).thenAnswer((_) async => const Ok<void>(null));
+    final activityNotifier = MockActivityNotifier();
+    when(() => activityNotifier.onActivityOccurred).thenAnswer(
+      (_) => const Stream.empty(),
+    );
+    getIt.registerLazySingleton<NotificationsBloc>(
+      () => NotificationsBloc(
+        getFeed,
+        getFeedLocal,
+        markRead,
+        activityNotifier,
+        notificationsSync,
+      ),
+    );
   });
 
   tearDown(() async {
@@ -133,19 +161,27 @@ void main() {
     );
 
     // Splash gates routing on session restoration; wait for the login screen.
+    // runAsync steps outside TestAsyncUtils.guard so real Dart timers fire,
+    // including the splash screen's 2-second minimum-display guard.
     await tester.pump();
     await settle(tester);
-    await tester.pump(const Duration(seconds: 3));
+    await tester.runAsync(
+      () async => Future<void>.delayed(const Duration(seconds: 3)),
+    );
     await settle(tester);
-    for (var i = 0; i < 40 && find.text('Sign in').evaluate().isEmpty; i++) {
+    for (
+      var i = 0;
+      i < 40 && find.text('Welcome Back').evaluate().isEmpty;
+      i++
+    ) {
       await tester.pump(const Duration(milliseconds: 100));
     }
-    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('Welcome Back'), findsOneWidget);
 
     // Fill credentials and submit.
     await tester.enterText(find.byType(TextFormField).at(0), 'alice');
     await tester.enterText(find.byType(TextFormField).at(1), 'hunter2');
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.tap(find.text('Log In'));
     await settle(tester);
     await tester.pumpAndSettle();
     for (var i = 0; i < 20 && find.text('Home').evaluate().isEmpty; i++) {
