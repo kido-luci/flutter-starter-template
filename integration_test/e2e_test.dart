@@ -118,15 +118,7 @@ void main() {
     expect(find.text(editedBookmarkTitle), findsWidgets);
     expect(find.text(bookmarkTitle), findsNothing);
 
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    await E2eApp.pumpUntil(
-      tester,
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Bookmarks'),
-      ),
-    );
+    await _goToBookmarksList(tester, find.text(editedBookmarkTitle).first);
 
     // ---- Collections: create one through the real backend ------------------
     await tester.tap(find.byTooltip('Home'));
@@ -335,6 +327,21 @@ Future<void> _openBookmarkDetail(WidgetTester tester, String title) async {
   expect(detailTitle, findsOneWidget);
   await E2eApp.pumpUntil(tester, _popupMenuButton());
   expect(_popupMenuButton(), findsWidgets);
+}
+
+Future<void> _goToBookmarksList(
+  WidgetTester tester,
+  Finder contextFinder,
+) async {
+  const BookmarksListRoute().go(tester.element(contextFinder));
+  await E2eApp.settle(tester);
+  await tester.pumpAndSettle();
+  final bookmarksTitle = find.descendant(
+    of: find.byType(AppBar),
+    matching: find.text('Bookmarks'),
+  );
+  await E2eApp.pumpUntil(tester, bookmarksTitle);
+  expect(bookmarksTitle, findsOneWidget);
 }
 
 Finder _popupMenuButton() {
