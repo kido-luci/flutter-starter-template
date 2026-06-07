@@ -16,6 +16,7 @@
 
 import 'dart:async';
 
+import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/router.dart';
@@ -110,7 +111,12 @@ void main() {
       find.byType(TextFormField).at(1),
       editedBookmarkTitle,
     );
-    await tester.tap(find.text('Save').last, warnIfMissed: false);
+    final saveBookmarkButton = tester.widget<AppButton>(
+      find.byWidgetPredicate(
+        (widget) => widget is AppButton && widget.label == 'Save',
+      ),
+    );
+    saveBookmarkButton.onPressed!();
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
 
