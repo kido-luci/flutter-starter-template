@@ -20,6 +20,9 @@ part 'profile_about.dart';
 class ProfileBody extends StatelessWidget {
   const ProfileBody({super.key});
 
+  /// Extra bottom padding so content clears the floating bottom bar.
+  static const double _bottomInset = 96;
+
   void _onDeleteAccountState(BuildContext context, DeleteAccountState state) {
     switch (state) {
       case DeleteAccountSuccess():
@@ -50,7 +53,7 @@ class ProfileBody extends StatelessWidget {
             AppSpacing.xl,
             AppSpacing.lg,
             AppSpacing.xl,
-            AppSpacing.xxxl,
+            _bottomInset,
           ),
           children: [
             const _ProfileHeader().animateSlideDown(),

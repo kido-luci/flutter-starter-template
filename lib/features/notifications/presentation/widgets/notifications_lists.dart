@@ -1,5 +1,8 @@
 part of 'notifications_widgets.dart';
 
+/// Extra bottom padding so list content clears the floating bottom bar.
+const double _listBottomInset = 96;
+
 class _NotificationsList extends StatelessWidget {
   const _NotificationsList({required this.notifications});
 
@@ -14,7 +17,12 @@ class _NotificationsList extends StatelessWidget {
       onRefresh: () => _refresh(context),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          _listBottomInset,
+        ),
         children: [
           if (notifications.isEmpty)
             _TabEmptyState(
@@ -100,7 +108,12 @@ class _ActivitiesList extends StatelessWidget {
       onRefresh: () => _refresh(context),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          _listBottomInset,
+        ),
         children: [
           _SectionHeader(title: context.l10n.notificationsActivitySection),
           const SizedBox(height: AppSpacing.sm),
