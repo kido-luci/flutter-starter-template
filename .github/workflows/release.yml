@@ -1,13 +1,16 @@
 name: Release
 
 # Builds and uploads mobile releases via Fastlane: iOS → TestFlight,
-# Android → Google Play. Triggered by pushing a version tag (e.g. v1.2.0) or
-# manually with a chosen flavor/platform.
+# Android → Google Play. Triggered manually with a chosen flavor/platform.
+#
+# This is a template repo, so the store-deploy is opt-in: run it from the
+# Actions tab (workflow_dispatch) once you have configured the secrets and
+# variables listed under each job's `env:` (Settings → Secrets and variables →
+# Actions). To restore tag-triggered releases in a project built from this
+# template, add a `push: tags: ['v*']` entry below.
 #
 # This workflow only does the CI plumbing; the lane logic lives in
-# ios/fastlane/Fastfile and android/fastlane/Fastfile. It expects the secrets
-# and variables listed under each job's `env:` to be configured in the repo
-# (Settings → Secrets and variables → Actions). See the fastlane READMEs.
+# ios/fastlane/Fastfile and android/fastlane/Fastfile. See the fastlane READMEs.
 
 on:
   workflow_dispatch:
@@ -22,9 +25,6 @@ on:
         type: choice
         options: [both, ios, android]
         default: both
-  push:
-    tags:
-      - 'v*'
 
 env:
   # Keep in sync with .fvmrc (3.44.0). CI installs the SDK directly, so the
