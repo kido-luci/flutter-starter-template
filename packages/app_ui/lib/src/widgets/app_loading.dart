@@ -26,6 +26,6 @@ class AppLoading extends StatelessWidget {
           ],
         ],
       ),
-    );
+    ).animateFadeIn(duration: AppDurations.fast);
   }
 }

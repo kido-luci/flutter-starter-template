@@ -17,7 +17,7 @@ class _NotificationsTabs extends StatelessWidget {
               AppSpacing.lg,
               AppSpacing.md,
             ),
-            child: _NotificationsTabBar(state: state),
+            child: _NotificationsTabBar(state: state).animateFadeIn(),
           ),
           Expanded(
             child: TabBarView(

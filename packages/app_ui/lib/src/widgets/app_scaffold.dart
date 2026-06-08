@@ -59,8 +59,8 @@ class AppScaffold extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   centerTitle: true,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
+                  // Flat app bar styling (elevation, scrolled-under
+                  // elevation) now comes from the theme's `appBarTheme`.
                   leading:
                       leading ??
                       (Navigator.of(context).canPop()
@@ -109,13 +109,7 @@ class AppScaffold extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(AppRadius.xl),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 24,
-                                offset: Offset(0, 8),
-                              ),
-                            ],
+                            boxShadow: AppElevation.cardShadow,
                           ),
                           child: const AppLoading(),
                         ),

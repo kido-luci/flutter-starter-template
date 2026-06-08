@@ -7,14 +7,11 @@ class _ActivityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
+    return AppCard(
       color: context.colorScheme.surfaceContainerHighest.withValues(
         alpha: 0.4,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
+      padding: EdgeInsets.zero,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: context.colorScheme.secondaryContainer,

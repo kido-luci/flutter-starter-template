@@ -26,14 +26,18 @@ class AppEmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(icon, size: 56, color: context.colorScheme.onSurfaceVariant),
+            FaIcon(
+              icon,
+              size: AppIconSize.xxxl,
+              color: context.colorScheme.onSurfaceVariant,
+            ).animateScale(),
             const SizedBox(height: AppSpacing.lg),
             if (title != null) ...[
               Text(
                 title!,
                 style: context.textTheme.titleLarge,
                 textAlign: TextAlign.center,
-              ),
+              ).animateFadeIn(delay: AppDurations.fast),
               const SizedBox(height: AppSpacing.sm),
             ],
             Text(
@@ -42,10 +46,10 @@ class AppEmptyView extends StatelessWidget {
                 color: context.colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
-            ),
+            ).animateFadeIn(delay: AppDurations.fast),
             if (action != null) ...[
               const SizedBox(height: AppSpacing.xxl),
-              action!,
+              action!.animateSlideUp(delay: AppDurations.medium),
             ],
           ],
         ),

@@ -135,7 +135,7 @@ class _SortMenuButton extends StatelessWidget {
       tooltip: context.l10n.bookmarksSortTooltip,
       initialValue: sort,
       color: colorScheme.surface,
-      elevation: 8,
+      elevation: AppElevation.lg,
       shadowColor: colorScheme.shadow.withValues(alpha: 0.18),
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(

@@ -95,7 +95,7 @@ class _CollectionsListBody extends StatelessWidget {
               onTap: () => CollectionDetailRoute(collection.id).push<void>(
                 context,
               ),
-            );
+            ).animateStaggerItem(index);
           },
         );
       },

@@ -32,7 +32,9 @@ void main() {
         home: Scaffold(body: CollectionsListView()),
       ),
     );
-    await tester.pump();
+    // Advance past the per-item stagger entrance motion so no flutter_animate
+    // timers remain pending when the test ends.
+    await tester.pump(const Duration(seconds: 1));
   }
 
   testWidgets('renders a card per collection', (tester) async {

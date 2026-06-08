@@ -37,10 +37,17 @@ Future<void> _pumpGolden(
       ),
     ),
   );
-  // A fixed-duration pump instead of pumpAndSettle: some widgets contain an
-  // indeterminate CircularProgressIndicator that never settles. Advancing a
-  // fixed amount of time renders the spinner at a deterministic frame.
-  await tester.pump(const Duration(milliseconds: 100));
+  // Step frame-by-frame instead of pumpAndSettle: some widgets contain an
+  // indeterminate CircularProgressIndicator that never settles (so
+  // pumpAndSettle would time out). `flutter_animate`'s auto-played entrance
+  // animations (fade/slide/scale-ins) advance per frame, not in a single jumped
+  // pump, so we step ~1.2s in 100ms frames — long enough for those to finish —
+  // which also lands the spinner on a deterministic frame. A single large pump
+  // would leave the entrance animations at their opacity-0 start and capture a
+  // blank golden.
+  for (var i = 0; i < 12; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
 
 Future<void> _expectGolden(WidgetTester tester, String name) {

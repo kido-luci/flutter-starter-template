@@ -35,28 +35,32 @@ class AppErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(icon, size: 56, color: context.colorScheme.error),
+            FaIcon(
+              icon,
+              size: AppIconSize.xxxl,
+              color: context.colorScheme.error,
+            ).animateScale(),
             const SizedBox(height: AppSpacing.lg),
             if (title != null) ...[
               Text(
                 title!,
                 style: context.textTheme.titleLarge,
                 textAlign: TextAlign.center,
-              ),
+              ).animateFadeIn(delay: AppDurations.fast),
               const SizedBox(height: AppSpacing.sm),
             ],
             Text(
               message,
               style: context.textTheme.bodyMedium,
               textAlign: TextAlign.center,
-            ),
+            ).animateFadeIn(delay: AppDurations.fast),
             if (onRetry != null) ...[
               const SizedBox(height: AppSpacing.xxl),
               FilledButton.tonalIcon(
                 onPressed: effectiveOnRetry,
                 icon: const FaIcon(FontAwesomeIcons.rotateRight),
                 label: Text(retryLabel ?? 'Retry'),
-              ),
+              ).animateSlideUp(delay: AppDurations.medium),
             ],
           ],
         ),

@@ -33,7 +33,7 @@ class _SearchSection extends StatelessWidget {
         Material(
           clipBehavior: Clip.antiAlias,
           color: context.colorScheme.surface,
-          elevation: context.isDark ? 0 : 3,
+          elevation: context.isDark ? AppElevation.none : AppElevation.md,
           shadowColor: context.colorScheme.shadow.withValues(alpha: 0.08),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -605,7 +605,7 @@ class _ElevatedSurface extends StatelessWidget {
     return Material(
       clipBehavior: Clip.antiAlias,
       color: context.colorScheme.surface,
-      elevation: context.isDark ? 0 : 3,
+      elevation: context.isDark ? AppElevation.none : AppElevation.md,
       shadowColor: context.colorScheme.shadow.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),

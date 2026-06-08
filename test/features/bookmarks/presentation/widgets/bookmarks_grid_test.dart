@@ -86,7 +86,10 @@ void main() {
       await pumpList(tester, 500);
 
       await tester.tap(find.text('Collections'));
-      await tester.pump(const Duration(milliseconds: 300));
+      // Advance past the empty state's entrance motion (AppEmptyView's
+      // .animateScale / .animateFadeIn / .animateSlideUp) so no
+      // flutter_animate timers remain pending when the test ends.
+      await tester.pumpAndSettle();
 
       // With no collections, the embedded collections view shows its empty
       // state instead of the bookmarks grid.
@@ -98,7 +101,9 @@ void main() {
       await pumpList(tester, 500);
 
       await tester.tap(find.text('Recent'));
-      await tester.pump(const Duration(milliseconds: 300));
+      // Advance past the empty state's entrance motion so no flutter_animate
+      // timers remain pending when the test ends.
+      await tester.pumpAndSettle();
 
       // Both fixtures are dated well over a week ago, so none are "recent".
       expect(find.text('Nothing recent'), findsOneWidget);

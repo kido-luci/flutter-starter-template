@@ -108,7 +108,14 @@ class AppButton extends StatelessWidget {
               ),
     };
 
-    return expand ? SizedBox(width: double.infinity, child: button) : button;
+    final pressable = _PressScale(
+      enabled: effectiveOnPressed != null,
+      child: button,
+    );
+
+    return expand
+        ? SizedBox(width: double.infinity, child: pressable)
+        : pressable;
   }
 
   double get _spinnerSize => switch (size) {
@@ -172,5 +179,46 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.outlined ||
       AppButtonVariant.text => context.colorScheme.primary,
     };
+  }
+}
+
+/// Scales [child] down slightly while pressed, springing back on release.
+///
+/// Wraps the themed button in a [Listener] so the micro-interaction is purely
+/// visual — it does not intercept taps, leaving the button's own gesture and
+/// haptic handling untouched. Disabled when [enabled] is `false` so non-
+/// interactive buttons stay static.
+class _PressScale extends StatefulWidget {
+  const _PressScale({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  State<_PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<_PressScale> {
+  static const _pressedScale = 0.97;
+
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: widget.enabled ? (_) => _setPressed(true) : null,
+      onPointerUp: widget.enabled ? (_) => _setPressed(false) : null,
+      onPointerCancel: widget.enabled ? (_) => _setPressed(false) : null,
+      child: AnimatedScale(
+        scale: _pressed ? _pressedScale : 1,
+        duration: AppDurations.xfast,
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
   }
 }

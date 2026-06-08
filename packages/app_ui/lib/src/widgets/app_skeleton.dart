@@ -207,6 +207,6 @@ class AppSkeletonList extends StatelessWidget {
         separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (_, _) => AppSkeletonListTile(hasLeading: hasLeading),
       ),
-    );
+    ).animateFadeIn(duration: AppDurations.fast);
   }
 }

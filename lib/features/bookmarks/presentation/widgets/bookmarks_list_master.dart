@@ -191,7 +191,7 @@ class _BookmarkFilterTabs extends StatelessWidget {
           ],
         ],
       ),
-    ).animateSlideDown(duration: 300.ms);
+    ).animateSlideDown(duration: AppDurations.medium);
   }
 }
 
@@ -276,7 +276,7 @@ class _BookmarksSearchField extends StatelessWidget {
           },
         ),
       ),
-    ).animateSlideDown(duration: 300.ms);
+    ).animateSlideDown(duration: AppDurations.medium);
   }
 }
 

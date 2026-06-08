@@ -35,7 +35,9 @@ void main() {
         home: CollectionDetailScreen(id: 'c-1'),
       ),
     );
-    await tester.pump();
+    // Advance past the entrance motion (.animateSlideDown / stagger) so no
+    // flutter_animate timers remain pending when the test ends.
+    await tester.pump(const Duration(seconds: 1));
   }
 
   testWidgets('renders the collection name and member bookmarks', (
@@ -49,7 +51,9 @@ void main() {
     );
 
     await pump(tester);
-    await tester.pump();
+    // Advance again past the entrance motion of the freshly-built ready
+    // state (its own .animateSlideDown / stagger / AppEmptyView animations).
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('Design'), findsOneWidget);
     expect(find.text('Flutter docs'), findsOneWidget);
@@ -64,7 +68,9 @@ void main() {
     when(() => summaries()).thenAnswer((_) async => const Ok([]));
 
     await pump(tester);
-    await tester.pump();
+    // Advance again past the entrance motion of the freshly-built ready
+    // state (its own .animateSlideDown / stagger / AppEmptyView animations).
+    await tester.pump(const Duration(seconds: 1));
 
     expect(
       find.text('No bookmarks in this collection yet.'),

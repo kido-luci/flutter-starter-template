@@ -158,7 +158,7 @@ class _MembersList extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          ).animateSlideDown(),
         ),
         if (members.isEmpty)
           SliverFillRemaining(
@@ -180,8 +180,11 @@ class _MembersList extends StatelessWidget {
               itemCount: members.length,
               itemBuilder: (context, index) {
                 final bookmark = members[index];
-                return Card(
+                return AppCard(
                   margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  padding: EdgeInsets.zero,
+                  onTap: () =>
+                      BookmarkDetailRoute(bookmark.id).push<void>(context),
                   child: ListTile(
                     title: Text(
                       bookmark.title,
@@ -201,10 +204,8 @@ class _MembersList extends StatelessWidget {
                           .read<CollectionDetailCubit>()
                           .removeBookmark(bookmark.id),
                     ),
-                    onTap: () =>
-                        BookmarkDetailRoute(bookmark.id).push<void>(context),
                   ),
-                );
+                ).animateStaggerItem(index);
               },
             ),
           ),

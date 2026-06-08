@@ -1,6 +1,7 @@
 export 'app_adaptive_scaffold.dart';
 export 'app_animated_text.dart';
 export 'app_button.dart';
+export 'app_card.dart';
 export 'app_carousel.dart';
 export 'app_confirm_dialog.dart';
 export 'app_empty_view.dart';

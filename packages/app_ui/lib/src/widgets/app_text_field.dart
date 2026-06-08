@@ -93,6 +93,9 @@ class AppTextField extends StatelessWidget {
             }
           : null,
       autofillHints: autofillHints,
+      // Border, fill, and radius now come from the theme's
+      // `inputDecorationTheme` (see `_componentThemes` in `app_theme.dart`),
+      // so only field-specific decoration bits are set here.
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -100,41 +103,9 @@ class AppTextField extends StatelessWidget {
         errorText: errorText,
         prefixIcon: prefixIcon != null ? FaIcon(prefixIcon) : null,
         suffixIcon: suffix,
-        filled: true,
-        fillColor: Theme.of(
-          context,
-        ).colorScheme.onSurface.withValues(alpha: 0.05),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.xl,
           vertical: AppSpacing.lg,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 1.5,
-          ),
         ),
       ),
     );

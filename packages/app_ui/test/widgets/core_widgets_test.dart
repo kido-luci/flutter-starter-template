@@ -12,8 +12,13 @@ Widget materialApp(Widget child) {
 
 void main() {
   group('AppLoading', () {
+    // `AppLoading` wraps its content in a fade-in entrance animation and
+    // hosts a perpetually-animating `CircularProgressIndicator`, so settle
+    // only the entrance (via a single pump past its duration) rather than
+    // `pumpAndSettle`, which would never terminate.
     testWidgets('renders a CircularProgressIndicator', (tester) async {
       await tester.pumpWidget(materialApp(const AppLoading()));
+      await tester.pump(AppDurations.fast);
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Loading...'), findsNothing);
@@ -23,12 +28,14 @@ void main() {
       await tester.pumpWidget(
         materialApp(const AppLoading(label: 'Loading...')),
       );
+      await tester.pump(AppDurations.fast);
 
       expect(find.text('Loading...'), findsOneWidget);
     });
 
     testWidgets('uses custom size', (tester) async {
       await tester.pumpWidget(materialApp(const AppLoading(size: 48)));
+      await tester.pump(AppDurations.fast);
 
       final spinner = tester.widget<CircularProgressIndicator>(
         find.byType(CircularProgressIndicator),
@@ -42,6 +49,7 @@ void main() {
       await tester.pumpWidget(
         materialApp(const AppEmptyView(message: 'Nothing here')),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Nothing here'), findsOneWidget);
       expect(
@@ -58,6 +66,7 @@ void main() {
       await tester.pumpWidget(
         materialApp(const AppEmptyView(message: 'Empty', title: 'No Data')),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('No Data'), findsOneWidget);
       expect(find.text('Empty'), findsOneWidget);
@@ -72,6 +81,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(
         find.byWidgetPredicate(
@@ -93,6 +103,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Add'), findsOneWidget);
     });
@@ -101,6 +112,7 @@ void main() {
   group('AppErrorView', () {
     testWidgets('renders message and default icon', (tester) async {
       await tester.pumpWidget(materialApp(const AppErrorView(message: 'Oops')));
+      await tester.pumpAndSettle();
 
       expect(find.text('Oops'), findsOneWidget);
       expect(
@@ -117,6 +129,7 @@ void main() {
       await tester.pumpWidget(
         materialApp(const AppErrorView(message: 'Oops', title: 'Error')),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Error'), findsOneWidget);
       expect(find.text('Oops'), findsOneWidget);
@@ -128,6 +141,7 @@ void main() {
       await tester.pumpWidget(
         materialApp(AppErrorView(message: 'Oops', onRetry: () {})),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Retry'), findsOneWidget);
       expect(
@@ -147,6 +161,7 @@ void main() {
           AppErrorView(message: 'Oops', onRetry: () => tapped = true),
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Retry'));
       expect(tapped, isTrue);
@@ -162,6 +177,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Try Again'), findsOneWidget);
     });
@@ -206,6 +222,11 @@ void main() {
           home: AppScaffold(body: Text('Content'), isLoading: true),
         ),
       );
+      // `AppScaffold`'s loading overlay hosts an `AppLoading` (perpetually
+      // animating spinner), so pump past the entrance/switcher animations
+      // rather than `pumpAndSettle`, which would never terminate.
+      await tester.pump(AppDurations.medium);
+      await tester.pump(AppDurations.fast);
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
