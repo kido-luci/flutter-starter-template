@@ -132,3 +132,9 @@ firebase.json
 # your own (it overwrites the placeholder locally). Native config stays ignored.
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
+
+# -------------------------------------------------------------------------
+# Local screenshot/demo tooling (not part of the template surface)
+# -------------------------------------------------------------------------
+tool/seed_demo.sh
+tool/capture_sim_window.sh

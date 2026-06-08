@@ -94,9 +94,6 @@ To enable seamless local development and testing, this template is paired with a
 
 ## 📸 Screenshots
 
-<p align="center"><i>📷 Screenshots coming soon.</i></p>
-
-<!-- Screenshot gallery — uncomment once doc/screenshots/*.png are captured.
 <p align="center">
   <img src="doc/screenshots/sign_in.png" alt="Sign in" width="240">
   <img src="doc/screenshots/home.png" alt="Home" width="240">
@@ -109,7 +106,6 @@ To enable seamless local development and testing, this template is paired with a
 </p>
 
 <p align="center"><sub>Light & true‑black OLED dark themes · Material 3 · responsive master/detail</sub></p>
--->
 
 
 <br>
