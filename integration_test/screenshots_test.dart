@@ -3,19 +3,19 @@
 // pre-seeded demo user (`demo` / `demo1234`, 8 bookmarks, 2 collections).
 //
 // Unlike `e2e_test.dart`, this suite asserts almost nothing about business
-// behaviour — it signs in and walks to six representative screens, capturing
-// a PNG of each via `IntegrationTestWidgetsFlutterBinding.takeScreenshot`. The
-// companion driver (`test_driver/integration_test.dart`) persists the bytes to
-// `doc/screenshots/<name>.png`.
+// behaviour — it signs in and walks to eight representative screens, capturing
+// each. By default the driver writes the bare app surface
+// (`test_driver/integration_test.dart` persists the PNGs). When run with
+// `--dart-define=WINDOW_CAPTURE=true` (via `tool/capture_sim_window.sh`) it
+// instead emits a `WINDOW_SHOT:<name>` sentinel + dwell per screen so the host
+// script can grab the whole Simulator *window* (device bezel included).
 //
-// The demo user's bookmarks and collections live only on the server (seeded
-// via the API, not created through the app), so each list screen must wait for
-// the app's offline-first background *pull* to land them in the local store
-// before it shows anything. A pull only progresses under `tester.runAsync`
-// (real wall-clock time, outside the fake-async guard) — plain `tester.pump`
-// never advances it — so the waits poll bloc state via [_pumpUntilTrue].
-// Home loads once and doesn't auto-refresh, so it's captured last, after the
-// syncs, with an explicit `HomeLoadRequested` reload.
+// The demo user's bookmarks/collections live only on the server (seeded via the
+// API, not created through the app), so list screens wait for the offline-first
+// background *pull* to land them locally. A pull only progresses under
+// `tester.runAsync` (real wall-clock time, outside the fake-async guard), so
+// the waits poll bloc state via [_pumpUntilTrue]. Home loads once and doesn't
+// auto-refresh, so it's captured late with an explicit `HomeLoadRequested`.
 //
 // Run with:
 // ```sh
@@ -35,6 +35,7 @@ import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:theme/theme.dart';
 
@@ -86,12 +87,27 @@ void main() {
     await tester.pumpAndSettle();
     await shot('sign_in');
 
+    // ---- Register (sample input, not submitted) ----------------------------
+    await tester.tap(find.text('Create an account'));
+    await tester.pumpAndSettle();
+    await E2eApp.pumpUntil(tester, find.text('Join Flutter Starter'));
+    expect(find.text('Join Flutter Starter'), findsWidgets);
+    await tester.enterText(find.byType(TextFormField).at(0), 'jane@example.com');
+    await tester.enterText(find.byType(TextFormField).at(1), 'MyPassw0rd');
+    await tester.pumpAndSettle();
+    await shot('register');
+    // Back to login without registering (the demo account already exists).
+    const LoginRoute().go(tester.element(find.text('Join Flutter Starter').first));
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
+    // ---- Sign in as the seeded demo user -----------------------------------
+    await E2eApp.pumpUntil(tester, find.text('Welcome Back'));
     await tester.enterText(find.byType(TextFormField).at(0), 'demo');
     await tester.enterText(find.byType(TextFormField).at(1), 'demo1234');
     await tester.tap(find.text('Log In'));
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
-
     await E2eApp.pumpUntil(tester, homeTitle);
     expect(homeTitle, findsOneWidget);
 
@@ -103,18 +119,37 @@ void main() {
     final bookmarksTitle = _appBarTitle('Bookmarks');
     await E2eApp.pumpUntil(tester, bookmarksTitle);
     expect(bookmarksTitle, findsOneWidget);
-
     final bmBloc = tester.element(bookmarksTitle).read<BookmarksListBloc>();
     await _pumpUntilTrue(tester, () => bmBloc.state.items.isNotEmpty);
     expect(bmBloc.state.items, isNotEmpty);
     await shot('bookmarks');
 
+    // ---- Create bookmark (sample input, not submitted) ---------------------
+    await tester.tap(find.byTooltip('Add bookmark'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    // The form uses a custom header (not a standard AppBar), so match the
+    // title as plain text rather than an AppBar descendant.
+    final newBookmarkTitle = find.text('New bookmark');
+    await E2eApp.pumpUntil(tester, newBookmarkTitle);
+    expect(newBookmarkTitle, findsWidgets);
+    await tester.enterText(
+      find.byType(TextFormField).at(0),
+      'https://www.anthropic.com',
+    );
+    await tester.enterText(find.byType(TextFormField).at(1), 'Anthropic');
+    await tester.pumpAndSettle();
+    await shot('create_bookmark');
+    GoRouter.of(tester.element(newBookmarkTitle.first)).pop();
+    await E2eApp.settle(tester);
+    await tester.pumpAndSettle();
+
     // ---- Bookmark detail -----------------------------------------------------
     // Open the first row by id (its card may be scrolled off-screen, so don't
     // rely on finding its title text in the lazy list).
     final first = bmBloc.state.items.first;
-    final bookmarksContext = tester.element(bookmarksTitle);
-    unawaited(BookmarkDetailRoute(first.id).push<void>(bookmarksContext));
+    unawaited(
+      BookmarkDetailRoute(first.id).push<void>(tester.element(bookmarksTitle)),
+    );
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
     final detailTitle = _appBarTitle('Bookmark Details');
@@ -124,25 +159,25 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    // ---- Collections ---------------------------------------------------------
-    await tester.tap(find.byTooltip('Home'));
+    // ---- Notifications ------------------------------------------------------
+    // The seeded API creates each generated an activity + notification, so the
+    // feed is populated once notifications sync pulls it in.
+    await tester.tap(find.byTooltip('Notifications'));
     await tester.pumpAndSettle();
-    await E2eApp.pumpUntil(tester, homeTitle);
-    expect(homeTitle, findsOneWidget);
-
-    await _pushCollectionsList(tester, homeTitle);
-    await _pumpUntilTrue(
-      tester,
-      () => find.text('AI Tools').evaluate().isNotEmpty,
+    final notificationsTitle = _appBarTitle('Notifications');
+    await E2eApp.pumpUntil(tester, notificationsTitle);
+    expect(notificationsTitle, findsOneWidget);
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(seconds: 3)),
     );
-    expect(find.text('AI Tools'), findsWidgets);
-    await shot('collections');
-    await tester.pageBack();
     await tester.pumpAndSettle();
+    await shot('notifications');
 
     // ---- Home (populated) ----------------------------------------------------
-    // Both resources are now synced. Home loads once and doesn't auto-refresh,
-    // so re-issue a load and wait for its dashboard to reflect the synced data.
+    // Bookmarks + collections have synced by now. Home loads once and doesn't
+    // auto-refresh, so re-issue a load and wait for its dashboard to fill.
+    await tester.tap(find.byTooltip('Home'));
+    await tester.pumpAndSettle();
     await E2eApp.pumpUntil(tester, homeTitle);
     expect(homeTitle, findsOneWidget);
     final homeBloc = tester.element(homeTitle).read<HomeBloc>();
@@ -150,19 +185,18 @@ void main() {
     await _pumpUntilTrue(tester, () => homeBloc.state.totalBookmarks > 0);
     await shot('home');
 
-    // ---- Profile (dark mode) --------------------------------------------------
+    // ---- Profile (light mode) -----------------------------------------------
     await tester.tap(find.byTooltip('Profile'));
     await tester.pumpAndSettle();
     final profileTitle = _appBarTitle('Profile');
     await E2eApp.pumpUntil(tester, profileTitle);
     expect(profileTitle, findsOneWidget);
-
     tester
         .element(find.byType(MaterialApp))
         .read<ThemeBloc>()
-        .add(const ThemeModeChanged(ThemeMode.dark));
+        .add(const ThemeModeChanged(ThemeMode.light));
     await tester.pumpAndSettle();
-    await shot('profile_dark');
+    await shot('profile');
 
     debugPrint('WINDOW_SHOT_DONE');
   });
@@ -187,20 +221,4 @@ Future<void> _pumpUntilTrue(
     await tester.runAsync(() => Future<void>.delayed(interval));
     await tester.pump();
   }
-}
-
-Future<void> _pushCollectionsList(WidgetTester tester, Finder homeTitle) async {
-  await E2eApp.pumpUntil(tester, homeTitle);
-  // `GoRouter.of` resolves an `InheritedWidget` scoped *below* the `Router`
-  // that `MaterialApp.router` builds — `MaterialApp`'s own element sits above
-  // it, so it can't see the router. Use an element from inside the routed
-  // screen instead (the Home AppBar title).
-  //
-  // `push` returns a Future that only completes once the route is popped —
-  // don't await it here, or the test would deadlock.
-  unawaited(
-    const CollectionsListRoute().push<void>(tester.element(homeTitle)),
-  );
-  await E2eApp.settle(tester);
-  await tester.pumpAndSettle();
 }

@@ -2,14 +2,16 @@
 
 The PNGs here back the gallery in the root [`README.md`](../../README.md#-screenshots).
 
-| File                  | Screen                          |
-|-----------------------|---------------------------------|
-| `sign_in.png`         | Sign-in screen                  |
-| `home.png`            | Home dashboard                  |
-| `bookmarks.png`       | Bookmarks list                  |
-| `bookmark_detail.png` | Bookmark detail                 |
-| `collections.png`     | Collections list                |
-| `profile_dark.png`    | Profile, true-black dark theme  |
+| File                   | Screen                          |
+|------------------------|---------------------------------|
+| `sign_in.png`          | Sign-in screen                  |
+| `register.png`         | Register screen                 |
+| `home.png`             | Home dashboard                  |
+| `bookmarks.png`        | Bookmarks list                  |
+| `create_bookmark.png`  | New-bookmark form               |
+| `bookmark_detail.png`  | Bookmark detail                 |
+| `notifications.png`    | Notifications / activity feed   |
+| `profile.png`          | Profile (light theme)           |
 
 ## Regenerating them
 
