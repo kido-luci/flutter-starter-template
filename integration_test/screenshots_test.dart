@@ -6,9 +6,11 @@
 // behaviour — it signs in and walks to eight representative screens, capturing
 // each. By default the driver writes the bare app surface
 // (`test_driver/integration_test.dart` persists the PNGs). When run with
-// `--dart-define=WINDOW_CAPTURE=true` (via `tool/capture_sim_window.sh`) it
-// instead emits a `WINDOW_SHOT:<name>` sentinel + dwell per screen so the host
-// script can grab the whole Simulator *window* (device bezel included).
+// `--dart-define=WINDOW_CAPTURE=true` it instead emits a `WINDOW_SHOT:<name>`
+// sentinel + dwell per screen, so an external host script can grab the whole
+// Simulator *window* (device bezel included). The host script we use for the
+// committed PNGs is a local, uncommitted helper (it needs macOS Screen
+// Recording + `screencapture`); the default surface mode needs no such tool.
 //
 // The demo user's bookmarks/collections live only on the server (seeded via the
 // API, not created through the app), so list screens wait for the offline-first
@@ -42,8 +44,8 @@ import 'package:theme/theme.dart';
 import 'support/e2e_app.dart';
 
 // When true (`--dart-define=WINDOW_CAPTURE=true`), this run is being driven by
-// `tool/capture_sim_window.sh`, which grabs the Simulator *window* (device
-// bezel included) externally. In that mode we must NOT write surface PNGs via
+// an external host script that grabs the Simulator *window* (device bezel
+// included). In that mode we must NOT write surface PNGs via
 // the driver (`takeScreenshot`) — its asynchronous write races with, and
 // clobbers, the host capture at the same path — nor convert the Flutter surface
 // to an image (that freezes the live surface the window grab needs). We only
@@ -62,8 +64,8 @@ void main() {
     Future<void> shot(String name) async {
       await tester.pumpAndSettle();
       if (_windowCapture) {
-        // Signal tool/capture_sim_window.sh to grab the Simulator window for
-        // this screen, then dwell so it can react before navigation moves on.
+        // Signal the external host capture script to grab the Simulator window
+        // for this screen, then dwell so it can react before navigation moves on.
         debugPrint('WINDOW_SHOT:$name');
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(seconds: 6)),
