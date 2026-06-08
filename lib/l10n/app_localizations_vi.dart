@@ -373,6 +373,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bookmarksSortTooltip => 'Sắp xếp bookmark';
 
   @override
+  String get bookmarksSortMenuLabel => 'Menu sắp xếp';
+
+  @override
   String get bookmarksSortNewest => 'Mới nhất trước';
 
   @override
@@ -436,6 +439,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bookmarkDeleteDialogTitle => 'Xóa bookmark?';
+
+  @override
+  String get bookmarkDeleteDialogBody =>
+      'Không thể hoàn tác hành động này.\nBookmark sẽ bị xóa vĩnh viễn khỏi bộ sưu tập của bạn.';
 
   @override
   String bookmarkDeleteDialogMessage(String title) {

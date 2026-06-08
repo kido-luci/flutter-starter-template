@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
 import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmarks_list/bookmarks_list_bloc.dart';
+import 'bookmark_delete_dialog.dart';
 
 part 'bookmarks_list_card_content.dart';
 part 'bookmarks_list_card_actions.dart';

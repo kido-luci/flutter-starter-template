@@ -371,6 +371,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarksSortTooltip => 'Sort bookmarks';
 
   @override
+  String get bookmarksSortMenuLabel => 'Sort Menu';
+
+  @override
   String get bookmarksSortNewest => 'Newest first';
 
   @override
@@ -434,6 +437,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookmarkDeleteDialogTitle => 'Delete bookmark?';
+
+  @override
+  String get bookmarkDeleteDialogBody =>
+      'This action cannot be undone.\nThe bookmark will be permanently removed from your collection.';
 
   @override
   String bookmarkDeleteDialogMessage(String title) {

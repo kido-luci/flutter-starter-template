@@ -200,6 +200,7 @@
   "bookmarksAddTooltip": "Add bookmark",
   "bookmarksSearchClear": "Clear search",
   "bookmarksSortTooltip": "Sort bookmarks",
+  "bookmarksSortMenuLabel": "Sort Menu",
   "bookmarksSortNewest": "Newest first",
   "bookmarksSortOldest": "Oldest first",
   "bookmarksSortTitleAz": "Title (A–Z)",
@@ -221,6 +222,7 @@
   "bookmarkOpenInBrowser": "Open in Browser",
   "bookmarkNotFound": "Bookmark not found.",
   "bookmarkDeleteDialogTitle": "Delete bookmark?",
+  "bookmarkDeleteDialogBody": "This action cannot be undone.\nThe bookmark will be permanently removed from your collection.",
   "bookmarkDeleteDialogMessage": "\"{title}\" will be removed.",
   "@bookmarkDeleteDialogMessage": {
     "placeholders": {

@@ -119,23 +119,132 @@ class _SortMenuButton extends StatelessWidget {
     BookmarkSort.titleAz => context.l10n.bookmarksSortTitleAz,
   };
 
+  FaIconData _iconFor(BookmarkSort value) => switch (value) {
+    BookmarkSort.newest => FontAwesomeIcons.calendarDay,
+    BookmarkSort.oldest => FontAwesomeIcons.calendar,
+    BookmarkSort.titleAz => FontAwesomeIcons.arrowDownAZ,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final showLabel = MediaQuery.sizeOf(context).width >= AppBreakpoints.medium;
+
     return PopupMenuButton<BookmarkSort>(
-      icon: const FaIcon(FontAwesomeIcons.sort),
+      padding: EdgeInsets.zero,
       tooltip: context.l10n.bookmarksSortTooltip,
       initialValue: sort,
+      color: colorScheme.surface,
+      elevation: 8,
+      shadowColor: colorScheme.shadow.withValues(alpha: 0.18),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      offset: const Offset(0, AppSpacing.sm),
+      position: PopupMenuPosition.under,
       onSelected: (value) => context.read<BookmarksListBloc>().add(
         BookmarksListSortChanged(value),
       ),
+      child: Container(
+        height: 56,
+        width: showLabel ? 116 : 56,
+        margin: const EdgeInsets.only(right: AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(
+              FontAwesomeIcons.filter,
+              size: 20,
+              color: colorScheme.primary,
+            ),
+            if (showLabel) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                context.l10n.bookmarksSortMenuLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
       itemBuilder: (context) => [
         for (final value in BookmarkSort.values)
-          CheckedPopupMenuItem<BookmarkSort>(
+          PopupMenuItem<BookmarkSort>(
             value: value,
-            checked: value == sort,
-            child: Text(_labelFor(context, value)),
+            padding: EdgeInsets.zero,
+            child: _SortMenuItem(
+              icon: _iconFor(value),
+              label: _labelFor(context, value),
+              selected: value == sort,
+            ),
           ),
       ],
+    );
+  }
+}
+
+class _SortMenuItem extends StatelessWidget {
+  const _SortMenuItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+  });
+
+  final FaIconData icon;
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
+      color: selected
+          ? colorScheme.primaryContainer.withValues(alpha: 0.38)
+          : Colors.transparent,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 22,
+            child: FaIcon(
+              icon,
+              size: 16,
+              color: selected ? colorScheme.primary : colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: selected ? colorScheme.primary : colorScheme.onSurface,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -776,6 +776,12 @@ abstract class AppLocalizations {
   /// **'Sort bookmarks'**
   String get bookmarksSortTooltip;
 
+  /// No description provided for @bookmarksSortMenuLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort Menu'**
+  String get bookmarksSortMenuLabel;
+
   /// No description provided for @bookmarksSortNewest.
   ///
   /// In en, this message translates to:
@@ -901,6 +907,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete bookmark?'**
   String get bookmarkDeleteDialogTitle;
+
+  /// No description provided for @bookmarkDeleteDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.\nThe bookmark will be permanently removed from your collection.'**
+  String get bookmarkDeleteDialogBody;
 
   /// No description provided for @bookmarkDeleteDialogMessage.
   ///
