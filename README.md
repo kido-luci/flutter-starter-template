@@ -42,7 +42,6 @@ To enable seamless local development and testing, this template is paired with a
 <br>
 
 - [✨ What's Inside](#-whats-inside)
-- [📸 Screenshots](#-screenshots)
 - [🧬 Architecture](#-architecture)
   - [📁 Feature Slice (Clean Architecture)](#-feature-slice-clean-architecture)
 - [🚀 Quick Start](#-quick-start)
@@ -92,8 +91,6 @@ To enable seamless local development and testing, this template is paired with a
 ---
 
 <br>
-
-## 📸 Screenshots
 
 <p align="center">
   <img src="doc/screenshots/app_cover_thumbnail.png" alt="Flutter Starter Template app demo" width="800">
