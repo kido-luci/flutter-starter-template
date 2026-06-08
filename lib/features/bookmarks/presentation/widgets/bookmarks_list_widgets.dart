@@ -147,37 +147,41 @@ class _SortMenuButton extends StatelessWidget {
       onSelected: (value) => context.read<BookmarksListBloc>().add(
         BookmarksListSortChanged(value),
       ),
-      child: Container(
-        height: 56,
-        width: showLabel ? 116 : 56,
-        margin: const EdgeInsets.only(right: AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FaIcon(
-              FontAwesomeIcons.filter,
-              size: 20,
-              color: colorScheme.primary,
-            ),
-            if (showLabel) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.bookmarksSortMenuLabel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0,
-                ),
+      child: Semantics(
+        button: true,
+        label: context.l10n.bookmarksSortTooltip,
+        child: Container(
+          height: 56,
+          width: showLabel ? 116 : 56,
+          margin: const EdgeInsets.only(right: AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(
+                FontAwesomeIcons.filter,
+                size: 20,
+                color: colorScheme.primary,
               ),
+              if (showLabel) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  context.l10n.bookmarksSortMenuLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
       itemBuilder: (context) => [
