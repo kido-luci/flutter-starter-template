@@ -11,6 +11,7 @@ export 'src/widgets/app_adaptive_scaffold.dart';
 export 'src/widgets/app_animated_text.dart';
 export 'src/widgets/app_button.dart';
 export 'src/widgets/app_carousel.dart';
+export 'src/widgets/app_confirm_dialog.dart';
 export 'src/widgets/app_empty_view.dart';
 export 'src/widgets/app_error_view.dart';
 export 'src/widgets/app_link_preview.dart';

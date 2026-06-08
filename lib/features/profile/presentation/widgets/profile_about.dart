@@ -64,24 +64,16 @@ class _SignOutButton extends StatelessWidget {
 
   Future<void> _confirmSignOut(BuildContext context) async {
     final l10n = context.l10n;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.commonSignOut),
-        content: Text(l10n.profileSignOutConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.commonSignOut),
-          ),
-        ],
-      ),
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: l10n.commonSignOut,
+      message: l10n.profileSignOutConfirmMessage,
+      confirmLabel: l10n.commonSignOut,
+      cancelLabel: l10n.commonCancel,
+      icon: FontAwesomeIcons.arrowRightFromBracket,
+      isDestructive: false,
     );
-    if (confirmed == true && context.mounted) {
+    if (confirmed && context.mounted) {
       SessionScope.of(context).signOut();
     }
   }

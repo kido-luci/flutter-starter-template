@@ -32,24 +32,15 @@ class _CollectionDetailView extends StatelessWidget {
   final String id;
 
   Future<void> _confirmDelete(BuildContext context, String name) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.collectionDeleteDialogTitle),
-        content: Text(context.l10n.collectionDeleteDialogMessage(name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(context.l10n.collectionDeleteAction),
-          ),
-        ],
-      ),
+    final l10n = context.l10n;
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: l10n.collectionDeleteDialogTitle,
+      message: l10n.collectionDeleteDialogMessage(name),
+      confirmLabel: l10n.collectionDeleteAction,
+      cancelLabel: l10n.commonCancel,
     );
-    if ((confirmed ?? false) && context.mounted) {
+    if (confirmed && context.mounted) {
       await context.read<CollectionDetailCubit>().delete();
     }
   }

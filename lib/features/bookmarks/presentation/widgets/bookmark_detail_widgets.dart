@@ -17,7 +17,6 @@ import '../../domain/entities/bookmark.dart';
 import '../bloc/bookmark_detail/bookmark_detail_bloc.dart';
 import '../bloc/bookmark_detail/bookmark_detail_state.dart';
 import 'app_video_player.dart';
-import 'bookmark_delete_dialog.dart';
 import 'bookmark_failure_messages.dart';
 
 /// Provides a [BookmarkDetailBloc] for [id] and renders the detail embedded in
@@ -179,11 +178,15 @@ class BookmarkDetailView extends StatelessWidget {
   }
 
   Future<void> _confirmAndDelete(BuildContext context, Bookmark b) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => const BookmarkDeleteDialog(),
+    final l10n = context.l10n;
+    final confirmed = await AppConfirmDialog.show(
+      context,
+      title: l10n.bookmarkDeleteDialogTitle,
+      message: l10n.bookmarkDeleteDialogBody,
+      confirmLabel: l10n.commonDelete,
+      cancelLabel: l10n.commonCancel,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     if (!context.mounted) return;
     context.read<BookmarkDetailBloc>().add(BookmarkDetailDeleteRequested(b.id));
   }

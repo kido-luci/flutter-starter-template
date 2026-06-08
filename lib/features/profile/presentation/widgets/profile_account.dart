@@ -101,34 +101,20 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final canDelete = _controller.text.trim() == widget.username;
-    return AlertDialog(
-      title: Text(l10n.profileDeleteAccountDialogTitle),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.profileDeleteAccountDialogMessage),
-          const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            controller: _controller,
-            label: l10n.profileDeleteAccountConfirmLabel(widget.username),
-            autofocus: true,
-            onChanged: (_) => setState(() {}),
-          ),
-        ],
+    return AppConfirmDialog(
+      title: l10n.profileDeleteAccountDialogTitle,
+      message: l10n.profileDeleteAccountDialogMessage,
+      confirmLabel: l10n.commonDelete,
+      cancelLabel: l10n.commonCancel,
+      confirmEnabled: canDelete,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
+      content: AppTextField(
+        controller: _controller,
+        label: l10n.profileDeleteAccountConfirmLabel(widget.username),
+        autofocus: true,
+        onChanged: (_) => setState(() {}),
       ),
-      actions: [
-        AppButton(
-          label: l10n.commonCancel,
-          variant: AppButtonVariant.text,
-          onPressed: () => Navigator.of(context).pop(false),
-        ),
-        AppButton(
-          label: l10n.commonDelete,
-          variant: AppButtonVariant.tonal,
-          onPressed: canDelete ? () => Navigator.of(context).pop(true) : null,
-        ),
-      ],
     );
   }
 }

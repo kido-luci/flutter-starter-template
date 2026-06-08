@@ -47,9 +47,12 @@ Future<void> _showCardMenu(BuildContext context, Bookmark bookmark) async {
 }
 
 Future<bool> _confirmDelete(BuildContext context) async {
-  return await showDialog<bool>(
-        context: context,
-        builder: (_) => const BookmarkDeleteDialog(),
-      ) ??
-      false;
+  final l10n = context.l10n;
+  return AppConfirmDialog.show(
+    context,
+    title: l10n.bookmarkDeleteDialogTitle,
+    message: l10n.bookmarkDeleteDialogBody,
+    confirmLabel: l10n.commonDelete,
+    cancelLabel: l10n.commonCancel,
+  );
 }
