@@ -217,17 +217,39 @@ feature/
 
 ### ⚡ Install & Generate
 
+> 🧩 **Starting a new project?** Click **Use this template** on GitHub to spin
+> up your own repo, then clone it. To explore the template itself, clone
+> directly.
+
 ```bash
 # --recurse-submodules pulls the companion Go backend (a git submodule)
 git clone --recurse-submodules https://github.com/kido-luci/flutter-starter-template.git
 cd flutter-starter-template
 
-fvm flutter pub get
-fvm dart run build_runner build --delete-conflicting-outputs
+# One-shot bootstrap: submodules, FVM SDK, disable SPM (macOS), pub get,
+# code generation, backend deps, and the pre-push hook. Idempotent.
+./tool/setup.sh
 ```
 
-> 💡 **Already cloned without submodules?** Run
-> `git submodule update --init --recursive` to fetch the backend.
+> 💡 **Already cloned without submodules?** `tool/setup.sh` runs
+> `git submodule update --init --recursive` for you. Re-run the script anytime
+> your tree needs a refresh; pass `--help` to see flags (`--no-codegen`,
+> `--no-hooks`, `--no-backend`).
+
+<details>
+<summary><b>⚙️ Prefer to run the steps manually?</b></summary>
+<br>
+
+`tool/setup.sh` simply chains these:
+
+```bash
+fvm flutter pub get
+fvm dart run build_runner build --delete-conflicting-outputs
+fvm flutter config --no-enable-swift-package-manager   # macOS only — see below
+git config core.hooksPath .githooks                    # enable the pre-push gate
+```
+
+</details>
 
 ### 🍎 iOS one-time setup
 
@@ -236,7 +258,8 @@ iOS 15.0 deployment target, but Flutter 3.44.0 hardcodes the SPM-generated
 package to 13.0, and two plugins (`permission_handler_apple`,
 `objectbox_flutter_libs`) don't support SPM yet. This setting lives in a
 machine-global Flutter config (`~/.config/flutter/settings`), so **every new
-machine and CI runner must run it once** before the first iOS build:
+machine and CI runner must run it once** before the first iOS build.
+`tool/setup.sh` already does this on macOS; to run it by hand:
 
 ```bash
 fvm flutter config --no-enable-swift-package-manager
@@ -450,9 +473,10 @@ cd android && bundle exec fastlane beta flavor:prod   # → Google Play
 - **Build numbers** auto‑increment (lane arg → `BUILD_NUMBER` → git commit
   count) so repeated uploads are never rejected.
 - **CI** — [`.github/workflows/release.yml`](.github/workflows/release.yml) runs
-  both lanes on a `v*` tag push or manual dispatch (macOS for iOS, Linux for
+  both lanes on **manual dispatch** (Actions → Release; macOS for iOS, Linux for
   Android), restoring the git‑ignored Firebase configs and signing assets from
-  repository secrets.
+  repository secrets. To fire releases from a `v*` tag instead, add a
+  `push: tags: ['v*']` trigger to that workflow.
 
 Setup steps and the full list of required secrets live in
 [`ios/fastlane/README.md`](ios/fastlane/README.md) and

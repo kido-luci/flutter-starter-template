@@ -40,6 +40,7 @@ harmless.
 ## Common commands
 
 ```bash
+./tool/setup.sh                              # one-shot bootstrap of a fresh clone (idempotent)
 fvm flutter pub get                          # install dependencies
 fvm flutter run                              # run on the default device (debug)
 fvm flutter run --profile                    # profile mode
