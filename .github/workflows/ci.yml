@@ -7,6 +7,7 @@ on:
     # these paths (lib/, test/, packages/, pubspec.*, etc.) still triggers CI.
     paths-ignore:
       - '**/*.md'
+      - 'doc/**'
       - 'LICENSE'
       - '.mcp.json'
       - '.agents/**'
@@ -15,11 +16,13 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.github/workflows/**'
       - 'skills-lock.json'
   pull_request:
     branches: [main]
     paths-ignore:
       - '**/*.md'
+      - 'doc/**'
       - 'LICENSE'
       - '.mcp.json'
       - '.agents/**'
@@ -28,6 +31,7 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.github/workflows/**'
       - 'skills-lock.json'
 
 # Cancel superseded runs on the same ref to save CI minutes.
