@@ -5,6 +5,7 @@
   </picture>
   <a href="https://github.com/kido-luci/flutter-starter-template/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge"></a>
   <a href="https://luci-studio.com"><img alt="Luci" src="https://img.shields.io/badge/built_by-Luci_Studio-FF6B6B?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjIiIHJ5PSIyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjIiLz48bGluZSB4MT0iMTIuMSIgeTE9IjkuMSIgeDI9IjE1IiB5Mj0iMTUiLz48L3N2Zz4="></a>
+  <a href="#-support"><img alt="Sponsor" src="https://img.shields.io/badge/💖-Sponsor-EA4AAA?style=for-the-badge"></a>
 </p>
 
 <p align="center">
@@ -832,6 +833,28 @@ Generated localizations are emitted into `lib/l10n/`. Import
 `package:flutter_starter_template/l10n/app_localizations.dart` and use
 `AppLocalizations.of(context)` (or the `context.l10n` extension) to access
 localized strings.
+
+<br>
+
+---
+
+<br>
+
+## ❤️ Support
+
+If this template saves you time, you can support its development:
+
+<a href="https://paypal.me/TrungLapTieu?locale.x=en_US&country.x=VN">
+  <img alt="Donate with PayPal" src="https://img.shields.io/badge/Donate-PayPal-00457C?style=flat-square&logo=paypal&logoColor=white">
+</a>
+
+<br><br>
+
+<sub>On desktop? Scan to pay from your phone:</sub>
+
+<img alt="PayPal donation QR code" src="doc/paypal-qr.png" width="180">
+
+Every bit is appreciated and helps keep this project maintained. 🙏
 
 <br>
 
