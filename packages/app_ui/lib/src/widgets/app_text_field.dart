@@ -101,7 +101,13 @@ class AppTextField extends StatelessWidget {
         hintText: hint,
         helperText: helperText,
         errorText: errorText,
-        prefixIcon: prefixIcon != null ? FaIcon(prefixIcon) : null,
+        prefixIcon: prefixIcon != null
+            ? Center(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: FaIcon(prefixIcon, size: AppIconSize.md),
+              )
+            : null,
         suffixIcon: suffix,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.xl,
