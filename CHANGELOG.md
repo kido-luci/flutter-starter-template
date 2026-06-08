@@ -36,6 +36,9 @@ First stable release of the Flutter starter template.
 - **CI/CD** — GitHub Actions for analyze/test with coverage gating (`ci.yml`),
   CodeQL (`codeql.yml`), and a manual-dispatch Fastlane release pipeline
   (`release.yml`) for TestFlight and Google Play.
+- **Bootstrap CLI** — `tool/setup.sh`, a one-command idempotent setup
+  (submodules, FVM SDK, SPM disable on macOS, `pub get`, code generation,
+  backend deps, and the pre-push hook).
 - **Tooling** — Dart & CodeGraph MCP servers and vendored agent skills.
 
 [1.0.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.0.0
