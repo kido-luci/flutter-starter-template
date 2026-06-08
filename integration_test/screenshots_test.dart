@@ -92,12 +92,17 @@ void main() {
     await tester.pumpAndSettle();
     await E2eApp.pumpUntil(tester, find.text('Join Flutter Starter'));
     expect(find.text('Join Flutter Starter'), findsWidgets);
-    await tester.enterText(find.byType(TextFormField).at(0), 'jane@example.com');
+    await tester.enterText(
+      find.byType(TextFormField).at(0),
+      'jane@example.com',
+    );
     await tester.enterText(find.byType(TextFormField).at(1), 'MyPassw0rd');
     await tester.pumpAndSettle();
     await shot('register');
     // Back to login without registering (the demo account already exists).
-    const LoginRoute().go(tester.element(find.text('Join Flutter Starter').first));
+    const LoginRoute().go(
+      tester.element(find.text('Join Flutter Starter').first),
+    );
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
 
