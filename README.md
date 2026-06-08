@@ -55,6 +55,7 @@ To enable seamless local development and testing, this template is paired with a
 - [🔗 Deep Linking](#-deep-linking)
 - [🧩 UI Widgets](#-ui-widgets)
 - [🧰 Tech Stack](#-tech-stack)
+- [📱 Screen Gallery](#-screen-gallery)
 - [🤖 AI‑Native Workflow](#-ainative-workflow)
 - [🔄 Code Generation](#-code-generation)
 - [🌐 Localization (i18n)](#-localization-i18n)
@@ -95,16 +96,7 @@ To enable seamless local development and testing, this template is paired with a
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="doc/screenshots/sign_in.png" alt="Sign in" width="200">
-  <img src="doc/screenshots/register.png" alt="Register" width="200">
-  <img src="doc/screenshots/home.png" alt="Home" width="200">
-  <img src="doc/screenshots/bookmarks.png" alt="Bookmarks" width="200">
-</p>
-<p align="center">
-  <img src="doc/screenshots/create_bookmark.png" alt="Create bookmark" width="200">
-  <img src="doc/screenshots/bookmark_detail.png" alt="Bookmark detail" width="200">
-  <img src="doc/screenshots/notifications.png" alt="Notifications" width="200">
-  <img src="doc/screenshots/profile.png" alt="Profile" width="200">
+  <img src="doc/screenshots/app_cover_thumbnail.png" alt="Flutter Starter Template app demo" width="800">
 </p>
 
 <p align="center"><sub>JWT auth · Material 3 · offline‑first bookmarks & activity feed</sub></p>
@@ -612,6 +604,27 @@ because they are tied to bookmark attachment behavior.
 | **Splash**         | Custom session-restore bootstrapper (no package)                                                   |
 | **Testing & Lints**| `test_utils` (`mocktail`) · `bloc_test` · `very_good_analysis` · `build_verify`                    |
 | **Backend**        | Go — `chi/v5` · `golang-jwt/v5` · `cors`                                                          |
+
+<br>
+
+---
+
+<br>
+
+## 📱 Screen Gallery
+
+<p align="center">
+  <img src="doc/screenshots/sign_in.png" alt="Sign in" width="200">
+  <img src="doc/screenshots/register.png" alt="Register" width="200">
+  <img src="doc/screenshots/home.png" alt="Home" width="200">
+  <img src="doc/screenshots/bookmarks.png" alt="Bookmarks" width="200">
+</p>
+<p align="center">
+  <img src="doc/screenshots/create_bookmark.png" alt="Create bookmark" width="200">
+  <img src="doc/screenshots/bookmark_detail.png" alt="Bookmark detail" width="200">
+  <img src="doc/screenshots/notifications.png" alt="Notifications" width="200">
+  <img src="doc/screenshots/profile.png" alt="Profile" width="200">
+</p>
 
 <br>
 
