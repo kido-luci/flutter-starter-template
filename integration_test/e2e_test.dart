@@ -397,7 +397,7 @@ Future<void> _signOut(WidgetTester tester) async {
   signOutButton.onPressed!();
   await tester.pumpAndSettle();
 
-  await tester.tap(find.widgetWithText(TextButton, 'Sign out'));
+  await tester.tap(find.widgetWithText(FilledButton, 'Sign out').last);
   await E2eApp.settle(tester);
   await tester.pumpAndSettle();
 
