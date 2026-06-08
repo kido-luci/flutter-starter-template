@@ -20,7 +20,7 @@ class BookmarksSearchAnalyticsTracker {
             queryLength: normalized.length,
             resultCount: resultCount,
           )
-          .uw();
+          .fire();
     });
   }
 

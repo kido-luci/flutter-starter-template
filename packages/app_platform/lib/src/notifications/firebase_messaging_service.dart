@@ -49,7 +49,7 @@ class FirebaseMessagingService {
     // Fetching the initial token can block for several seconds on Apple
     // platforms while waiting for the APNs token. Don't hold up app startup for
     // it — the token is delivered through `_tokenStream` once it's ready.
-    _saveInitialToken().uw();
+    _saveInitialToken().fire();
 
     _messaging.onTokenRefresh.listen(_onTokenRefresh);
 
@@ -131,7 +131,9 @@ class FirebaseMessagingService {
   }
 
   void _handleNotificationTap(Map<String, dynamic>? data) {
-    _analytics.trackNotificationOpened(payloadKeyCount: data?.length ?? 0).uw();
+    _analytics
+        .trackNotificationOpened(payloadKeyCount: data?.length ?? 0)
+        .fire();
     final callback = onNotificationTap;
     if (callback != null) {
       callback(data);

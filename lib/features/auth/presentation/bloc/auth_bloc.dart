@@ -45,14 +45,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _restoreSession();
     switch (result) {
       case Ok(value: final user):
-        _analytics.setCurrentUser(user.id).uw();
+        _analytics.setCurrentUser(user.id).fire();
         emit(AuthState.authenticated(user));
       case Err(failure: NoSessionFailure()):
         // Expected on first launch / after sign-out — not an error.
-        _analytics.setCurrentUser(null).uw();
+        _analytics.setCurrentUser(null).fire();
         emit(const AuthState.initial());
       case Err(:final failure):
-        _analytics.setCurrentUser(null).uw();
+        _analytics.setCurrentUser(null).fire();
         emit(AuthState.failure(failure));
     }
   }
@@ -75,13 +75,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ));
     switch (result) {
       case Ok(value: final user):
-        _analytics.setCurrentUser(user.id).uw();
-        _analytics.logLogin(method: 'password').uw();
+        _analytics.setCurrentUser(user.id).fire();
+        _analytics.logLogin(method: 'password').fire();
         emit(AuthState.authenticated(user));
       case Err(:final failure):
         _analytics
             .trackLoginFailed(errorType: failure.runtimeType.toString())
-            .uw();
+            .fire();
         emit(AuthState.failure(failure));
     }
   }
@@ -97,13 +97,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ));
     switch (result) {
       case Ok(value: final user):
-        _analytics.setCurrentUser(user.id).uw();
-        _analytics.logSignUp(signUpMethod: 'password').uw();
+        _analytics.setCurrentUser(user.id).fire();
+        _analytics.logSignUp(signUpMethod: 'password').fire();
         emit(AuthState.authenticated(user));
       case Err(:final failure):
         _analytics
             .trackLoginFailed(errorType: failure.runtimeType.toString())
-            .uw();
+            .fire();
         emit(AuthState.failure(failure));
     }
   }
@@ -117,9 +117,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthState.signingOut(current.user));
     }
     final result = await _signOut();
-    _analytics.setCurrentUser(null).uw();
+    _analytics.setCurrentUser(null).fire();
     if (result case Ok<void>()) {
-      _analytics.trackSignOut().uw();
+      _analytics.trackSignOut().fire();
     }
     // Sign-out is best-effort: drop session locally regardless of result so the
     // user isn't stuck if the server call failed.

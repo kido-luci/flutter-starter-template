@@ -119,7 +119,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
     BookmarksListSyncRetried event,
     Emitter<BookmarksListState> emit,
   ) async {
-    _analytics.trackBookmarkSyncRetried().uw();
+    _analytics.trackBookmarkSyncRetried().fire();
     await _sync.sync();
   }
 
@@ -156,8 +156,8 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
           bookmarkId: bookmark.id,
           source: AnalyticsSources.list,
         )
-        .uw();
-    _share.share(text: bookmark.shareText, subject: bookmark.title).uw();
+        .fire();
+    _share.share(text: bookmark.shareText, subject: bookmark.title).fire();
   }
 
   Future<void> _onDeleteRequested(
@@ -179,7 +179,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
               bookmarkId: id,
               source: AnalyticsSources.list,
             )
-            .uw();
+            .fire();
       case Err(:final failure):
         _analytics
             .trackBookmarkDeleteFailed(
@@ -187,7 +187,7 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
               source: AnalyticsSources.list,
               errorType: failure.runtimeType.toString(),
             )
-            .uw();
+            .fire();
         emit(state.copyWith(items: previous));
         await _loadAndEmit(emit);
     }

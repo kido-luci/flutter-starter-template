@@ -44,6 +44,6 @@ class BookmarkFormSubmitter {
       bookmarkId: bookmark.id,
       tagCount: bookmark.tags.length,
       hasDescription: bookmark.description.isNotEmpty,
-    ).uw();
+    ).fire();
   }
 }

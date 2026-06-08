@@ -47,7 +47,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     if (event.mode == state.mode) return;
     emit(state.copyWith(mode: event.mode));
     await _prefs.setString(_kThemeModeKey, event.mode.name);
-    _analytics.trackThemeModeChanged(event.mode.name).uw();
+    _analytics.trackThemeModeChanged(event.mode.name).fire();
   }
 
   Future<void> _onSchemeChanged(
@@ -57,6 +57,6 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     if (event.scheme == state.scheme) return;
     emit(state.copyWith(scheme: event.scheme));
     await _prefs.setString(_kThemeSchemeKey, event.scheme.name);
-    _analytics.trackThemeSchemeChanged(event.scheme.name).uw();
+    _analytics.trackThemeSchemeChanged(event.scheme.name).fire();
   }
 }

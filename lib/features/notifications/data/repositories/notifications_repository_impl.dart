@@ -20,7 +20,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   Future<Result<NotificationsFeed>> getFeed() async {
     final feed = await _readLocal();
     // Refresh in the background; the read returns the cache immediately.
-    _sync.sync().uw();
+    _sync.sync().fire();
     return Ok(feed);
   }
 
@@ -32,7 +32,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   @override
   Future<Result<void>> markRead(String id) async {
     await _local.markReadPending(id);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return const Ok(null);
   }
 

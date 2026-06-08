@@ -24,7 +24,7 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
   Future<Result<List<Bookmark>>> list() async {
     final result = await listLocal();
     // Trigger a refresh in the background; reads return immediately.
-    _sync.sync().uw();
+    _sync.sync().fire();
     return result;
   }
 
@@ -60,7 +60,7 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
       syncStateCode: SyncState.pendingCreate.code,
     );
     await _local.putNew(entity);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return Ok(entity.toDomain());
   }
 
@@ -79,7 +79,7 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
       existing.syncState = SyncState.pendingUpdate;
     }
     await _local.put(existing);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return Ok(existing.toDomain());
   }
 
@@ -98,7 +98,7 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
     existing.syncState = SyncState.pendingDelete;
     existing.updatedAt = DateTime.now().toUtc();
     await _local.put(existing);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return const Ok(null);
   }
 

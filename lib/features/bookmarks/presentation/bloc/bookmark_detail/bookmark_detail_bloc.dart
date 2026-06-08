@@ -48,7 +48,7 @@ class BookmarkDetailBloc
               tagCount: bookmark.tags.length,
               hasDescription: bookmark.description.isNotEmpty,
             )
-            .uw();
+            .fire();
         emit(BookmarkDetailState.ready(bookmark));
       case Err(:final failure):
         emit(BookmarkDetailState.failure(failure));
@@ -71,7 +71,7 @@ class BookmarkDetailBloc
               bookmarkId: event.id,
               source: AnalyticsSources.detail,
             )
-            .uw();
+            .fire();
         emit(const BookmarkDetailState.deleted());
       case Err(:final failure):
         _analytics
@@ -80,7 +80,7 @@ class BookmarkDetailBloc
               source: AnalyticsSources.detail,
               errorType: failure.runtimeType.toString(),
             )
-            .uw();
+            .fire();
         emit(BookmarkDetailState.failure(failure));
     }
   }
@@ -95,8 +95,8 @@ class BookmarkDetailBloc
           bookmarkId: bookmark.id,
           source: AnalyticsSources.detail,
         )
-        .uw();
-    _share.share(text: bookmark.shareText, subject: bookmark.title).uw();
+        .fire();
+    _share.share(text: bookmark.shareText, subject: bookmark.title).fire();
   }
 
   void _onUrlOpened(
@@ -108,6 +108,6 @@ class BookmarkDetailBloc
           bookmarkId: event.bookmark.id,
           source: AnalyticsSources.detail,
         )
-        .uw();
+        .fire();
   }
 }

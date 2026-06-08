@@ -23,8 +23,8 @@ class DeleteAccountCubit extends Cubit<DeleteAccountState> {
 
     switch (result) {
       case Ok():
-        _analytics.trackAccountDeleted().uw();
-        _analytics.setCurrentUser(null).uw();
+        _analytics.trackAccountDeleted().fire();
+        _analytics.setCurrentUser(null).fire();
         emit(const DeleteAccountState.success());
       case Err(:final failure):
         emit(DeleteAccountState.failure(failure));

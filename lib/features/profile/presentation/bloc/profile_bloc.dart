@@ -30,6 +30,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     ProfileUserIdCopied event,
     Emitter<ProfileState> emit,
   ) {
-    _analytics.trackUserIdCopied().uw();
+    _analytics.trackUserIdCopied().fire();
   }
 }

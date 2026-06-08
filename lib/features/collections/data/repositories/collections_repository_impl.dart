@@ -24,7 +24,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
   Future<Result<List<Collection>>> list() async {
     final result = await listLocal();
     // Trigger a refresh in the background; reads return immediately.
-    _sync.sync().uw();
+    _sync.sync().fire();
     return result;
   }
 
@@ -58,7 +58,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
       syncStateCode: SyncState.pendingCreate.code,
     );
     await _local.putNew(entity);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return Ok(entity.toDomain());
   }
 
@@ -77,7 +77,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
       existing.syncState = SyncState.pendingUpdate;
     }
     await _local.put(existing);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return Ok(existing.toDomain());
   }
 
@@ -96,7 +96,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
     existing.syncState = SyncState.pendingDelete;
     existing.updatedAt = DateTime.now().toUtc();
     await _local.put(existing);
-    _sync.sync().uw();
+    _sync.sync().fire();
     return const Ok(null);
   }
 

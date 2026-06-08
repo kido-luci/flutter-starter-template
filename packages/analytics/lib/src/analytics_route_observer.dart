@@ -32,6 +32,6 @@ class AnalyticsRouteObserver extends NavigatorObserver {
     if (route is! PageRoute) return;
     final screenName = route.settings.name;
     if (screenName == null || screenName.isEmpty) return;
-    _analytics.logScreenView(screenName: screenName).uw();
+    _analytics.logScreenView(screenName: screenName).fire();
   }
 }
