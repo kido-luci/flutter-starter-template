@@ -27,8 +27,9 @@ class _HomeBodyState extends State<HomeBody> {
   static const double _bottomInset = 112;
 
   final TextEditingController _searchController = TextEditingController();
-  final ValueNotifier<String> _selectedFilterIdNotifier =
-      ValueNotifier<String>('all');
+  final ValueNotifier<String> _selectedFilterIdNotifier = ValueNotifier<String>(
+    'all',
+  );
   late final Listenable _filterListenable;
 
   @override
@@ -138,7 +139,8 @@ class _HomeBodyState extends State<HomeBody> {
                                 _RecentBookmarksSection(
                                   recentItems: filteredItems,
                                   isEmpty: state.totalBookmarks == 0,
-                                  hasMatches: !hasActiveFilters ||
+                                  hasMatches:
+                                      !hasActiveFilters ||
                                       filteredItems.isNotEmpty,
                                   animationDelay: 440.ms,
                                 ),
