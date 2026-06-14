@@ -1,3 +1,6 @@
 [submodule "simple_backend_server"]
 	path = simple_backend_server
 	url = https://github.com/kido-luci/flutter-starter-template-simple-backend
+[submodule "tool/cli"]
+	path = tool/cli
+	url = https://github.com/kido-luci/flutter-starter-template-cli.git
