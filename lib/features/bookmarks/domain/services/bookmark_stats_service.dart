@@ -16,7 +16,7 @@ class BookmarkStatsService extends BookmarkStatsReader {
   static const _recentWindow = Duration(days: 7);
   static const _recentItemCount = 3;
 
-  final ListBookmarks _listBookmarks;
+  final ListBookmarksUseCase _listBookmarks;
 
   @override
   Future<Result<BookmarkStats>> call([NoParams param = noParams]) async {

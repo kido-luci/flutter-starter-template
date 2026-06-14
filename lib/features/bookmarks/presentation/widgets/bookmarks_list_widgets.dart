@@ -47,7 +47,12 @@ class _BookmarksListViewState extends State<BookmarksListView> {
 
   Future<void> _reload() {
     final bloc = context.read<BookmarksListBloc>();
-    final completion = bloc.stream.firstWhere((state) => !state.isLoading);
+    // orElse guards against the bloc closing mid-refresh (e.g. user navigates
+    // away), which would otherwise throw a StateError inside RefreshIndicator.
+    final completion = bloc.stream.firstWhere(
+      (state) => !state.isLoading,
+      orElse: () => bloc.state,
+    );
     bloc.add(const BookmarksListLoadRequested());
     return completion.then((_) {});
   }

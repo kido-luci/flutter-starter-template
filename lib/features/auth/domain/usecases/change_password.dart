@@ -6,8 +6,8 @@ import '../repositories/auth_repository.dart';
 typedef ChangePasswordParams = ({String currentPassword, String newPassword});
 
 @injectable
-class ChangePassword extends UseCase<ChangePasswordParams, void> {
-  const ChangePassword(this._repository);
+class ChangePasswordUseCase extends UseCase<ChangePasswordParams, void> {
+  const ChangePasswordUseCase(this._repository);
 
   final AuthRepository _repository;
 

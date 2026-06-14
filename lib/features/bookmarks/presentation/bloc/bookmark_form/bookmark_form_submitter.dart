@@ -9,8 +9,8 @@ import 'bookmark_form_state.dart';
 class BookmarkFormSubmitter {
   const BookmarkFormSubmitter(this._create, this._update, this._analytics);
 
-  final CreateBookmark _create;
-  final UpdateBookmark _update;
+  final CreateBookmarkUseCase _create;
+  final UpdateBookmarkUseCase _update;
   final AnalyticsService _analytics;
 
   Future<Result<void>> submit(BookmarkFormState state) async {

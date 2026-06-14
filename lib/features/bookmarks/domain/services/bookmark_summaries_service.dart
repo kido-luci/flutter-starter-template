@@ -14,7 +14,7 @@ import '../usecases/list_bookmarks.dart';
 class BookmarkSummariesService extends BookmarkSummariesReader {
   const BookmarkSummariesService(this._listBookmarks);
 
-  final ListBookmarks _listBookmarks;
+  final ListBookmarksUseCase _listBookmarks;
 
   @override
   Future<Result<List<BookmarkSummary>>> call([

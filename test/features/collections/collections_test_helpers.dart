@@ -13,17 +13,18 @@ import 'package:test_utils/test_utils.dart';
 
 class MockCollectionsRepository extends Mock implements CollectionsRepository {}
 
-class MockListCollections extends Mock implements ListCollections {}
+class MockListCollections extends Mock implements ListCollectionsUseCase {}
 
-class MockListLocalCollections extends Mock implements ListLocalCollections {}
+class MockListLocalCollections extends Mock
+    implements ListLocalCollectionsUseCase {}
 
-class MockGetCollection extends Mock implements GetCollection {}
+class MockGetCollection extends Mock implements GetCollectionUseCase {}
 
-class MockCreateCollection extends Mock implements CreateCollection {}
+class MockCreateCollection extends Mock implements CreateCollectionUseCase {}
 
-class MockUpdateCollection extends Mock implements UpdateCollection {}
+class MockUpdateCollection extends Mock implements UpdateCollectionUseCase {}
 
-class MockDeleteCollection extends Mock implements DeleteCollection {}
+class MockDeleteCollection extends Mock implements DeleteCollectionUseCase {}
 
 class MockCollectionsSyncController extends Mock
     implements CollectionsSyncController {}

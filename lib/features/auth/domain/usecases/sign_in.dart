@@ -7,8 +7,8 @@ import '../repositories/auth_repository.dart';
 typedef SignInParams = ({String username, String password});
 
 @injectable
-class SignIn extends UseCase<SignInParams, AuthUser> {
-  const SignIn(this._repository);
+class SignInUseCase extends UseCase<SignInParams, AuthUser> {
+  const SignInUseCase(this._repository);
 
   final AuthRepository _repository;
 

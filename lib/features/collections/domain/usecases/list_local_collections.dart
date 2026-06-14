@@ -7,10 +7,10 @@ import '../repositories/collections_repository.dart';
 /// Reads collections from the local store without triggering a sync.
 ///
 /// Used to refresh the list after a sync cycle completes, avoiding the
-/// read-triggers-sync feedback loop that `ListCollections` would cause.
+/// read-triggers-sync feedback loop that `ListCollectionsUseCase` would cause.
 @injectable
-class ListLocalCollections extends NoParamUseCase<List<Collection>> {
-  const ListLocalCollections(this._repository);
+class ListLocalCollectionsUseCase extends NoParamUseCase<List<Collection>> {
+  const ListLocalCollectionsUseCase(this._repository);
 
   final CollectionsRepository _repository;
 

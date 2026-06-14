@@ -11,13 +11,13 @@ class FakeCollectionInput extends Fake implements CollectionInput {}
 
 void main() {
   late MockCollectionsRepository repository;
-  late CreateCollection useCase;
+  late CreateCollectionUseCase useCase;
 
   setUpAll(() => registerFallbackValue(FakeCollectionInput()));
 
   setUp(() {
     repository = MockCollectionsRepository();
-    useCase = CreateCollection(repository);
+    useCase = CreateCollectionUseCase(repository);
   });
 
   test('rejects a blank name without touching the repository', () async {

@@ -12,12 +12,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../test_utils.dart';
 
-class MockGetNotificationsFeed extends Mock implements GetNotificationsFeed {}
+class MockGetNotificationsFeed extends Mock
+    implements GetNotificationsFeedUseCase {}
 
 class MockGetNotificationsFeedLocal extends Mock
-    implements GetNotificationsFeedLocal {}
+    implements GetNotificationsFeedLocalUseCase {}
 
-class MockMarkNotificationRead extends Mock implements MarkNotificationRead {}
+class MockMarkNotificationRead extends Mock
+    implements MarkNotificationReadUseCase {}
 
 void main() {
   late MockGetNotificationsFeed getFeed;

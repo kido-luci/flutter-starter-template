@@ -25,9 +25,9 @@ void main() {
     repo = _MockBookmarksRepository();
   });
 
-  group('CreateBookmark', () {
+  group('CreateBookmarkUseCase', () {
     test('rejects empty title without hitting repository', () async {
-      final result = await CreateBookmark(repo)(
+      final result = await CreateBookmarkUseCase(repo)(
         const BookmarkInput(
           title: '',
           url: 'https://flutter.dev',
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('rejects empty url without hitting repository', () async {
-      final result = await CreateBookmark(repo)(
+      final result = await CreateBookmarkUseCase(repo)(
         const BookmarkInput(
           title: 'Flutter',
           url: '',
@@ -61,9 +61,9 @@ void main() {
     });
   });
 
-  group('UpdateBookmark', () {
+  group('UpdateBookmarkUseCase', () {
     test('rejects empty title without hitting repository', () async {
-      final result = await UpdateBookmark(repo)((
+      final result = await UpdateBookmarkUseCase(repo)((
         id: 'b-1',
         input: const BookmarkInput(
           title: '',
@@ -81,25 +81,25 @@ void main() {
   });
 
   group('read and delete use cases', () {
-    test('ListBookmarks delegates to repository', () async {
+    test('ListBookmarksUseCase delegates to repository', () async {
       when(() => repo.list()).thenAnswer((_) async => const Ok([]));
 
-      final result = await ListBookmarks(repo)();
+      final result = await ListBookmarksUseCase(repo)();
 
       expect(result, isA<Ok<List<Bookmark>>>());
       verify(() => repo.list()).called(1);
     });
 
-    test('ListLocalBookmarks delegates to repository', () async {
+    test('ListLocalBookmarksUseCase delegates to repository', () async {
       when(() => repo.listLocal()).thenAnswer((_) async => const Ok([]));
 
-      final result = await ListLocalBookmarks(repo)();
+      final result = await ListLocalBookmarksUseCase(repo)();
 
       expect(result, isA<Ok<List<Bookmark>>>());
       verify(() => repo.listLocal()).called(1);
     });
 
-    test('GetBookmark delegates to repository', () async {
+    test('GetBookmarkUseCase delegates to repository', () async {
       final bookmark = Bookmark(
         id: 'b-1',
         title: 'Flutter',
@@ -111,16 +111,16 @@ void main() {
       );
       when(() => repo.get('b-1')).thenAnswer((_) async => Ok(bookmark));
 
-      final result = await GetBookmark(repo)('b-1');
+      final result = await GetBookmarkUseCase(repo)('b-1');
 
       expect(result, isA<Ok<Bookmark>>());
       verify(() => repo.get('b-1')).called(1);
     });
 
-    test('DeleteBookmark delegates to repository', () async {
+    test('DeleteBookmarkUseCase delegates to repository', () async {
       when(() => repo.delete('b-1')).thenAnswer((_) async => const Ok(null));
 
-      final result = await DeleteBookmark(repo)('b-1');
+      final result = await DeleteBookmarkUseCase(repo)('b-1');
 
       expect(result, isA<Ok<void>>());
       verify(() => repo.delete('b-1')).called(1);

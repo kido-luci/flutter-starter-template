@@ -13,9 +13,9 @@ class CollectionFormCubit extends Cubit<CollectionFormState> {
   CollectionFormCubit(this._create, this._update, this._get)
     : super(const CollectionFormState());
 
-  final CreateCollection _create;
-  final UpdateCollection _update;
-  final GetCollection _get;
+  final CreateCollectionUseCase _create;
+  final UpdateCollectionUseCase _update;
+  final GetCollectionUseCase _get;
 
   /// Loads an existing collection for editing. No-op for the create flow.
   Future<void> loadForEdit(String id) async {

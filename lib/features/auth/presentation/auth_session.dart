@@ -36,6 +36,7 @@ class AuthSession extends ChangeNotifier implements Session {
           state is AuthAuthenticated ||
           state is AuthInitial ||
           state is AuthFailure,
+      orElse: () => _bloc.state,
     );
     _bloc.add(const AuthSessionRestoreRequested());
     await settled;

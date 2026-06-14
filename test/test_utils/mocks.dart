@@ -43,19 +43,19 @@ class MockNotificationsBloc
 
 class MockActivityNotifier extends Mock implements ActivityNotifier {}
 
-class MockSignIn extends Mock implements SignIn {}
+class MockSignIn extends Mock implements SignInUseCase {}
 
-class MockRegister extends Mock implements Register {}
+class MockRegister extends Mock implements RegisterUseCase {}
 
-class MockSignOut extends Mock implements SignOut {}
+class MockSignOut extends Mock implements SignOutUseCase {}
 
-class MockDeleteAccount extends Mock implements DeleteAccount {}
+class MockDeleteAccount extends Mock implements DeleteAccountUseCase {}
 
-class MockRestoreSession extends Mock implements RestoreSession {}
+class MockRestoreSession extends Mock implements RestoreSessionUseCase {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
-class MockListBookmarks extends Mock implements ListBookmarks {}
+class MockListBookmarks extends Mock implements ListBookmarksUseCase {}
 
 class MockBookmarkStatsReader extends Mock implements BookmarkStatsReader {}
 
@@ -64,15 +64,16 @@ class MockCollectionsReader extends Mock implements CollectionsReader {}
 class MockCollectionsSyncController extends Mock
     implements CollectionsSyncController {}
 
-class MockListLocalBookmarks extends Mock implements ListLocalBookmarks {}
+class MockListLocalBookmarks extends Mock
+    implements ListLocalBookmarksUseCase {}
 
-class MockGetBookmark extends Mock implements GetBookmark {}
+class MockGetBookmark extends Mock implements GetBookmarkUseCase {}
 
-class MockCreateBookmark extends Mock implements CreateBookmark {}
+class MockCreateBookmark extends Mock implements CreateBookmarkUseCase {}
 
-class MockUpdateBookmark extends Mock implements UpdateBookmark {}
+class MockUpdateBookmark extends Mock implements UpdateBookmarkUseCase {}
 
-class MockDeleteBookmark extends Mock implements DeleteBookmark {}
+class MockDeleteBookmark extends Mock implements DeleteBookmarkUseCase {}
 
 class MockBookmarksSyncController extends Mock
     implements BookmarksSyncController {}
@@ -88,31 +89,34 @@ class FakeUpdateCollectionParams extends Fake
     implements UpdateCollectionParams {}
 
 // Notifications use-cases
-class MockGetNotificationsFeed extends Mock implements GetNotificationsFeed {}
+class MockGetNotificationsFeed extends Mock
+    implements GetNotificationsFeedUseCase {}
 
 class MockGetNotificationsFeedLocal extends Mock
-    implements GetNotificationsFeedLocal {}
+    implements GetNotificationsFeedLocalUseCase {}
 
-class MockMarkNotificationRead extends Mock implements MarkNotificationRead {}
+class MockMarkNotificationRead extends Mock
+    implements MarkNotificationReadUseCase {}
 
 // Collections use-cases
-class MockListCollections extends Mock implements ListCollections {}
+class MockListCollections extends Mock implements ListCollectionsUseCase {}
 
-class MockListLocalCollections extends Mock implements ListLocalCollections {}
+class MockListLocalCollections extends Mock
+    implements ListLocalCollectionsUseCase {}
 
-class MockDeleteCollection extends Mock implements DeleteCollection {}
+class MockDeleteCollection extends Mock implements DeleteCollectionUseCase {}
 
-class MockGetCollection extends Mock implements GetCollection {}
+class MockGetCollection extends Mock implements GetCollectionUseCase {}
 
-class MockCreateCollection extends Mock implements CreateCollection {}
+class MockCreateCollection extends Mock implements CreateCollectionUseCase {}
 
-class MockUpdateCollection extends Mock implements UpdateCollection {}
+class MockUpdateCollection extends Mock implements UpdateCollectionUseCase {}
 
 class MockBookmarkSummariesReader extends Mock
     implements BookmarkSummariesReader {}
 
 // Auth use-cases (additional)
-class MockChangePassword extends Mock implements ChangePassword {}
+class MockChangePassword extends Mock implements ChangePasswordUseCase {}
 
 /// In-memory [Session] double for widget tests.
 class FakeSession extends ChangeNotifier implements Session {

@@ -5,8 +5,8 @@ import '../entities/bookmark.dart';
 import '../repositories/bookmarks_repository.dart';
 
 @injectable
-class GetBookmark extends UseCase<String, Bookmark> {
-  const GetBookmark(this._repository);
+class GetBookmarkUseCase extends UseCase<String, Bookmark> {
+  const GetBookmarkUseCase(this._repository);
 
   final BookmarksRepository _repository;
 

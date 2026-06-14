@@ -5,8 +5,8 @@ import '../entities/bookmark.dart';
 import '../repositories/bookmarks_repository.dart';
 
 @injectable
-class ListBookmarks extends NoParamUseCase<List<Bookmark>> {
-  const ListBookmarks(this._repository);
+class ListBookmarksUseCase extends NoParamUseCase<List<Bookmark>> {
+  const ListBookmarksUseCase(this._repository);
 
   final BookmarksRepository _repository;
 

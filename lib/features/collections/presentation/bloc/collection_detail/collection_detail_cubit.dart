@@ -19,9 +19,9 @@ class CollectionDetailCubit extends Cubit<CollectionDetailState> {
     this._bookmarkSummaries,
   ) : super(const CollectionDetailState());
 
-  final GetCollection _get;
-  final UpdateCollection _update;
-  final DeleteCollection _delete;
+  final GetCollectionUseCase _get;
+  final UpdateCollectionUseCase _update;
+  final DeleteCollectionUseCase _delete;
   final BookmarkSummariesReader _bookmarkSummaries;
 
   Future<void> load(String id) async {

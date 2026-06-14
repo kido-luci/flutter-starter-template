@@ -4,8 +4,8 @@ import 'package:injectable/injectable.dart';
 import '../repositories/collections_repository.dart';
 
 @injectable
-class DeleteCollection extends UseCase<String, void> {
-  const DeleteCollection(this._repository);
+class DeleteCollectionUseCase extends UseCase<String, void> {
+  const DeleteCollectionUseCase(this._repository);
 
   final CollectionsRepository _repository;
 

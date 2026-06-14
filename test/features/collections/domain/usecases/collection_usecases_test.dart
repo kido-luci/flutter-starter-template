@@ -19,37 +19,40 @@ void main() {
     repository = MockCollectionsRepository();
   });
 
-  test('ListCollections delegates to repository.list', () async {
+  test('ListCollectionsUseCase delegates to repository.list', () async {
     when(
       () => repository.list(),
     ).thenAnswer((_) async => Ok([buildCollection()]));
 
-    final result = await ListCollections(repository)();
+    final result = await ListCollectionsUseCase(repository)();
 
     expect((result as Ok<List<Collection>>).value, hasLength(1));
     verify(() => repository.list()).called(1);
   });
 
-  test('ListLocalCollections delegates to repository.listLocal', () async {
-    when(() => repository.listLocal()).thenAnswer((_) async => const Ok([]));
+  test(
+    'ListLocalCollectionsUseCase delegates to repository.listLocal',
+    () async {
+      when(() => repository.listLocal()).thenAnswer((_) async => const Ok([]));
 
-    await ListLocalCollections(repository)();
+      await ListLocalCollectionsUseCase(repository)();
 
-    verify(() => repository.listLocal()).called(1);
-  });
+      verify(() => repository.listLocal()).called(1);
+    },
+  );
 
-  test('GetCollection delegates to repository.get', () async {
+  test('GetCollectionUseCase delegates to repository.get', () async {
     when(
       () => repository.get('c-1'),
     ).thenAnswer((_) async => Ok(buildCollection()));
 
-    final result = await GetCollection(repository)('c-1');
+    final result = await GetCollectionUseCase(repository)('c-1');
 
     expect((result as Ok<Collection>).value.id, 'c-1');
   });
 
-  test('UpdateCollection validates before delegating', () async {
-    final result = await UpdateCollection(repository)(
+  test('UpdateCollectionUseCase validates before delegating', () async {
+    final result = await UpdateCollectionUseCase(repository)(
       const UpdateCollectionParams(
         id: 'c-1',
         input: CollectionInput(name: '  ', icon: 'f5fd', color: 0xFF6366F1),
@@ -60,12 +63,12 @@ void main() {
     verifyNever(() => repository.update(any(), any()));
   });
 
-  test('DeleteCollection delegates to repository.delete', () async {
+  test('DeleteCollectionUseCase delegates to repository.delete', () async {
     when(
       () => repository.delete('c-1'),
     ).thenAnswer((_) async => const Ok(null));
 
-    await DeleteCollection(repository)('c-1');
+    await DeleteCollectionUseCase(repository)('c-1');
 
     verify(() => repository.delete('c-1')).called(1);
   });

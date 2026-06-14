@@ -27,11 +27,24 @@ class _HomeBodyState extends State<HomeBody> {
   static const double _bottomInset = 112;
 
   final TextEditingController _searchController = TextEditingController();
-  String _selectedFilterId = 'all';
+  final ValueNotifier<String> _selectedFilterIdNotifier = ValueNotifier<String>(
+    'all',
+  );
+  late final Listenable _filterListenable;
+
+  @override
+  void initState() {
+    super.initState();
+    _filterListenable = Listenable.merge([
+      _searchController,
+      _selectedFilterIdNotifier,
+    ]);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _selectedFilterIdNotifier.dispose();
     super.dispose();
   }
 
@@ -58,12 +71,6 @@ class _HomeBodyState extends State<HomeBody> {
         builder: (context, state) {
           return LayoutBuilder(
             builder: (context, constraints) {
-              final filters = _filters(context);
-              final filteredItems = _filterItems(state.recentItems, filters);
-              final hasActiveFilters =
-                  _searchController.text.trim().isNotEmpty ||
-                  _selectedFilterId != 'all';
-
               return SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.xl,
@@ -79,10 +86,16 @@ class _HomeBodyState extends State<HomeBody> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _SearchSection(
-                          controller: _searchController,
-                          onChanged: (_) => setState(() {}),
-                        ).animateFadeIn(delay: 100.ms),
+                        // _QuickActions and _WeeklyDigestPanel are outside all
+                        // listeners — their entrance animations are never
+                        // re-triggered by search/filter input.
+                        ListenableBuilder(
+                          listenable: _searchController,
+                          builder: (context, _) => _SearchSection(
+                            controller: _searchController,
+                            onChanged: (_) {},
+                          ).animateFadeIn(delay: 100.ms),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         _QuickActions(
                           onAdd: () =>
@@ -93,28 +106,47 @@ class _HomeBodyState extends State<HomeBody> {
                               const BookmarksListRoute().push<void>(context),
                         ).animateSlideUp(delay: 160.ms),
                         const SizedBox(height: AppSpacing.md),
-                        _FilterChips(
-                          filters: filters,
-                          selectedId: _selectedFilterId,
-                          onSelected: (filter) {
-                            setState(() => _selectedFilterId = filter.id);
+                        ListenableBuilder(
+                          listenable: _filterListenable,
+                          builder: (context, _) {
+                            final filters = _filters(context);
+                            final filteredItems = _filterItems(
+                              state.recentItems,
+                              filters,
+                            );
+                            final hasActiveFilters =
+                                _searchController.text.trim().isNotEmpty ||
+                                _selectedFilterIdNotifier.value != 'all';
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _FilterChips(
+                                  filters: filters,
+                                  selectedId: _selectedFilterIdNotifier.value,
+                                  onSelected: (filter) =>
+                                      _selectedFilterIdNotifier.value =
+                                          filter.id,
+                                ).animateFadeIn(delay: 220.ms),
+                                const SizedBox(height: AppSpacing.xl),
+                                _SuggestedBookmarksSection(
+                                  items: filteredItems,
+                                ).animateFadeIn(delay: 320.ms),
+                                const SizedBox(height: AppSpacing.xl),
+                                _FeaturedCollectionsSection(
+                                  collections: state.collections,
+                                ).animateFadeIn(delay: 380.ms),
+                                const SizedBox(height: AppSpacing.xl),
+                                _RecentBookmarksSection(
+                                  recentItems: filteredItems,
+                                  isEmpty: state.totalBookmarks == 0,
+                                  hasMatches:
+                                      !hasActiveFilters ||
+                                      filteredItems.isNotEmpty,
+                                  animationDelay: 440.ms,
+                                ),
+                              ],
+                            );
                           },
-                        ).animateFadeIn(delay: 220.ms),
-                        const SizedBox(height: AppSpacing.xl),
-                        _SuggestedBookmarksSection(
-                          items: filteredItems,
-                        ).animateFadeIn(delay: 320.ms),
-                        const SizedBox(height: AppSpacing.xl),
-                        _FeaturedCollectionsSection(
-                          collections: state.collections,
-                        ).animateFadeIn(delay: 380.ms),
-                        const SizedBox(height: AppSpacing.xl),
-                        _RecentBookmarksSection(
-                          recentItems: filteredItems,
-                          isEmpty: state.totalBookmarks == 0,
-                          hasMatches:
-                              !hasActiveFilters || filteredItems.isNotEmpty,
-                          animationDelay: 440.ms,
                         ),
                         const SizedBox(height: AppSpacing.xl),
                         _WeeklyDigestPanel(
@@ -140,7 +172,7 @@ class _HomeBodyState extends State<HomeBody> {
   ) {
     final query = _searchController.text.trim().toLowerCase();
     final selectedFilter = filters.firstWhere(
-      (filter) => filter.id == _selectedFilterId,
+      (filter) => filter.id == _selectedFilterIdNotifier.value,
       orElse: () => filters.first,
     );
 

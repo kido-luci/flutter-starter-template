@@ -21,9 +21,9 @@ part 'bookmark_form_event.dart';
 @injectable
 class BookmarkFormBloc extends Bloc<BookmarkFormEvent, BookmarkFormState> {
   BookmarkFormBloc(
-    GetBookmark get,
-    CreateBookmark create,
-    UpdateBookmark update,
+    GetBookmarkUseCase get,
+    CreateBookmarkUseCase create,
+    UpdateBookmarkUseCase update,
     AnalyticsService analytics,
     ImagePickerService imagePickerService,
     PermissionService permissionService,
@@ -134,8 +134,13 @@ class BookmarkFormBloc extends Bloc<BookmarkFormEvent, BookmarkFormState> {
     BookmarkFormImageRemoved event,
     Emitter<BookmarkFormState> emit,
   ) {
-    final updated = List<String>.of(state.imageUrls)..remove(event.path);
-    emit(state.copyWith(imageUrls: updated));
+    emit(
+      state.copyWith(
+        imageUrls: state.imageUrls
+            .where((p) => p != event.path)
+            .toList(growable: false),
+      ),
+    );
   }
 
   Future<void> _onVideoPicked(
@@ -185,7 +190,10 @@ class BookmarkFormBloc extends Bloc<BookmarkFormEvent, BookmarkFormState> {
     switch (result) {
       case BookmarkMediaSuccess(value: final paths):
         if (paths.isNotEmpty) {
-          emit(state.copyWith(imageUrls: [...state.imageUrls, ...paths]));
+          // Use a set merge so picking the same image twice doesn't duplicate
+          // it; LinkedHashSet preserves insertion order (existing first).
+          final merged = {...state.imageUrls, ...paths}.toList(growable: false);
+          emit(state.copyWith(imageUrls: merged));
         }
       case BookmarkMediaFailure(:final failure):
         emit(state.copyWith(status: BookmarkFormStatus.idle, failure: failure));

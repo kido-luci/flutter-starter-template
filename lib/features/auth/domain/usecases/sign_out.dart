@@ -4,8 +4,8 @@ import 'package:injectable/injectable.dart';
 import '../repositories/auth_repository.dart';
 
 @injectable
-class SignOut extends NoParamUseCase<void> {
-  const SignOut(this._repository);
+class SignOutUseCase extends NoParamUseCase<void> {
+  const SignOutUseCase(this._repository);
 
   final AuthRepository _repository;
 

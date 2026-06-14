@@ -5,8 +5,8 @@ import '../entities/collection.dart';
 import '../repositories/collections_repository.dart';
 
 @injectable
-class GetCollection extends UseCase<String, Collection> {
-  const GetCollection(this._repository);
+class GetCollectionUseCase extends UseCase<String, Collection> {
+  const GetCollectionUseCase(this._repository);
 
   final CollectionsRepository _repository;
 

@@ -52,9 +52,9 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   late final StreamSubscription<void> _activitySubscription;
   late final StreamSubscription<void> _syncSubscription;
 
-  final GetNotificationsFeed _getFeed;
-  final GetNotificationsFeedLocal _getFeedLocal;
-  final MarkNotificationRead _markRead;
+  final GetNotificationsFeedUseCase _getFeed;
+  final GetNotificationsFeedLocalUseCase _getFeedLocal;
+  final MarkNotificationReadUseCase _markRead;
 
   Future<void> _onLoadRequested(
     NotificationsLoadRequested event,

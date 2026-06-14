@@ -28,7 +28,7 @@ void main() {
     when(() => listBloc.stream).thenAnswer((_) => Stream.value(state));
 
     // The Collections tab embeds the collections feature's list view, which
-    // resolves its bloc from getIt. Register an empty one.
+    // resolves its bloc from getIt. RegisterUseCase an empty one.
     final collectionsBloc = MockCollectionsListBloc();
     when(() => collectionsBloc.state).thenReturn(const CollectionsListState());
     getIt.registerFactory<CollectionsListBloc>(() => collectionsBloc);
