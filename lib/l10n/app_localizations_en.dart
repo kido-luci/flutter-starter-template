@@ -67,7 +67,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginSocialUnavailable => 'Social sign-in isn\'t configured yet.';
 
   @override
-  String get registerAppBarTitle => 'RegisterUseCase';
+  String get registerAppBarTitle => 'Register';
 
   @override
   String get registerHeadline => 'Join Flutter Starter';

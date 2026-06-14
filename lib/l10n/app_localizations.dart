@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerAppBarTitle.
   ///
   /// In en, this message translates to:
-  /// **'RegisterUseCase'**
+  /// **'Register'**
   String get registerAppBarTitle;
 
   /// No description provided for @registerHeadline.
