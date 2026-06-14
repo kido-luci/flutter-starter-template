@@ -56,7 +56,6 @@ void main() {
     final signOut = MockSignOut();
     when(signOut.call).thenAnswer((_) async => const Ok(null));
 
-
     final bookmarkStats = MockBookmarkStatsReader();
     when(
       bookmarkStats.call,

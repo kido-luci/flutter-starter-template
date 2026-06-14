@@ -9,7 +9,7 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_contracts/src/activity_notifier.dart' as _i562;
 
 class SharedContractsPackageModule extends _i526.MicroPackageModule {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     gh.lazySingleton<_i562.ActivityNotifier>(() => _i562.ActivityNotifier());

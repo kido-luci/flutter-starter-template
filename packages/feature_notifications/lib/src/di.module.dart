@@ -16,15 +16,23 @@ import 'package:feature_notifications/src/domain/usecases/mark_notification_read
 import 'package:injectable/injectable.dart' as _i526;
 
 class FeatureNotificationsPackageModule extends _i526.MicroPackageModule {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
-    gh.factory<_i618.GetNotificationsFeedUseCase>(() =>
-        _i618.GetNotificationsFeedUseCase(gh<_i705.NotificationsRepository>()));
-    gh.factory<_i590.GetNotificationsFeedLocalUseCase>(() =>
-        _i590.GetNotificationsFeedLocalUseCase(
-            gh<_i705.NotificationsRepository>()));
-    gh.factory<_i122.MarkNotificationReadUseCase>(() =>
-        _i122.MarkNotificationReadUseCase(gh<_i705.NotificationsRepository>()));
+    gh.factory<_i618.GetNotificationsFeedUseCase>(
+      () => _i618.GetNotificationsFeedUseCase(
+        gh<_i705.NotificationsRepository>(),
+      ),
+    );
+    gh.factory<_i590.GetNotificationsFeedLocalUseCase>(
+      () => _i590.GetNotificationsFeedLocalUseCase(
+        gh<_i705.NotificationsRepository>(),
+      ),
+    );
+    gh.factory<_i122.MarkNotificationReadUseCase>(
+      () => _i122.MarkNotificationReadUseCase(
+        gh<_i705.NotificationsRepository>(),
+      ),
+    );
   }
 }
