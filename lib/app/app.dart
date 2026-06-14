@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
@@ -77,14 +78,19 @@ class _AppState extends State<App> {
   }
 
   void _onAuthChanged(AuthState state) {
-    if (state is AuthAuthenticated) {
-      for (final c in _syncControllers) {
-        c.start();
-      }
-    } else {
-      for (final c in _syncControllers) {
-        c.stop();
-      }
+    for (final c in _syncControllers) {
+      unawaited(
+        (state is AuthAuthenticated ? c.start() : c.stop()).catchError(
+          (Object error, StackTrace stackTrace) {
+            developer.log(
+              'Feature sync lifecycle failed',
+              name: 'App',
+              error: error,
+              stackTrace: stackTrace,
+            );
+          },
+        ),
+      );
     }
   }
 
@@ -92,7 +98,16 @@ class _AppState extends State<App> {
   void dispose() {
     _authSub?.cancel();
     for (final c in _syncControllers) {
-      c.stop();
+      unawaited(
+        c.stop().catchError((Object error, StackTrace stackTrace) {
+          developer.log(
+            'Feature sync stop failed during dispose',
+            name: 'App',
+            error: error,
+            stackTrace: stackTrace,
+          );
+        }),
+      );
     }
     _session.dispose();
     _router.dispose();
