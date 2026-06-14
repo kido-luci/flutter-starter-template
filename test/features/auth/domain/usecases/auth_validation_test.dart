@@ -29,7 +29,10 @@ void main() {
     });
 
     test('rejects empty password without hitting repository', () async {
-      final result = await SignInUseCase(repo)((username: 'alice', password: ''));
+      final result = await SignInUseCase(repo)((
+        username: 'alice',
+        password: '',
+      ));
 
       expect(result, isA<Err<AuthUser>>());
       verifyZeroInteractions(repo);
@@ -40,7 +43,10 @@ void main() {
         () => repo.signIn(username: 'alice', password: 'pw'),
       ).thenAnswer((_) async => const Ok(testUser));
 
-      final result = await SignInUseCase(repo)((username: 'alice', password: 'pw'));
+      final result = await SignInUseCase(repo)((
+        username: 'alice',
+        password: 'pw',
+      ));
 
       expect(result, isA<Ok<AuthUser>>());
       verify(() => repo.signIn(username: 'alice', password: 'pw')).called(1);

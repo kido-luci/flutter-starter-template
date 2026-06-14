@@ -64,7 +64,8 @@ class MockCollectionsReader extends Mock implements CollectionsReader {}
 class MockCollectionsSyncController extends Mock
     implements CollectionsSyncController {}
 
-class MockListLocalBookmarks extends Mock implements ListLocalBookmarksUseCase {}
+class MockListLocalBookmarks extends Mock
+    implements ListLocalBookmarksUseCase {}
 
 class MockGetBookmark extends Mock implements GetBookmarkUseCase {}
 
@@ -88,17 +89,20 @@ class FakeUpdateCollectionParams extends Fake
     implements UpdateCollectionParams {}
 
 // Notifications use-cases
-class MockGetNotificationsFeed extends Mock implements GetNotificationsFeedUseCase {}
+class MockGetNotificationsFeed extends Mock
+    implements GetNotificationsFeedUseCase {}
 
 class MockGetNotificationsFeedLocal extends Mock
     implements GetNotificationsFeedLocalUseCase {}
 
-class MockMarkNotificationRead extends Mock implements MarkNotificationReadUseCase {}
+class MockMarkNotificationRead extends Mock
+    implements MarkNotificationReadUseCase {}
 
 // Collections use-cases
 class MockListCollections extends Mock implements ListCollectionsUseCase {}
 
-class MockListLocalCollections extends Mock implements ListLocalCollectionsUseCase {}
+class MockListLocalCollections extends Mock
+    implements ListLocalCollectionsUseCase {}
 
 class MockDeleteCollection extends Mock implements DeleteCollectionUseCase {}
 

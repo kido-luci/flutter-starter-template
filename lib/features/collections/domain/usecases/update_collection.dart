@@ -14,7 +14,8 @@ class UpdateCollectionParams {
 }
 
 @injectable
-class UpdateCollectionUseCase extends UseCase<UpdateCollectionParams, Collection> {
+class UpdateCollectionUseCase
+    extends UseCase<UpdateCollectionParams, Collection> {
   const UpdateCollectionUseCase(this._repository);
 
   final CollectionsRepository _repository;

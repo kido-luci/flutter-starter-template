@@ -8,7 +8,8 @@ import '../repositories/notifications_repository.dart';
 /// the UI after a background sync, without kicking off another sync (which
 /// would loop).
 @injectable
-class GetNotificationsFeedLocalUseCase extends NoParamUseCase<NotificationsFeed> {
+class GetNotificationsFeedLocalUseCase
+    extends NoParamUseCase<NotificationsFeed> {
   const GetNotificationsFeedLocalUseCase(this._repository);
 
   final NotificationsRepository _repository;

@@ -15,7 +15,8 @@ class MockCollectionsRepository extends Mock implements CollectionsRepository {}
 
 class MockListCollections extends Mock implements ListCollectionsUseCase {}
 
-class MockListLocalCollections extends Mock implements ListLocalCollectionsUseCase {}
+class MockListLocalCollections extends Mock
+    implements ListLocalCollectionsUseCase {}
 
 class MockGetCollection extends Mock implements GetCollectionUseCase {}
 

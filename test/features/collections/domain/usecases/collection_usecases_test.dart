@@ -30,13 +30,16 @@ void main() {
     verify(() => repository.list()).called(1);
   });
 
-  test('ListLocalCollectionsUseCase delegates to repository.listLocal', () async {
-    when(() => repository.listLocal()).thenAnswer((_) async => const Ok([]));
+  test(
+    'ListLocalCollectionsUseCase delegates to repository.listLocal',
+    () async {
+      when(() => repository.listLocal()).thenAnswer((_) async => const Ok([]));
 
-    await ListLocalCollectionsUseCase(repository)();
+      await ListLocalCollectionsUseCase(repository)();
 
-    verify(() => repository.listLocal()).called(1);
-  });
+      verify(() => repository.listLocal()).called(1);
+    },
+  );
 
   test('GetCollectionUseCase delegates to repository.get', () async {
     when(
