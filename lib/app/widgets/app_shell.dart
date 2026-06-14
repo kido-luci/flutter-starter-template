@@ -9,6 +9,8 @@ import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../features/notifications/presentation/bloc/notifications_state.dart';
 import '../di/injection.dart';
 
+enum _AppTab { home, bookmarks, notifications, profile }
+
 /// Hosts the persistent adaptive navigation around the authenticated branches.
 ///
 /// Renders an [AppAdaptiveScaffold] whose body is the [navigationShell] (the
@@ -68,7 +70,7 @@ class _AppShellState extends State<AppShell> {
             destinations: destinations,
             selectedIndex: widget.navigationShell.currentIndex,
             onDestinationSelected: (index) {
-              if (index == 2) {
+              if (index == _AppTab.notifications.index) {
                 // Refresh when tapping the tab to ensure it's up to date
                 getIt<NotificationsBloc>().add(
                   const NotificationsLoadRequested(),
