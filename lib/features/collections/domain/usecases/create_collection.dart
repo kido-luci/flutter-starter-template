@@ -6,8 +6,8 @@ import '../repositories/collections_repository.dart';
 import '_collection_validation.dart';
 
 @injectable
-class CreateCollection extends UseCase<CollectionInput, Collection> {
-  const CreateCollection(this._repository);
+class CreateCollectionUseCase extends UseCase<CollectionInput, Collection> {
+  const CreateCollectionUseCase(this._repository);
 
   final CollectionsRepository _repository;
 

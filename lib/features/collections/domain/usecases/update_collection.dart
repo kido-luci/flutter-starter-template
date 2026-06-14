@@ -5,7 +5,7 @@ import '../entities/collection.dart';
 import '../repositories/collections_repository.dart';
 import '_collection_validation.dart';
 
-/// Parameters for [UpdateCollection]: the collection id plus the new input.
+/// Parameters for [UpdateCollectionUseCase]: the collection id plus the new input.
 class UpdateCollectionParams {
   const UpdateCollectionParams({required this.id, required this.input});
 
@@ -14,8 +14,8 @@ class UpdateCollectionParams {
 }
 
 @injectable
-class UpdateCollection extends UseCase<UpdateCollectionParams, Collection> {
-  const UpdateCollection(this._repository);
+class UpdateCollectionUseCase extends UseCase<UpdateCollectionParams, Collection> {
+  const UpdateCollectionUseCase(this._repository);
 
   final CollectionsRepository _repository;
 

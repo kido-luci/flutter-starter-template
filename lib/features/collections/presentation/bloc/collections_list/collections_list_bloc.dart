@@ -42,9 +42,9 @@ class CollectionsListBloc
     });
   }
 
-  final ListCollections _list;
-  final ListLocalCollections _listLocal;
-  final DeleteCollection _delete;
+  final ListCollectionsUseCase _list;
+  final ListLocalCollectionsUseCase _listLocal;
+  final DeleteCollectionUseCase _delete;
   final CollectionsSyncController _sync;
   late final StreamSubscription<CollectionsSyncStatus> _syncSub;
   CollectionsSyncStatus _lastSyncStatus = CollectionsSyncStatus.idle;

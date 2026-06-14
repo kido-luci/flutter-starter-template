@@ -13,7 +13,7 @@ import '../usecases/list_collections.dart';
 class CollectionsSummaryService extends CollectionsReader {
   const CollectionsSummaryService(this._listCollections);
 
-  final ListCollections _listCollections;
+  final ListCollectionsUseCase _listCollections;
 
   @override
   Future<Result<List<CollectionSummary>>> call([

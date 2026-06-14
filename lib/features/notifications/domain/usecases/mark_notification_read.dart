@@ -4,8 +4,8 @@ import 'package:injectable/injectable.dart';
 import '../repositories/notifications_repository.dart';
 
 @injectable
-class MarkNotificationRead extends UseCase<String, void> {
-  const MarkNotificationRead(this._repository);
+class MarkNotificationReadUseCase extends UseCase<String, void> {
+  const MarkNotificationReadUseCase(this._repository);
 
   final NotificationsRepository _repository;
 

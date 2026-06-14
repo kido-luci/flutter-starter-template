@@ -18,8 +18,8 @@ class AddToCollectionCubit extends Cubit<AddToCollectionState> {
   AddToCollectionCubit(this._list, this._update)
     : super(const AddToCollectionState());
 
-  final ListCollections _list;
-  final UpdateCollection _update;
+  final ListCollectionsUseCase _list;
+  final UpdateCollectionUseCase _update;
 
   Future<void> load(String bookmarkId) async {
     emit(state.copyWith(isLoading: true, failure: null));

@@ -11,7 +11,7 @@ class DeleteAccountCubit extends Cubit<DeleteAccountState> {
   DeleteAccountCubit(this._deleteAccount, this._analytics)
     : super(const DeleteAccountState.initial());
 
-  final DeleteAccount _deleteAccount;
+  final DeleteAccountUseCase _deleteAccount;
   final AnalyticsService _analytics;
 
   Future<void> submit() async {

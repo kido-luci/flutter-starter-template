@@ -21,9 +21,9 @@ part 'bookmark_form_event.dart';
 @injectable
 class BookmarkFormBloc extends Bloc<BookmarkFormEvent, BookmarkFormState> {
   BookmarkFormBloc(
-    GetBookmark get,
-    CreateBookmark create,
-    UpdateBookmark update,
+    GetBookmarkUseCase get,
+    CreateBookmarkUseCase create,
+    UpdateBookmarkUseCase update,
     AnalyticsService analytics,
     ImagePickerService imagePickerService,
     PermissionService permissionService,

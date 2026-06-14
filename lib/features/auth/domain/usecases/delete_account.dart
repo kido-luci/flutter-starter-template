@@ -4,8 +4,8 @@ import 'package:injectable/injectable.dart';
 import '../repositories/auth_repository.dart';
 
 @injectable
-class DeleteAccount extends NoParamUseCase<void> {
-  const DeleteAccount(this._repository);
+class DeleteAccountUseCase extends NoParamUseCase<void> {
+  const DeleteAccountUseCase(this._repository);
 
   final AuthRepository _repository;
 

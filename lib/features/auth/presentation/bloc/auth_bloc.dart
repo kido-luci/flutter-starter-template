@@ -31,10 +31,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignOutRequested>(_onSignOutRequested, transformer: droppable());
   }
 
-  final SignIn _signIn;
-  final Register _register;
-  final SignOut _signOut;
-  final RestoreSession _restoreSession;
+  final SignInUseCase _signIn;
+  final RegisterUseCase _register;
+  final SignOutUseCase _signOut;
+  final RestoreSessionUseCase _restoreSession;
   final AnalyticsService _analytics;
 
   Future<void> _onSessionRestoreRequested(

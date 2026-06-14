@@ -59,9 +59,9 @@ class BookmarksListBloc extends Bloc<BookmarksListEvent, BookmarksListState> {
     });
   }
 
-  final ListBookmarks _list;
-  final ListLocalBookmarks _listLocal;
-  final DeleteBookmark _delete;
+  final ListBookmarksUseCase _list;
+  final ListLocalBookmarksUseCase _listLocal;
+  final DeleteBookmarkUseCase _delete;
   final BookmarksSyncController _sync;
   final AnalyticsService _analytics;
   final ShareService _share;

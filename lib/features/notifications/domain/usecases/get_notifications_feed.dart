@@ -5,8 +5,8 @@ import '../entities/notifications_feed.dart';
 import '../repositories/notifications_repository.dart';
 
 @injectable
-class GetNotificationsFeed extends NoParamUseCase<NotificationsFeed> {
-  const GetNotificationsFeed(this._repository);
+class GetNotificationsFeedUseCase extends NoParamUseCase<NotificationsFeed> {
+  const GetNotificationsFeedUseCase(this._repository);
 
   final NotificationsRepository _repository;
 

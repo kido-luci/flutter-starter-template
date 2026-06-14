@@ -5,7 +5,7 @@ import 'bookmark_form_state.dart';
 class BookmarkFormLoader {
   const BookmarkFormLoader(this._get);
 
-  final GetBookmark _get;
+  final GetBookmarkUseCase _get;
 
   Future<Result<BookmarkFormState>> load(String id) async {
     final result = await _get(id);

@@ -4,8 +4,8 @@ import 'package:injectable/injectable.dart';
 import '../repositories/bookmarks_repository.dart';
 
 @injectable
-class DeleteBookmark extends UseCase<String, void> {
-  const DeleteBookmark(this._repository);
+class DeleteBookmarkUseCase extends UseCase<String, void> {
+  const DeleteBookmarkUseCase(this._repository);
 
   final BookmarksRepository _repository;
 

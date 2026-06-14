@@ -16,9 +16,9 @@ void main() {
     repo = MockAuthRepository();
   });
 
-  group('SignIn', () {
+  group('SignInUseCase', () {
     test('rejects empty username without hitting repository', () async {
-      final result = await SignIn(repo)((username: '', password: 'pw'));
+      final result = await SignInUseCase(repo)((username: '', password: 'pw'));
 
       expect(result, isA<Err<AuthUser>>());
       expect(
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('rejects empty password without hitting repository', () async {
-      final result = await SignIn(repo)((username: 'alice', password: ''));
+      final result = await SignInUseCase(repo)((username: 'alice', password: ''));
 
       expect(result, isA<Err<AuthUser>>());
       verifyZeroInteractions(repo);
@@ -40,16 +40,16 @@ void main() {
         () => repo.signIn(username: 'alice', password: 'pw'),
       ).thenAnswer((_) async => const Ok(testUser));
 
-      final result = await SignIn(repo)((username: 'alice', password: 'pw'));
+      final result = await SignInUseCase(repo)((username: 'alice', password: 'pw'));
 
       expect(result, isA<Ok<AuthUser>>());
       verify(() => repo.signIn(username: 'alice', password: 'pw')).called(1);
     });
   });
 
-  group('Register', () {
+  group('RegisterUseCase', () {
     test('rejects empty credentials without hitting repository', () async {
-      final result = await Register(repo)((username: '', password: ''));
+      final result = await RegisterUseCase(repo)((username: '', password: ''));
 
       expect(result, isA<Err<AuthUser>>());
       expect(
@@ -60,9 +60,9 @@ void main() {
     });
   });
 
-  group('ChangePassword', () {
+  group('ChangePasswordUseCase', () {
     test('rejects empty currentPassword', () async {
-      final result = await ChangePassword(repo)(
+      final result = await ChangePasswordUseCase(repo)(
         (currentPassword: '', newPassword: 'new'),
       );
 
@@ -75,7 +75,7 @@ void main() {
     });
 
     test('rejects empty newPassword', () async {
-      final result = await ChangePassword(repo)(
+      final result = await ChangePasswordUseCase(repo)(
         (currentPassword: 'cur', newPassword: ''),
       );
 
@@ -85,39 +85,39 @@ void main() {
   });
 
   group('session use cases', () {
-    test('DeleteAccount delegates to repository', () async {
+    test('DeleteAccountUseCase delegates to repository', () async {
       when(() => repo.deleteAccount()).thenAnswer((_) async => const Ok(null));
 
-      final result = await DeleteAccount(repo)();
+      final result = await DeleteAccountUseCase(repo)();
 
       expect(result, isA<Ok<void>>());
       verify(() => repo.deleteAccount()).called(1);
     });
 
-    test('RestoreSession delegates to repository', () async {
+    test('RestoreSessionUseCase delegates to repository', () async {
       when(
         () => repo.restoreSession(),
       ).thenAnswer((_) async => const Ok(testUser));
 
-      final result = await RestoreSession(repo)();
+      final result = await RestoreSessionUseCase(repo)();
 
       expect(result, isA<Ok<AuthUser>>());
       verify(() => repo.restoreSession()).called(1);
     });
 
-    test('SignOut delegates to repository', () async {
+    test('SignOutUseCase delegates to repository', () async {
       when(() => repo.signOut()).thenAnswer((_) async => const Ok(null));
 
-      final result = await SignOut(repo)();
+      final result = await SignOutUseCase(repo)();
 
       expect(result, isA<Ok<void>>());
       verify(() => repo.signOut()).called(1);
     });
 
-    test('SignOut maps thrown errors to UnknownFailure', () async {
+    test('SignOutUseCase maps thrown errors to UnknownFailure', () async {
       when(() => repo.signOut()).thenThrow(Exception('offline'));
 
-      final result = await SignOut(repo)();
+      final result = await SignOutUseCase(repo)();
 
       expect(result, isA<Err<void>>());
       expect((result as Err<void>).failure, isA<UnknownFailure>());

@@ -8,8 +8,8 @@ import '_bookmark_validation.dart';
 typedef UpdateBookmarkParams = ({String id, BookmarkInput input});
 
 @injectable
-class UpdateBookmark extends UseCase<UpdateBookmarkParams, Bookmark> {
-  const UpdateBookmark(this._repository);
+class UpdateBookmarkUseCase extends UseCase<UpdateBookmarkParams, Bookmark> {
+  const UpdateBookmarkUseCase(this._repository);
 
   final BookmarksRepository _repository;
 

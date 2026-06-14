@@ -29,8 +29,8 @@ class BookmarkDetailBloc
     on<BookmarkDetailUrlOpened>(_onUrlOpened);
   }
 
-  final GetBookmark _get;
-  final DeleteBookmark _delete;
+  final GetBookmarkUseCase _get;
+  final DeleteBookmarkUseCase _delete;
   final AnalyticsService _analytics;
   final ShareService _share;
 

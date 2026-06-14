@@ -6,8 +6,8 @@ import '../repositories/bookmarks_repository.dart';
 import '_bookmark_validation.dart';
 
 @injectable
-class CreateBookmark extends UseCase<BookmarkInput, Bookmark> {
-  const CreateBookmark(this._repository);
+class CreateBookmarkUseCase extends UseCase<BookmarkInput, Bookmark> {
+  const CreateBookmarkUseCase(this._repository);
 
   final BookmarksRepository _repository;
 

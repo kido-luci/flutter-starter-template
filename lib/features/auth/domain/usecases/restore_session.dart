@@ -5,8 +5,8 @@ import '../../../../shared/domain/entities/auth_user.dart';
 import '../repositories/auth_repository.dart';
 
 @injectable
-class RestoreSession extends NoParamUseCase<AuthUser> {
-  const RestoreSession(this._repository);
+class RestoreSessionUseCase extends NoParamUseCase<AuthUser> {
+  const RestoreSessionUseCase(this._repository);
 
   final AuthRepository _repository;
 

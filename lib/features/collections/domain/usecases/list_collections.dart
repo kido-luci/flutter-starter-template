@@ -5,8 +5,8 @@ import '../entities/collection.dart';
 import '../repositories/collections_repository.dart';
 
 @injectable
-class ListCollections extends NoParamUseCase<List<Collection>> {
-  const ListCollections(this._repository);
+class ListCollectionsUseCase extends NoParamUseCase<List<Collection>> {
+  const ListCollectionsUseCase(this._repository);
 
   final CollectionsRepository _repository;
 
