@@ -9,7 +9,11 @@ import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../features/notifications/presentation/bloc/notifications_state.dart';
 import '../di/injection.dart';
 
-enum _AppTab { home, bookmarks, notifications, profile }
+/// Index of the notifications destination in the [AppShell] destinations list.
+///
+/// Named so that reordering the list produces a compile-visible update point
+/// rather than a silent behavioural break.
+const int _kNotificationsTabIndex = 2;
 
 /// Hosts the persistent adaptive navigation around the authenticated branches.
 ///
@@ -70,7 +74,7 @@ class _AppShellState extends State<AppShell> {
             destinations: destinations,
             selectedIndex: widget.navigationShell.currentIndex,
             onDestinationSelected: (index) {
-              if (index == _AppTab.notifications.index) {
+              if (index == _kNotificationsTabIndex) {
                 // Refresh when tapping the tab to ensure it's up to date
                 getIt<NotificationsBloc>().add(
                   const NotificationsLoadRequested(),
