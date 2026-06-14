@@ -1,8 +1,7 @@
 import 'package:architecture/architecture.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter_starter_template/features/bookmarks/domain/entities/bookmark.dart';
 import 'package:flutter_starter_template/features/collections/domain/entities/collection.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/app_notification.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
 import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_starter_template/shared/domain/entities/auth_user.dart';
 

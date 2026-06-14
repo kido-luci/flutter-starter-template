@@ -32,6 +32,8 @@ workspace:
   - packages/sync
   - packages/theme
   - packages/test_utils
+  - packages/shared_contracts
+  - packages/feature_notifications
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -49,6 +51,8 @@ dependencies:
   storage: ^0.1.0
   sync: ^0.1.0
   theme: ^0.1.0
+  shared_contracts: ^0.1.0
+  feature_notifications: ^0.1.0
 
   flutter:
     sdk: flutter

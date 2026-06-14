@@ -1,6 +1,5 @@
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:objectbox/objectbox.dart';
-
-import '../../domain/entities/user_activity.dart';
 
 /// ObjectBox row caching a single activity-log entry. Read-only from the user's
 /// perspective — the server owns the log, so this is only ever filled by sync.

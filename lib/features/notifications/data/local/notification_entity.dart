@@ -1,6 +1,5 @@
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:objectbox/objectbox.dart';
-
-import '../../domain/entities/app_notification.dart';
 
 /// ObjectBox row caching a single notification. Mutable by necessity —
 /// ObjectBox writes back into instances during property loading.

@@ -12,13 +12,12 @@ import '../core/extensions/build_context_extensions.dart';
 import '../features/auth/presentation/auth_session.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/bloc/auth_state.dart';
-import '../features/bookmarks/domain/services/bookmarks_sync_controller.dart';
-import '../features/collections/domain/services/collections_sync_controller.dart';
-import '../features/notifications/domain/services/notifications_sync_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/domain/session.dart';
 import '../shared/presentation/session_scope.dart';
 import 'di/injection.dart';
+import 'feature_module.dart';
+import 'features.dart';
 import 'router.dart';
 
 class App extends StatefulWidget {
@@ -26,9 +25,7 @@ class App extends StatefulWidget {
     super.key,
     this.authBloc,
     this.themeBloc,
-    this.bookmarksSync,
-    this.collectionsSync,
-    this.notificationsSync,
+    this.features,
     this.navigatorObservers,
     this.session,
     this.videoPlayerService,
@@ -36,9 +33,10 @@ class App extends StatefulWidget {
 
   final AuthBloc? authBloc;
   final ThemeBloc? themeBloc;
-  final BookmarksSyncController? bookmarksSync;
-  final CollectionsSyncController? collectionsSync;
-  final NotificationsSyncController? notificationsSync;
+
+  /// Optional feature overrides — primarily for testing. Defaults to
+  /// [enabledFeatures] from `features.dart`.
+  final List<FeatureModule>? features;
   final List<NavigatorObserver>? navigatorObservers;
   final Session? session;
   final VideoPlayerService? videoPlayerService;
@@ -53,9 +51,7 @@ class _AppState extends State<App> {
   late final Session _session;
   late final GoRouter _router;
   late final DeepLinkState _deepLink;
-  late final BookmarksSyncController _sync;
-  late final CollectionsSyncController _collectionsSync;
-  late final NotificationsSyncController _notificationsSync;
+  late final List<FeatureSyncController> _syncControllers;
   late final VideoPlayerService _videoPlayerService;
   StreamSubscription<AuthState>? _authSub;
 
@@ -71,36 +67,33 @@ class _AppState extends State<App> {
     );
     _router = result.router;
     _deepLink = result.deepLink;
-    _sync = widget.bookmarksSync ?? getIt<BookmarksSyncController>();
-    _collectionsSync =
-        widget.collectionsSync ?? getIt<CollectionsSyncController>();
-    _notificationsSync =
-        widget.notificationsSync ?? getIt<NotificationsSyncController>();
+    _syncControllers = (widget.features ?? enabledFeatures)
+        .map((f) => f.syncController)
+        .whereType<FeatureSyncController>()
+        .toList(growable: false);
     _videoPlayerService =
         widget.videoPlayerService ?? getIt<VideoPlayerService>();
     _authSub = _authBloc.stream.listen(_onAuthChanged);
-    // Session restoration is driven by SplashScreen so it can gate routing
-    // on completion instead of racing the redirect.
   }
 
   void _onAuthChanged(AuthState state) {
     if (state is AuthAuthenticated) {
-      _sync.start();
-      _collectionsSync.start();
-      _notificationsSync.start();
+      for (final c in _syncControllers) {
+        c.start();
+      }
     } else {
-      _sync.stop();
-      _collectionsSync.stop();
-      _notificationsSync.stop();
+      for (final c in _syncControllers) {
+        c.stop();
+      }
     }
   }
 
   @override
   void dispose() {
     _authSub?.cancel();
-    _sync.stop();
-    _collectionsSync.stop();
-    _notificationsSync.stop();
+    for (final c in _syncControllers) {
+      c.stop();
+    }
     _session.dispose();
     _router.dispose();
     super.dispose();

@@ -36,6 +36,8 @@ const _layers = <String, int>{
   'storage': 1, // shared_preferences / secure storage
   'analytics': 1, // -> architecture
   'app_ui': 1, // design tokens; no workspace package deps
+  'shared_contracts': 1, // cross-feature domain contracts -> architecture
+  'feature_notifications': 1, // notifications domain layer -> architecture
   // 2 — composed infra built on the primitives.
   'network': 2, // -> config
   'app_platform': 2, // -> analytics, architecture

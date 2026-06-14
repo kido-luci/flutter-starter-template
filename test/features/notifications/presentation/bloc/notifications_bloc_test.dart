@@ -1,11 +1,6 @@
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/app_notification.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/user_activity.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed_local.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/mark_notification_read.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_test/flutter_test.dart';

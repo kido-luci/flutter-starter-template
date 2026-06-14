@@ -1,8 +1,5 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/repositories/notifications_repository.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/mark_notification_read.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

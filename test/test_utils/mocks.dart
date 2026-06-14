@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_starter_template/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/change_password.dart';
@@ -23,10 +24,6 @@ import 'package:flutter_starter_template/features/collections/domain/usecases/ge
 import 'package:flutter_starter_template/features/collections/domain/usecases/list_collections.dart';
 import 'package:flutter_starter_template/features/collections/domain/usecases/list_local_collections.dart';
 import 'package:flutter_starter_template/features/collections/domain/usecases/update_collection.dart';
-import 'package:flutter_starter_template/features/notifications/domain/services/notifications_sync_controller.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/get_notifications_feed_local.dart';
-import 'package:flutter_starter_template/features/notifications/domain/usecases/mark_notification_read.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';

@@ -1,9 +1,11 @@
 import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:config/config.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:network/network.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
 import 'package:theme/theme.dart';
 
@@ -14,11 +16,9 @@ final GetIt getIt = GetIt.instance;
 /// Async because core database modules use `@preResolve` to open native
 /// resources before any consumer is constructed. Must be awaited from `main`.
 ///
-/// `analytics` is registered before `app_platform` and `theme`
-/// because both depend on `AnalyticsService` (the former via
-/// `FirebaseMessagingService`, the latter via `ThemeBloc`). `storage` is
-/// listed before `theme` because `ThemeBloc` reads the `SharedPreferences`
-/// that `storage` provides.
+/// Order: `shared_contracts` registers `ActivityNotifier` (consumed by
+/// `feature_notifications`'s BLoC), so it must be listed before
+/// `feature_notifications`.
 @InjectableInit(
   externalPackageModulesBefore: [
     ExternalModule(CoreAnalyticsPackageModule),
@@ -27,6 +27,8 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(CorePlatformPackageModule),
     ExternalModule(CoreStoragePackageModule),
     ExternalModule(CoreThemePackageModule),
+    ExternalModule(SharedContractsPackageModule),
+    ExternalModule(FeatureNotificationsPackageModule),
   ],
 )
 Future<void> configureDependencies() async {
