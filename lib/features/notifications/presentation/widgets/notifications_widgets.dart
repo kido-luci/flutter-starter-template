@@ -1,15 +1,15 @@
 import 'package:app_ui/app_ui.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/extensions/build_context_extensions.dart';
-import '../../domain/entities/app_notification.dart';
-import '../../domain/entities/user_activity.dart';
 import '../bloc/notifications_bloc.dart';
 import '../bloc/notifications_state.dart';
-part 'notifications_tabs.dart';
+
 part 'notifications_lists.dart';
+part 'notifications_tabs.dart';
 part 'notifications_tiles.dart';
 
 class NotificationsView extends StatelessWidget {

@@ -1,13 +1,11 @@
-import 'dart:async';
-
 import 'package:architecture/architecture.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
+import 'package:flutter_starter_template/app/feature_module.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
@@ -19,11 +17,19 @@ import 'package:theme/theme.dart';
 
 import 'test_utils.dart';
 
+final class _NoOpSyncModule extends FeatureModule {
+  @override
+  FeatureSyncController get syncController => _NoOpSync();
+}
+
+final class _NoOpSync implements FeatureSyncController {
+  @override
+  Future<void> start() async {}
+  @override
+  Future<void> stop() async {}
+}
+
 void main() {
-  late StreamController<BookmarksSyncStatus> syncStatusController;
-  late MockBookmarksSyncController sync;
-  late MockCollectionsSyncController collectionsSync;
-  late MockNotificationsSyncController notificationsSync;
   late MockAnalyticsService analytics;
   late AuthBloc authBloc;
   late ThemeBloc themeBloc;
@@ -49,29 +55,6 @@ void main() {
 
     final signOut = MockSignOut();
     when(signOut.call).thenAnswer((_) async => const Ok(null));
-
-    syncStatusController = StreamController<BookmarksSyncStatus>.broadcast();
-    sync = MockBookmarksSyncController();
-    when(
-      () => sync.statusStream,
-    ).thenAnswer((_) => syncStatusController.stream);
-    when(() => sync.statusNow).thenReturn(BookmarksSyncStatus.idle);
-    when(() => sync.start()).thenAnswer((_) async {});
-    when(() => sync.stop()).thenAnswer((_) async {});
-    when(() => sync.sync()).thenAnswer((_) async {});
-
-    collectionsSync = MockCollectionsSyncController();
-    when(() => collectionsSync.start()).thenAnswer((_) async {});
-    when(() => collectionsSync.stop()).thenAnswer((_) async {});
-    when(() => collectionsSync.sync()).thenAnswer((_) async {});
-
-    notificationsSync = MockNotificationsSyncController();
-    when(
-      () => notificationsSync.onSynced,
-    ).thenAnswer((_) => const Stream.empty());
-    when(() => notificationsSync.start()).thenAnswer((_) async {});
-    when(() => notificationsSync.stop()).thenAnswer((_) async {});
-    when(() => notificationsSync.sync()).thenAnswer((_) async {});
 
     final bookmarkStats = MockBookmarkStatsReader();
     when(
@@ -111,7 +94,6 @@ void main() {
     }
     await themeBloc.close();
     await authBloc.close();
-    await syncStatusController.close();
   });
 
   testWidgets('signs in and lands on home screen', (tester) async {
@@ -119,9 +101,7 @@ void main() {
       App(
         authBloc: authBloc,
         themeBloc: themeBloc,
-        bookmarksSync: sync,
-        collectionsSync: collectionsSync,
-        notificationsSync: notificationsSync,
+        features: [_NoOpSyncModule(), _NoOpSyncModule(), _NoOpSyncModule()],
         navigatorObservers: const [],
         videoPlayerService: MockVideoPlayerService(),
       ),

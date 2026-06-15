@@ -1,12 +1,9 @@
 import 'package:architecture/architecture.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter_starter_template/features/notifications/data/local/activity_entity.dart';
 import 'package:flutter_starter_template/features/notifications/data/local/notification_entity.dart';
 import 'package:flutter_starter_template/features/notifications/data/local/notifications_local_data_source.dart';
 import 'package:flutter_starter_template/features/notifications/data/repositories/notifications_repository_impl.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/app_notification.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/notifications_feed.dart';
-import 'package:flutter_starter_template/features/notifications/domain/entities/user_activity.dart';
-import 'package:flutter_starter_template/features/notifications/domain/services/notifications_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

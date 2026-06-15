@@ -1,9 +1,7 @@
 import 'package:architecture/architecture.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../domain/entities/notifications_feed.dart';
-import '../../domain/repositories/notifications_repository.dart';
-import '../../domain/services/notifications_sync_controller.dart';
 import '../local/notifications_local_data_source.dart';
 
 /// Offline-first: reads serve from the local ObjectBox cache, the read-mark
