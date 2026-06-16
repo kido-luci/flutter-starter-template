@@ -147,3 +147,79 @@ jobs:
             **/*.gen.dart
             **/firebase_options.dart
             lib/l10n/**
+
+  # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
+  # the app, so Gradle/plugin/asset/manifest regressions slip past it and only
+  # surface at release time. This job catches them per-PR by building an
+  # unsigned debug APK. Debug (not release) keeps it secret-free: it signs with
+  # the auto-generated debug keystore, so no signing material is needed and the
+  # job runs on fork PRs too. The real signed release build still happens in
+  # release.yml before shipping.
+  build-android:
+    name: Build Android (debug)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      # The com.google.gms.google-services Gradle plugin parses
+      # google-services.json at build time (it never contacts Firebase), and
+      # the file is git-ignored — so a fresh checkout has none and Gradle fails
+      # without it. We write a placeholder rather than restoring the real config
+      # from a secret: a smoke-test only needs the app to assemble, and a
+      # secret-free job keeps working on fork PRs. The package_name must match
+      # the flavor we build (dev → base applicationId + ".dev"); update it here
+      # if android/app/build.gradle.kts flavor suffixes change.
+      - name: Generate placeholder google-services.json
+        run: |
+          cat > android/app/google-services.json <<'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "ci-placeholder",
+              "storage_bucket": "ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.lucistudio.flutter_starter_template.dev"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  { "current_key": "AIzaPlaceholderCiKey0000000000000000000" }
+                ],
+                "services": {
+                  "appinvite_service": { "other_platform_oauth_client": [] }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # building, or the Dart compile fails on missing sources. As in the test
+      # job, we do NOT cache .dart_tool/build: with the outputs git-ignored, a
+      # restored cache makes build_runner skip files it believes exist,
+      # producing a broken tree.
+      - name: Generate code
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      # The app uses Android flavors (dev/staging/prod), so a flavor is
+      # required. dev is the natural debug target.
+      - name: Build debug APK
+        run: flutter build apk --debug --flavor dev
