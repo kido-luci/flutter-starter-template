@@ -1,5 +1,5 @@
 import 'package:database/database.dart';
-import 'package:feature_notifications/feature_notifications.dart';
+import '../../domain/entities/user_activity.dart';
 
 /// Maps the persistence [ActivityEntity] to the domain [UserActivity].
 ///

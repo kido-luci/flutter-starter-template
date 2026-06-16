@@ -1,7 +1,9 @@
 import 'package:architecture/architecture.dart';
-import 'package:feature_notifications/feature_notifications.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../domain/entities/notifications_feed.dart';
+import '../../domain/repositories/notifications_repository.dart';
+import '../../domain/services/notifications_sync_controller.dart';
 import '../local/activity_entity_mapper.dart';
 import '../local/notification_entity_mapper.dart';
 import '../local/notifications_local_data_source.dart';

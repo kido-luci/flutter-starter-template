@@ -10,8 +10,6 @@ import 'package:flutter_starter_template/features/auth/domain/usecases/register.
 import 'package:flutter_starter_template/features/auth/domain/usecases/restore_session.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/sign_in.dart';
 import 'package:flutter_starter_template/features/auth/domain/usecases/sign_out.dart';
-import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
-import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_summaries.dart';

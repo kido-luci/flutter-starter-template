@@ -2,11 +2,15 @@ import 'dart:async';
 
 import 'package:architecture/architecture.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 
+import '../../domain/entities/app_notification.dart';
+import '../../domain/services/notifications_sync_controller.dart';
+import '../../domain/usecases/get_notifications_feed.dart';
+import '../../domain/usecases/get_notifications_feed_local.dart';
+import '../../domain/usecases/mark_notification_read.dart';
 import 'notifications_state.dart';
 
 part 'notifications_event.dart';

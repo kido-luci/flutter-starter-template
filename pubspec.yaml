@@ -36,7 +36,7 @@ workspace:
   - packages/shared_ui
   - packages/database
   - packages/localization
-  - packages/feature_notifications
+  - packages/features/notifications
   - packages/features/collections
   - packages/features/bookmarks
 

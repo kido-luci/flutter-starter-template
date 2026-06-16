@@ -1,5 +1,6 @@
 import 'package:architecture/architecture.dart';
 import 'package:checks/checks.dart';
+import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
@@ -7,8 +8,6 @@ import 'package:flutter_starter_template/app/feature_module.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
-import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_bloc.dart';
-import 'package:flutter_starter_template/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
 import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
