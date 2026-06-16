@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
     # Skip analyze/test when a push touches only docs. Any change outside
-    # these paths (lib/, test/, packages/, pubspec.*, etc.) still triggers CI.
+    # these paths (lib/, test/, packages/, pubspec.*, .github/workflows/, etc.)
+    # still triggers CI — workflow changes are deliberately NOT ignored so CI
+    # validates its own edits.
     paths-ignore:
       - '**/*.md'
       - 'doc/**'
@@ -16,7 +18,6 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
-      - '.github/workflows/**'
       - 'skills-lock.json'
   pull_request:
     branches: [main]
@@ -31,13 +32,17 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
-      - '.github/workflows/**'
       - 'skills-lock.json'
 
 # Cancel superseded runs on the same ref to save CI minutes.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+# Minimal default token scope; no job writes to the repo. The Codecov upload
+# tolerates failure (fail_ci_if_error: false), so read access is sufficient.
+permissions:
+  contents: read
 
 jobs:
   analyze-and-test:
@@ -46,6 +51,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -190,6 +197,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -265,6 +274,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       # connectivity_plus 7.x compiles against the iOS 26 SDK: it references
       # NWPath.isUltraConstrained behind an `if #available(iOS 26.0, *)`, but
@@ -387,7 +398,7 @@ jobs:
       # no-ops. (The build-phase script already adds ~/.pub-cache/bin to PATH.)
       - name: Install FlutterFire CLI
         run: |
-          dart pub global activate flutterfire_cli
+          dart pub global activate flutterfire_cli 1.4.0
           echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
 
       # dev flavor maps to the shared dev.xcscheme. --no-codesign skips signing
@@ -406,6 +417,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
