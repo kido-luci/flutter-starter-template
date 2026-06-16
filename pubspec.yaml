@@ -33,7 +33,12 @@ workspace:
   - packages/theme
   - packages/test_utils
   - packages/shared_contracts
+  - packages/shared_ui
+  - packages/database
+  - packages/localization
   - packages/feature_notifications
+  - packages/features/collections
+  - packages/features/bookmarks
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -52,7 +57,12 @@ dependencies:
   sync: ^0.1.0
   theme: ^0.1.0
   shared_contracts: ^0.1.0
+  shared_ui: ^0.1.0
+  database: ^0.1.0
+  localization: ^0.1.0
   feature_notifications: ^0.1.0
+  feature_collections: ^0.1.0
+  feature_bookmarks: ^0.1.0
 
   flutter:
     sdk: flutter
@@ -226,8 +236,8 @@ flutter_launcher_icons:
 # The following section is specific to Flutter packages.
 flutter:
 
-  # Enables generation of localized strings from ARB files via `gen-l10n`.
-  generate: true
+  # Localized strings now live in `package:localization` (gen-l10n runs there);
+  # the app consumes `AppLocalizations` from that package.
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

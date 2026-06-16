@@ -1,0 +1,23 @@
+name: shared_ui
+description: >-
+  Cross-feature presentation contracts and widgets for the Flutter starter
+  template: the app-wide `Session` contract, its `SessionScope` accessor, and
+  the shared collection visual vocabulary.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  shared_contracts: ^0.1.0
+  font_awesome_flutter: ^11.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

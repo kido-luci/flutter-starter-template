@@ -1,8 +1,5 @@
+import 'package:database/database.dart';
 import 'package:injectable/injectable.dart' hide Order;
-
-import '../../../../objectbox.g.dart';
-import 'activity_entity.dart';
-import 'notification_entity.dart';
 
 /// ObjectBox-backed cache for the notifications feed. All operations are
 /// synchronous on the ObjectBox side; wrapped in `Future` to keep the

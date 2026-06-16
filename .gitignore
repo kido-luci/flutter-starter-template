@@ -21,10 +21,11 @@ build/
 *.config.dart
 *.gen.dart
 # ObjectBox is the deliberate exception: its generated binding stays tracked
-# alongside lib/objectbox-model.json (which no glob matches). Together they
-# encode stable entity/schema UIDs that must persist across builds for
-# on-device DB migrations.
-!lib/objectbox.g.dart
+# alongside packages/database/lib/objectbox-model.json (which no glob matches).
+# Together they encode stable entity/schema UIDs that must persist across builds
+# for on-device DB migrations. The binding lives in the database package now that
+# entities are centralized there, so it is un-ignored at that path.
+!packages/database/lib/objectbox.g.dart
 
 # Test coverage output
 coverage/

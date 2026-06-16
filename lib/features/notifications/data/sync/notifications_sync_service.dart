@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:developer' show log;
 
+import 'package:database/database.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:network/network.dart';
 import 'package:sync/sync.dart';
 
 import '../datasources/notifications_remote_data_source.dart';
-import '../local/activity_entity.dart';
-import '../local/notification_entity.dart';
 import '../local/notifications_local_data_source.dart';
 import '../models/notification_dto.dart';
 import '../models/user_activity_dto.dart';

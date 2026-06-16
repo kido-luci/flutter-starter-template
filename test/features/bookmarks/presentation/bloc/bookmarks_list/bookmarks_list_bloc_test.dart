@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_state.dart';
+import 'package:feature_bookmarks/src/domain/services/bookmarks_sync_controller.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../../test_utils.dart';

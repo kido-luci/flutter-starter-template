@@ -1,10 +1,10 @@
 import 'package:architecture/architecture.dart';
+import 'package:feature_collections/src/presentation/bloc/collection_detail/collection_detail_cubit.dart';
+import 'package:feature_collections/src/presentation/screens/collection_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collection_detail/collection_detail_cubit.dart';
-import 'package:flutter_starter_template/features/collections/presentation/screens/collection_detail_screen.dart';
-import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:localization/localization.dart';
 import 'package:test_utils/test_utils.dart';
 
 import '../../collections_test_helpers.dart';

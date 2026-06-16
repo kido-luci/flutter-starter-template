@@ -4,9 +4,9 @@ import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bl
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_starter_template/features/auth/presentation/screens/login_screen.dart';
 import 'package:flutter_starter_template/features/auth/presentation/screens/register_screen.dart';
-import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 
 import '../../../../test_utils.dart';
 

@@ -76,29 +76,36 @@ jobs:
 
       # Generate code so analyze/test see it. Most generated files
       # (*.g.dart, *.freezed.dart, *.config.dart, *.gen.dart) are git-ignored
-      # and produced fresh here. ObjectBox's binding (lib/objectbox.g.dart) and
-      # model (lib/objectbox-model.json) ARE tracked — they hold stable schema
-      # UIDs — so the diff guard fails the build if those drift, i.e. someone
-      # changed an @Entity without committing the regenerated binding.
+      # and produced fresh here. ObjectBox's binding
+      # (packages/database/lib/objectbox.g.dart) and model
+      # (packages/database/lib/objectbox-model.json) ARE tracked — they hold
+      # stable schema UIDs — so the diff guard fails the build if those drift,
+      # i.e. someone changed an @Entity without committing the regenerated
+      # binding. The binding's $lib$ aggregate builder is per-package, so it must
+      # be generated inside the database package, not by the app-root run.
       - name: Generate code & verify ObjectBox binding is up to date
         run: |
-          dart run build_runner build --delete-conflicting-outputs
-          if ! git diff --quiet --exit-code -- lib/objectbox.g.dart lib/objectbox-model.json; then
-            echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit lib/objectbox.g.dart + lib/objectbox-model.json."
-            git diff --stat -- lib/objectbox.g.dart lib/objectbox-model.json
+          ./tool/codegen.sh
+          (cd packages/database && dart run build_runner build --delete-conflicting-outputs)
+          objectbox_files="packages/database/lib/objectbox.g.dart packages/database/lib/objectbox-model.json"
+          if ! git diff --quiet --exit-code -- $objectbox_files; then
+            echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' inside packages/database and commit the binding + model."
+            git diff --stat -- $objectbox_files
             exit 1
           fi
 
       # Localizations are generated (generate: true) and the output under
-      # lib/l10n/ is tracked in git, so editing an .arb without regenerating
-      # AppLocalizations would drift undetected. Regenerate and fail if the
-      # tracked output changes — the same guard we use for the ObjectBox binding.
+      # packages/localization/lib/l10n/ is tracked in git, so editing an .arb
+      # without regenerating AppLocalizations would drift undetected. Regenerate
+      # and fail if the tracked output changes — the same guard we use for the
+      # ObjectBox binding. l10n.yaml lives in the localization package now.
       - name: Verify localizations are up to date
         run: |
-          flutter gen-l10n
-          if ! git diff --quiet --exit-code -- lib/l10n/app_localizations*.dart; then
-            echo "::error::Generated localizations are out of date. Run 'flutter gen-l10n' and commit lib/l10n/app_localizations*.dart."
-            git diff --stat -- lib/l10n/app_localizations*.dart
+          (cd packages/localization && flutter gen-l10n)
+          l10n_files="packages/localization/lib/l10n/app_localizations*.dart"
+          if ! git diff --quiet --exit-code -- $l10n_files; then
+            echo "::error::Generated localizations are out of date. Run 'flutter gen-l10n' inside packages/localization and commit the AppLocalizations output."
+            git diff --stat -- $l10n_files
             exit 1
           fi
 
@@ -255,7 +262,7 @@ jobs:
       - name: Generate code
         run: |
           flutter pub get --enforce-lockfile
-          dart run build_runner build --delete-conflicting-outputs
+          ./tool/codegen.sh
 
       # The app uses Android flavors (dev/staging/prod), so a flavor is
       # required. dev is the natural debug target.
@@ -389,7 +396,7 @@ jobs:
       - name: Generate code
         run: |
           flutter pub get --enforce-lockfile
-          dart run build_runner build --delete-conflicting-outputs
+          ./tool/codegen.sh
 
       # The Xcode project has a FlutterFire build phase that runs
       # `flutterfire upload-crashlytics-symbols`; without the CLI on PATH the

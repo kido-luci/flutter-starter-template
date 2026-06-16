@@ -4,6 +4,7 @@
 library;
 
 export 'src/activity_notifier.dart';
+export 'src/auth_user.dart';
 export 'src/bookmark_stats.dart';
 export 'src/bookmark_summaries.dart';
 export 'src/collections.dart';

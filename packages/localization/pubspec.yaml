@@ -1,0 +1,26 @@
+name: localization
+description: >-
+  App localization for the Flutter starter template: ARB sources and the
+  gen-l10n `AppLocalizations`, plus the `context.l10n` accessor. Shared by the
+  app shell and every feature package.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  generate: true

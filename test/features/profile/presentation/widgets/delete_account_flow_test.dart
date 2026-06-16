@@ -5,9 +5,9 @@ import 'package:flutter_starter_template/features/auth/presentation/bloc/delete_
 import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter_starter_template/features/profile/presentation/widgets/profile_widgets.dart';
-import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_starter_template/shared/presentation/session_scope.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:localization/localization.dart';
 import 'package:theme/theme.dart';
 
 import '../../../../test_utils.dart';

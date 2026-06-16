@@ -1,0 +1,28 @@
+name: database
+description: >-
+  Centralized ObjectBox persistence for the Flutter starter template: every
+  @Entity row, the generated bindings, and the Store lifecycle wrapper. Feature
+  data layers depend on this for their persistence models; domain mapping stays
+  in each feature.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  sync: ^0.1.0
+  objectbox: ^5.3.2
+  objectbox_flutter_libs: ^5.3.2
+  path_provider: ^2.1.5
+
+dev_dependencies:
+  build_runner: ^2.15.0
+  objectbox_generator: ^5.3.2
+  flutter_test:
+    sdk: flutter

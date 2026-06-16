@@ -1,5 +1,5 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/collections/domain/services/collections_summary_service.dart';
+import 'package:feature_collections/src/domain/services/collections_summary_service.dart';
 import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';

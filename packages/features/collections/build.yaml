@@ -1,0 +1,15 @@
+# Generator scoping mirrors the app's root build.yaml.
+global_options:
+  freezed:freezed:
+    runs_before:
+      - retrofit_generator:retrofit_generator
+
+targets:
+  $default:
+    builders:
+      retrofit_generator:
+        generate_for:
+          - lib/src/data/datasources/**
+      json_serializable:
+        generate_for:
+          - lib/src/data/models/**

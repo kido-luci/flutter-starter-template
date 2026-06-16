@@ -1,10 +1,10 @@
-import 'package:flutter_starter_template/features/bookmarks/data/datasources/bookmarks_remote_data_source.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/local/bookmark_entity.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/local/bookmarks_local_data_source.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/models/bookmark_dto.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/models/bookmark_request.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/sync/bookmark_media_upload_sync.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/sync/bookmarks_sync_adapter.dart';
+import 'package:database/database.dart';
+import 'package:feature_bookmarks/src/data/datasources/bookmarks_remote_data_source.dart';
+import 'package:feature_bookmarks/src/data/local/bookmarks_local_data_source.dart';
+import 'package:feature_bookmarks/src/data/models/bookmark_dto.dart';
+import 'package:feature_bookmarks/src/data/models/bookmark_request.dart';
+import 'package:feature_bookmarks/src/data/sync/bookmark_media_upload_sync.dart';
+import 'package:feature_bookmarks/src/data/sync/bookmarks_sync_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
 import 'package:sync/sync.dart';

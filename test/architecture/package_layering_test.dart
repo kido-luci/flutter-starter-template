@@ -36,9 +36,12 @@ const _layers = <String, int>{
   'storage': 1, // shared_preferences / secure storage
   'analytics': 1, // -> architecture
   'app_ui': 1, // design tokens; no workspace package deps
+  'localization': 1, // gen-l10n AppLocalizations; no workspace package deps
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
+  'database': 1, // centralized ObjectBox persistence -> sync
   'feature_notifications': 1, // notifications domain layer -> architecture
   // 2 — composed infra built on the primitives.
+  'shared_ui': 2, // cross-feature presentation contracts -> shared_contracts
   'network': 2, // -> config
   'app_platform': 2, // -> analytics, architecture
   'theme': 2, // -> analytics, architecture

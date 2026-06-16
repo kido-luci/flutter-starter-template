@@ -1,8 +1,6 @@
+import 'package:database/database.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sync/sync.dart';
-
-import '../../../objectbox.g.dart' hide SyncState;
-import 'sync_cursor_entity.dart';
 
 /// ObjectBox-backed [SyncCursorStore]. Kept in the same store as the synced
 /// entities so a cursor advance is durable alongside the rows it accounts for.

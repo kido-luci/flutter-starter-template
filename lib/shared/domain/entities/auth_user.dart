@@ -1,7 +1,7 @@
-/// Authenticated user identity exposed to the presentation layer.
-class AuthUser {
-  const AuthUser({required this.id, required this.username});
+/// Re-exports the `AuthUser` contract from `package:shared_contracts`.
+///
+/// Thin shim so existing in-app imports of this path keep working; feature
+/// packages import `package:shared_contracts` directly.
+library;
 
-  final String id;
-  final String username;
-}
+export 'package:shared_contracts/shared_contracts.dart' show AuthUser;

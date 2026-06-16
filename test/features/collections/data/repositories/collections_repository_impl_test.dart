@@ -1,9 +1,9 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/collections/data/local/collection_entity.dart';
-import 'package:flutter_starter_template/features/collections/data/local/collections_local_data_source.dart';
-import 'package:flutter_starter_template/features/collections/data/repositories/collections_repository_impl.dart';
-import 'package:flutter_starter_template/features/collections/domain/entities/collection.dart';
-import 'package:flutter_starter_template/features/collections/domain/services/collections_sync_controller.dart';
+import 'package:database/database.dart';
+import 'package:feature_collections/src/data/local/collections_local_data_source.dart';
+import 'package:feature_collections/src/data/repositories/collections_repository_impl.dart';
+import 'package:feature_collections/src/domain/entities/collection.dart';
+import 'package:feature_collections/src/domain/services/collections_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sync/sync.dart';
 import 'package:test_utils/test_utils.dart';
