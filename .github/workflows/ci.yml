@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
     # Skip analyze/test when a push touches only docs. Any change outside
-    # these paths (lib/, test/, packages/, pubspec.*, etc.) still triggers CI.
+    # these paths (lib/, test/, packages/, pubspec.*, .github/workflows/, etc.)
+    # still triggers CI — workflow changes are deliberately NOT ignored so CI
+    # validates its own edits.
     paths-ignore:
       - '**/*.md'
       - 'doc/**'
@@ -16,7 +18,6 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
-      - '.github/workflows/**'
       - 'skills-lock.json'
   pull_request:
     branches: [main]
@@ -31,13 +32,17 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
-      - '.github/workflows/**'
       - 'skills-lock.json'
 
 # Cancel superseded runs on the same ref to save CI minutes.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+# Minimal default token scope; no job writes to the repo. The Codecov upload
+# tolerates failure (fail_ci_if_error: false), so read access is sufficient.
+permissions:
+  contents: read
 
 jobs:
   analyze-and-test:
@@ -46,6 +51,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -55,8 +62,11 @@ jobs:
           channel: stable
           cache: true
 
+      # --enforce-lockfile makes CI resolve exactly what pubspec.lock pins, so a
+      # stale or uncommitted lockfile fails the build instead of silently
+      # resolving newer versions.
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       # NOTE: we deliberately do NOT cache .dart_tool/build here. Generated
       # files are git-ignored, so the checkout has none; a restored build cache
@@ -76,6 +86,19 @@ jobs:
           if ! git diff --quiet --exit-code -- lib/objectbox.g.dart lib/objectbox-model.json; then
             echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit lib/objectbox.g.dart + lib/objectbox-model.json."
             git diff --stat -- lib/objectbox.g.dart lib/objectbox-model.json
+            exit 1
+          fi
+
+      # Localizations are generated (generate: true) and the output under
+      # lib/l10n/ is tracked in git, so editing an .arb without regenerating
+      # AppLocalizations would drift undetected. Regenerate and fail if the
+      # tracked output changes — the same guard we use for the ObjectBox binding.
+      - name: Verify localizations are up to date
+        run: |
+          flutter gen-l10n
+          if ! git diff --quiet --exit-code -- lib/l10n/app_localizations*.dart; then
+            echo "::error::Generated localizations are out of date. Run 'flutter gen-l10n' and commit lib/l10n/app_localizations*.dart."
+            git diff --stat -- lib/l10n/app_localizations*.dart
             exit 1
           fi
 
@@ -147,3 +170,278 @@ jobs:
             **/*.gen.dart
             **/firebase_options.dart
             lib/l10n/**
+
+      # Publish coverage to Codecov for PR comments and trend tracking. This is
+      # informational only — it never gates the build (fail_ci_if_error: false),
+      # and `always()` uploads even when the threshold above fails. Tokenless
+      # upload works for public repos; set CODECOV_TOKEN to authenticate if you
+      # hit rate limits.
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
+  # the app, so Gradle/plugin/asset/manifest regressions slip past it and only
+  # surface at release time. This job catches them per-PR by building an
+  # unsigned debug APK. Debug (not release) keeps it secret-free: it signs with
+  # the auto-generated debug keystore, so no signing material is needed and the
+  # job runs on fork PRs too. The real signed release build still happens in
+  # release.yml before shipping.
+  build-android:
+    name: Build Android (debug)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      # The com.google.gms.google-services Gradle plugin parses
+      # google-services.json at build time (it never contacts Firebase), and
+      # the file is git-ignored — so a fresh checkout has none and Gradle fails
+      # without it. We write a placeholder rather than restoring the real config
+      # from a secret: a smoke-test only needs the app to assemble, and a
+      # secret-free job keeps working on fork PRs. The package_name must match
+      # the flavor we build (dev → base applicationId + ".dev"); update it here
+      # if android/app/build.gradle.kts flavor suffixes change.
+      - name: Generate placeholder google-services.json
+        run: |
+          cat > android/app/google-services.json <<'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "ci-placeholder",
+              "storage_bucket": "ci-placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.lucistudio.flutter_starter_template.dev"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  { "current_key": "AIzaPlaceholderCiKey0000000000000000000" }
+                ],
+                "services": {
+                  "appinvite_service": { "other_platform_oauth_client": [] }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # building, or the Dart compile fails on missing sources. As in the test
+      # job, we do NOT cache .dart_tool/build: with the outputs git-ignored, a
+      # restored cache makes build_runner skip files it believes exist,
+      # producing a broken tree.
+      - name: Generate code
+        run: |
+          flutter pub get --enforce-lockfile
+          dart run build_runner build --delete-conflicting-outputs
+
+      # The app uses Android flavors (dev/staging/prod), so a flavor is
+      # required. dev is the natural debug target.
+      - name: Build debug APK
+        run: flutter build apk --debug --flavor dev
+
+  # iOS counterpart of build-android: catches the CocoaPods/SPM/Podfile and
+  # native-plugin breakage class that only surfaces when Xcode actually
+  # assembles the app. --no-codesign skips certificates/provisioning entirely,
+  # so this needs no Apple secrets and the signed TestFlight build still lives
+  # in release.yml. macOS runners are free for public repos, so this runs on
+  # every PR; the only cost is wall-clock time (pod install + native compile).
+  build-ios:
+    name: Build iOS (debug, no codesign)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # connectivity_plus 7.x compiles against the iOS 26 SDK: it references
+      # NWPath.isUltraConstrained behind an `if #available(iOS 26.0, *)`, but
+      # the symbol must still exist at compile time. The macos-15 runner's
+      # default Xcode is older and lacks that SDK, so select the latest stable
+      # Xcode (which ships the iOS 26 SDK). Bump runner/Xcode together with the
+      # SDK requirement if a plugin later needs a newer one.
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      # This project requires CocoaPods, not SPM (see CLAUDE.md). The setting is
+      # machine-global, so each runner must disable SPM before the first build.
+      - name: Disable Swift Package Manager
+        run: flutter config --no-enable-swift-package-manager
+
+      # GoogleService-Info.plist is git-ignored but the Xcode project references
+      # it as a bundled resource, so a fresh checkout fails with "Build input
+      # file cannot be found". As on Android, write a placeholder rather than
+      # restoring the real plist from a secret: Firebase reads it at runtime,
+      # never at compile time, so dummy values assemble fine and the job stays
+      # secret-free and fork-friendly.
+      - name: Generate placeholder GoogleService-Info.plist
+        run: |
+          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+          	<key>API_KEY</key>
+          	<string>AIzaPlaceholderCiKey0000000000000000000</string>
+          	<key>GCM_SENDER_ID</key>
+          	<string>000000000000</string>
+          	<key>BUNDLE_ID</key>
+          	<string>com.lucistudio.flutter_starter_template.dev</string>
+          	<key>PROJECT_ID</key>
+          	<string>ci-placeholder</string>
+          	<key>STORAGE_BUCKET</key>
+          	<string>ci-placeholder.appspot.com</string>
+          	<key>IS_ADS_ENABLED</key>
+          	<false/>
+          	<key>IS_ANALYTICS_ENABLED</key>
+          	<false/>
+          	<key>IS_APPINVITE_ENABLED</key>
+          	<true/>
+          	<key>IS_GCM_ENABLED</key>
+          	<true/>
+          	<key>IS_SIGNIN_ENABLED</key>
+          	<true/>
+          	<key>GOOGLE_APP_ID</key>
+          	<string>1:000000000000:ios:0000000000000000000000</string>
+          </dict>
+          </plist>
+          EOF
+
+      # firebase.json (git-ignored) drives the FlutterFire Crashlytics build
+      # phase. Write a placeholder with "uploadDebugSymbols": false so the
+      # `flutterfire upload-crashlytics-symbols` phase reads it and skips the
+      # upload entirely — without it the phase throws PathNotFoundException, and
+      # with upload enabled it would need a real Firebase project. dSYM upload is
+      # a release concern handled in release.yml, not this smoke-test.
+      - name: Generate placeholder firebase.json
+        run: |
+          cat > firebase.json <<'EOF'
+          {
+            "flutter": {
+              "platforms": {
+                "android": {
+                  "default": {
+                    "projectId": "ci-placeholder",
+                    "appId": "1:000000000000:android:0000000000000000000000",
+                    "fileOutput": "android/app/google-services.json"
+                  }
+                },
+                "ios": {
+                  "default": {
+                    "projectId": "ci-placeholder",
+                    "appId": "1:000000000000:ios:0000000000000000000000",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                  }
+                },
+                "dart": {
+                  "lib/firebase_options.dart": {
+                    "projectId": "ci-placeholder",
+                    "configurations": {
+                      "android": "1:000000000000:android:0000000000000000000000",
+                      "ios": "1:000000000000:ios:0000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+          EOF
+
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # building. As elsewhere, we do NOT cache .dart_tool/build: a restored
+      # cache makes build_runner skip files it believes exist, producing a
+      # broken tree.
+      - name: Generate code
+        run: |
+          flutter pub get --enforce-lockfile
+          dart run build_runner build --delete-conflicting-outputs
+
+      # The Xcode project has a FlutterFire build phase that runs
+      # `flutterfire upload-crashlytics-symbols`; without the CLI on PATH the
+      # phase fails with "flutterfire: command not found". Install it so the
+      # phase resolves — on a debug build there are no dSYMs to upload, so it
+      # no-ops. (The build-phase script already adds ~/.pub-cache/bin to PATH.)
+      - name: Install FlutterFire CLI
+        run: |
+          dart pub global activate flutterfire_cli 1.4.0
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      # dev flavor maps to the shared dev.xcscheme. --no-codesign skips signing
+      # so no certificates or provisioning profiles are needed.
+      - name: Build iOS (no codesign)
+        run: flutter build ios --debug --no-codesign --flavor dev
+
+  # Golden (pixel-comparison) tests are excluded from analyze-and-test because
+  # Flutter goldens are not stable across operating systems and that job runs on
+  # Ubuntu, while the baselines are generated on macOS. Run them here on macOS —
+  # matching the baselines — so UI regressions are caught in CI. They currently
+  # live in packages/app_ui, which has no codegen, so no build_runner is needed.
+  golden-tests:
+    name: Golden tests (macOS)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Run golden tests
+        working-directory: packages/app_ui
+        run: flutter test --tags golden
+
+      # On mismatch, the golden harness writes actual/diff PNGs under a
+      # `failures/` directory next to the baselines. Upload them so a reviewer
+      # can see exactly what changed.
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: golden-failures
+          path: 'packages/app_ui/test/**/failures/**'
+          if-no-files-found: ignore
