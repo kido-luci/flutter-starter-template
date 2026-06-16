@@ -1,4 +1,3 @@
-// TEMP: trigger CI to validate new build/test/golden jobs — revert before merge.
 import 'dart:developer' as developer;
 
 import 'package:app_platform/app_platform.dart';
