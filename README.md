@@ -182,78 +182,114 @@ All shared UI lives in `packages/app_ui` and is consumed through
 live beside their package in `packages/<name>/test`, while root app tests stay
 under `test/`.
 
-**Workspace dependency graph** — how the packages and the app depend on each
-other. The arrows point from a package to what it depends on; dependency
-direction is `features → shared → ui → infra → architecture`. The root `app`
-(composition root) wires everything together.
+The workspace dependency graph is shown as three focused views — a layered
+overview, the infrastructure internals, and the feature packages — rather than
+one dense diagram. In every view, arrows point from a package **to what it
+depends on**.
+
+**1. Layered overview** — the mental model. Dependencies only ever point
+downward: `app → features → shared / infra → architecture`.
 
 ```mermaid
 graph TD
-  app["lib/ · app (composition root)"]
+  app["app · lib/ — composition root"]
+  features["Feature packages"]
+  shared["Shared contracts"]
+  infra["Infra & UI packages"]
+  architecture["architecture — foundation"]
 
-  subgraph Features
-    bookmarks[features/bookmarks]
-    collections[features/collections]
-    feature_notifications
-  end
+  app --> features & shared & infra
+  features --> shared & infra & architecture
+  shared --> architecture
+  infra --> architecture
+```
 
-  subgraph Shared["Shared contracts"]
-    shared_ui
-    shared_contracts
-  end
+**2. Infrastructure & shared contracts** — the inter-package edges within the
+lower layers. The leaf packages `sync`, `config`, `storage`, `app_ui`, and
+`localization` have no workspace dependencies (only third-party libs), so they
+don't appear here.
 
-  subgraph Infra["Infra & UI"]
-    network
-    database
-    sync
-    config
-    analytics
-    app_platform
-    theme
-    app_ui
-    storage
-    localization
-  end
-
-  architecture(["architecture · foundation"])
-
-  app --> bookmarks & collections & feature_notifications
-  app --> shared_ui & theme & app_ui & app_platform
-  app --> analytics & network & database & sync & config & storage & localization
-
-  bookmarks --> collections
-  bookmarks --> network & sync & database & analytics & app_platform & app_ui
-  bookmarks --> shared_ui & shared_contracts & localization & architecture
-  collections --> network & sync & database & app_ui
-  collections --> shared_ui & shared_contracts & localization & architecture
-  feature_notifications --> architecture
-
-  shared_ui --> shared_contracts
-  shared_contracts --> architecture
-
+```mermaid
+graph TD
+  shared_ui --> shared_contracts --> architecture
+  app_platform --> analytics --> architecture
+  theme --> analytics
+  app_platform --> architecture
+  theme --> architecture
   network --> config
   database --> sync
-  analytics --> architecture
-  app_platform --> analytics & architecture
-  theme --> analytics & architecture
+```
+
+**3. Feature packages** — what each feature depends on. `bookmarks` also reuses
+two capabilities from `collections`, so it depends on it directly.
+
+```mermaid
+graph TD
+  bookmarks["features/bookmarks"]
+  collections["features/collections"]
+  feature_notifications["feature_notifications"]
+
+  bookmarks --> collections
+  bookmarks --> network & database & sync & analytics & app_platform & app_ui
+  bookmarks --> shared_ui & shared_contracts & localization & architecture
+  collections --> network & database & sync & app_ui
+  collections --> shared_ui & shared_contracts & localization & architecture
+  feature_notifications --> architecture
 ```
 
 **External dependency encapsulation** — each infrastructure package owns its
 third-party libraries so the app (and other packages) depend on the workspace
 package, never the raw dependency.
 
+Each box is a workspace package; the libraries inside it are the third-party
+dependencies it encapsulates.
+
 ```mermaid
-graph LR
-  network --> dio & retrofit & firebase_performance
-  database --> objectbox & path_provider
-  config --> firebase_remote_config
-  analytics --> firebase_analytics
-  app_platform --> camera & image_picker & permission_handler & share_plus & video_player
-  app_platform --> firebase_messaging & firebase_crashlytics & flutter_local_notifications
-  theme --> flutter_bloc & flex_color_scheme
-  app_ui --> google_fonts & cached_network_image & photo_view & carousel_slider & flutter_slidable & flutter_animate
-  storage --> flutter_secure_storage & shared_preferences
-  localization --> intl
+graph TB
+  subgraph network
+    dio
+    retrofit
+    firebase_performance
+  end
+  subgraph database
+    objectbox
+    path_provider
+  end
+  subgraph app_platform
+    camera
+    image_picker
+    permission_handler
+    share_plus
+    video_player
+    firebase_messaging
+    firebase_crashlytics
+    flutter_local_notifications
+  end
+  subgraph app_ui
+    google_fonts
+    cached_network_image
+    photo_view
+    carousel_slider
+    flutter_slidable
+    flutter_animate
+  end
+  subgraph theme
+    flutter_bloc
+    flex_color_scheme
+  end
+  subgraph storage
+    flutter_secure_storage
+    shared_preferences
+  end
+  subgraph config
+    firebase_remote_config
+  end
+  subgraph analytics
+    firebase_analytics
+  end
+  subgraph localization
+    intl
+  end
 ```
 
 ### 📁 Feature Slice (Clean Architecture)
