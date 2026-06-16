@@ -1,9 +1,9 @@
 import 'package:app_platform/app_platform.dart';
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/update_bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmark_form/bookmark_form_bloc.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmark_form/bookmark_form_state.dart';
+import 'package:feature_bookmarks/src/domain/usecases/update_bookmark.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmark_form/bookmark_form_bloc.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmark_form/bookmark_form_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../../test_utils.dart';

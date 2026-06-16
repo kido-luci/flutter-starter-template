@@ -39,15 +39,10 @@ const _allowedCrossFeatureImports = <String, Set<String>>{
     'auth/presentation/bloc/delete_account_cubit.dart',
     'auth/presentation/bloc/delete_account_state.dart',
   },
-  // `bookmarks` surfaces two collections capabilities (single consumer each):
-  // the "add to collection" sheet on the bookmark detail screen, and the
-  // collections list embedded in the bookmarks "Collections" tab. Home reads
-  // collections through the shared `CollectionsReader` contract instead, so
-  // bookmarks remains the only consumer of these presentation widgets.
-  'bookmarks': {
-    'collections/presentation/widgets/add_to_collection_sheet.dart',
-    'collections/presentation/widgets/collections_list_view.dart',
-  },
+  // Note: bookmarks' two collections capabilities (the "add to collection"
+  // sheet and the embedded collections list) are now a package-level
+  // dependency (feature_bookmarks -> feature_collections), enforced by the
+  // package_layering_test rather than this in-app feature scan.
 };
 
 void main() {

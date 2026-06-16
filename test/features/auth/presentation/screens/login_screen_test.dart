@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter_starter_template/features/auth/presentation/screens/login_screen.dart';
-import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
+
 import '../../../../test_utils.dart';
 
 class MockAuthBloc extends Mock implements AuthBloc {}

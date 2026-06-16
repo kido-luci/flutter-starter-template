@@ -1,7 +1,7 @@
+import 'package:feature_bookmarks/feature_bookmarks.dart';
+import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 
-import '../features/bookmarks/domain/services/bookmarks_sync_controller.dart';
-import '../features/collections/domain/services/collections_sync_controller.dart';
 import 'di/injection.dart';
 import 'feature_module.dart';
 

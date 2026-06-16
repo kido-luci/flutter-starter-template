@@ -1,12 +1,12 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/entities/bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/repositories/bookmarks_repository.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/create_bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/delete_bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/get_bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_bookmarks.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/list_local_bookmarks.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/usecases/update_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/entities/bookmark.dart';
+import 'package:feature_bookmarks/src/domain/repositories/bookmarks_repository.dart';
+import 'package:feature_bookmarks/src/domain/usecases/create_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/delete_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/get_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/list_bookmarks.dart';
+import 'package:feature_bookmarks/src/domain/usecases/list_local_bookmarks.dart';
+import 'package:feature_bookmarks/src/domain/usecases/update_bookmark.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

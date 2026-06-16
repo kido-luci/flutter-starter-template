@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:feature_bookmarks/feature_bookmarks.dart';
+import 'package:feature_collections/feature_collections.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,12 +10,6 @@ import '../features/auth/presentation/bloc/auth_state.dart';
 import '../features/auth/presentation/screens/change_password_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
-import '../features/bookmarks/presentation/screens/bookmark_detail_screen.dart';
-import '../features/bookmarks/presentation/screens/bookmark_form_screen.dart';
-import '../features/bookmarks/presentation/screens/bookmarks_list_screen.dart';
-import '../features/collections/presentation/screens/collection_detail_screen.dart';
-import '../features/collections/presentation/screens/collection_form_screen.dart';
-import '../features/collections/presentation/screens/collections_list_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/notifications/presentation/screens/notifications_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';

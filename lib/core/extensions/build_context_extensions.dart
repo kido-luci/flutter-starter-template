@@ -1,9 +1,8 @@
-import 'package:flutter/widgets.dart';
+/// Re-exports the localization accessors (`AppLocalizations` and the
+/// `context.l10n` extension) from `package:localization`.
+///
+/// Kept as a thin shim so existing in-app imports of this path keep working;
+/// feature packages import `package:localization` directly.
+library;
 
-import '../../l10n/app_localizations.dart';
-
-/// Localization accessor for a [BuildContext].
-extension BuildContextLocalization on BuildContext {
-  /// The generated [AppLocalizations] for the current locale.
-  AppLocalizations get l10n => AppLocalizations.of(this);
-}
+export 'package:localization/localization.dart';

@@ -1,0 +1,19 @@
+# Generator scoping mirrors the app's root build.yaml: each generator's
+# annotations live in a small, well-defined set of directories.
+global_options:
+  freezed:freezed:
+    runs_before:
+      - retrofit_generator:retrofit_generator
+
+targets:
+  $default:
+    builders:
+      # @RestApi clients live only in the data/datasources directory.
+      retrofit_generator:
+        generate_for:
+          - lib/src/data/datasources/**
+      # @JsonSerializable (incl. freezed models with fromJson) lives only in
+      # the data/models directory.
+      json_serializable:
+        generate_for:
+          - lib/src/data/models/**

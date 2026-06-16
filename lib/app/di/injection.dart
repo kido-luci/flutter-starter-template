@@ -1,6 +1,8 @@
 import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:config/config.dart';
+import 'package:feature_bookmarks/feature_bookmarks.dart';
+import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -29,6 +31,8 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(CoreThemePackageModule),
     ExternalModule(SharedContractsPackageModule),
     ExternalModule(FeatureNotificationsPackageModule),
+    ExternalModule(FeatureCollectionsPackageModule),
+    ExternalModule(FeatureBookmarksPackageModule),
   ],
 )
 Future<void> configureDependencies() async {

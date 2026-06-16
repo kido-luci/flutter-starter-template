@@ -1,6 +1,6 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/update_collection.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collection_form/collection_form_cubit.dart';
+import 'package:feature_collections/src/domain/usecases/update_collection.dart';
+import 'package:feature_collections/src/presentation/bloc/collection_form/collection_form_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

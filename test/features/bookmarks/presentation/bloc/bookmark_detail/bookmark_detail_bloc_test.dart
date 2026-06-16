@@ -1,7 +1,7 @@
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmark_detail/bookmark_detail_bloc.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmark_detail/bookmark_detail_state.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmark_detail/bookmark_detail_bloc.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmark_detail/bookmark_detail_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../../test_utils.dart';

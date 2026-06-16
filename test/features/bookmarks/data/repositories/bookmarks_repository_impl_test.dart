@@ -1,9 +1,9 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/local/bookmark_entity.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/local/bookmarks_local_data_source.dart';
-import 'package:flutter_starter_template/features/bookmarks/data/repositories/bookmarks_repository_impl.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/entities/bookmark.dart';
-import 'package:flutter_starter_template/features/bookmarks/domain/services/bookmarks_sync_controller.dart';
+import 'package:database/database.dart';
+import 'package:feature_bookmarks/src/data/local/bookmarks_local_data_source.dart';
+import 'package:feature_bookmarks/src/data/repositories/bookmarks_repository_impl.dart';
+import 'package:feature_bookmarks/src/domain/entities/bookmark.dart';
+import 'package:feature_bookmarks/src/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sync/sync.dart';
 import 'package:test_utils/test_utils.dart';

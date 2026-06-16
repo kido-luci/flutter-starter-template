@@ -1,10 +1,10 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/collections/domain/entities/collection.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/delete_collection.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/get_collection.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/list_collections.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/list_local_collections.dart';
-import 'package:flutter_starter_template/features/collections/domain/usecases/update_collection.dart';
+import 'package:feature_collections/src/domain/entities/collection.dart';
+import 'package:feature_collections/src/domain/usecases/delete_collection.dart';
+import 'package:feature_collections/src/domain/usecases/get_collection.dart';
+import 'package:feature_collections/src/domain/usecases/list_collections.dart';
+import 'package:feature_collections/src/domain/usecases/list_local_collections.dart';
+import 'package:feature_collections/src/domain/usecases/update_collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

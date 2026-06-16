@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/collections/domain/services/collections_sync_controller.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_bloc.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_state.dart';
+import 'package:feature_collections/src/domain/services/collections_sync_controller.dart';
+import 'package:feature_collections/src/presentation/bloc/collections_list/collections_list_bloc.dart';
+import 'package:feature_collections/src/presentation/bloc/collections_list/collections_list_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

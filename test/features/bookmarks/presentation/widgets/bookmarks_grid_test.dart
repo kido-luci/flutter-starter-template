@@ -1,14 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
+import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_state.dart';
+import 'package:feature_bookmarks/src/presentation/widgets/bookmarks_list_widgets.dart';
+import 'package:feature_collections/src/presentation/bloc/collections_list/collections_list_bloc.dart';
+import 'package:feature_collections/src/presentation/bloc/collections_list/collections_list_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/bloc/bookmarks_list/bookmarks_list_state.dart';
-import 'package:flutter_starter_template/features/bookmarks/presentation/widgets/bookmarks_list_widgets.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_bloc.dart';
-import 'package:flutter_starter_template/features/collections/presentation/bloc/collections_list/collections_list_state.dart';
-import 'package:flutter_starter_template/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:localization/localization.dart';
 
 import '../../../../test_utils.dart';
 

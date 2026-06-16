@@ -1,8 +1,8 @@
-import 'package:flutter_starter_template/features/collections/data/datasources/collections_remote_data_source.dart';
-import 'package:flutter_starter_template/features/collections/data/local/collection_entity.dart';
-import 'package:flutter_starter_template/features/collections/data/models/collection_dto.dart';
-import 'package:flutter_starter_template/features/collections/data/models/collection_request.dart';
-import 'package:flutter_starter_template/features/collections/data/sync/collections_sync_adapter.dart';
+import 'package:database/database.dart';
+import 'package:feature_collections/src/data/datasources/collections_remote_data_source.dart';
+import 'package:feature_collections/src/data/models/collection_dto.dart';
+import 'package:feature_collections/src/data/models/collection_request.dart';
+import 'package:feature_collections/src/data/sync/collections_sync_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
 import 'package:sync/sync.dart';

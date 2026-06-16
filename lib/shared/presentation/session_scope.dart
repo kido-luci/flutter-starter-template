@@ -1,27 +1,8 @@
-import 'package:flutter/widgets.dart';
-
-import '../domain/session.dart';
-
-/// Exposes the app-wide [Session] to the widget tree.
+/// Re-exports `SessionScope` (and the `Session` it exposes) from
+/// `package:shared_ui`.
 ///
-/// Read it with `SessionScope.of(context)`. Rebuild on session changes with a
-/// `ListenableBuilder` listening to the returned [Session].
-class SessionScope extends InheritedWidget {
-  const SessionScope({
-    super.key,
-    required this.session,
-    required super.child,
-  });
+/// Thin shim so existing in-app imports of this path keep working; feature
+/// packages import `package:shared_ui` directly.
+library;
 
-  final Session session;
-
-  static Session of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<SessionScope>();
-    assert(scope != null, 'No SessionScope found in context.');
-    return scope!.session;
-  }
-
-  @override
-  bool updateShouldNotify(SessionScope oldWidget) =>
-      session != oldWidget.session;
-}
+export 'package:shared_ui/shared_ui.dart' show Session, SessionScope;
