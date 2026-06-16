@@ -108,57 +108,58 @@ To enable seamless local development and testing, this template is paired with a
 
 ## 🧬 Architecture
 
-<p align="center">
-  <img src="doc/svg/repo_top_level_structure.svg" alt="Repository Top Level Structure">
-</p>
-
 ```
 .
-├── lib/                              # Root Flutter app package
+├── lib/                              # Root Flutter app package (composition root)
 │   ├── main.dart                     # Entry: DI → Firebase → runApp
 │   ├── app/
-│   │   ├── app.dart                  # MaterialApp.router + providers
+│   │   ├── app.dart                  # MaterialApp.router + providers + SessionScope
 │   │   ├── router.dart               # TypedGoRoute + auth redirect
+│   │   ├── di/                       # App-level get_it + injectable wiring
 │   │   └── widgets/                  # App-level shell widgets
 │   ├── core/
-│   │   ├── data/database/            # ObjectBox wrapper and generated store binding
+│   │   ├── data/database/            # ObjectBox app-store bootstrap
+│   │   ├── data/sync/                # App-level sync wiring/adapters
 │   │   ├── di/                       # get_it + injectable app graph
 │   │   ├── extensions/               # App-specific convenience extensions
 │   │   └── platform/firebase/        # App bootstrap for Firebase services
-│   ├── features/
+│   ├── features/                     # App-only feature slices
 │   │   ├── auth/                     # Sign-in, sign-out, session restore
-│   │   ├── bookmarks/                # CRUD, offline sync, list/detail/form
-│   │   ├── collections/              # Group bookmarks into folders, offline sync
 │   │   ├── home/                     # Home dashboard
-│   │   ├── notifications/            # Notification and activity feed
+│   │   ├── notifications/            # Notification & activity feed (data + presentation)
 │   │   ├── profile/                  # User info + account actions
 │   │   └── splash/                   # Session restoration gate
 │   ├── gen/                          # flutter_gen asset references
-│   ├── l10n/                         # ARB files + generated localizations
 │   └── shared/                       # App-level shared domain/presentation contracts
 ├── packages/                         # Dart Pub Workspace members
+│   ├── architecture/                 # Failure, Result, UseCase primitives
+│   ├── network/                      # Dio, Retrofit, retry/performance interceptors
+│   ├── storage/                      # SharedPreferences and secure storage helpers
+│   ├── database/                     # Centralized ObjectBox entities, bindings, Store wrapper
+│   ├── config/                       # EnvConfig + Remote Config wrapper
+│   ├── analytics/                    # Analytics service + route observer
+│   ├── app_platform/                 # Camera, picker, permissions, notifications, share
+│   ├── sync/                         # Reusable offline-first sync engine (scheduler + delta CRUD)
+│   ├── theme/                        # ThemeBloc and persisted theme state
 │   ├── app_ui/                       # Design system, theme, layout, reusable widgets
-│   ├── analytics/               # Analytics service + route observer
-│   ├── config/                  # EnvConfig + Remote Config wrapper
-│   ├── architecture/                  # Failure, Result, UseCase primitives
-│   ├── network/                 # Dio, Retrofit, retry/performance interceptors
-│   ├── app_platform/                # Camera, picker, permissions, notifications, share
-│   ├── storage/                 # SharedPreferences and secure storage helpers
-│   ├── sync/                     # Reusable offline-first sync engine (scheduler + delta CRUD)
-│   ├── theme/                   # ThemeBloc and persisted theme state
+│   ├── shared_ui/                    # Cross-feature presentation contracts (Session/SessionScope) + shared widgets
+│   ├── shared_contracts/             # Cross-feature domain contracts & reader interfaces
+│   ├── localization/                 # ARB sources + gen-l10n AppLocalizations + context.l10n
+│   ├── feature_notifications/        # Notifications domain layer (entities, contracts, use cases)
+│   ├── features/
+│   │   ├── bookmarks/                # Bookmarks feature — data/domain/presentation package
+│   │   └── collections/             # Collections feature — data/domain/presentation package
 │   └── test_utils/                   # Shared mocks, images, and mocktail export
 ├── test/                             # Root app tests only
 └── integration_test/                 # Device/emulator integration tests
 ```
 
-<p align="center">
-  <img src="doc/svg/lib_internal_structure.svg" alt="Lib Internal Structure">
-</p>
-
 The repository uses Dart Pub Workspaces. The root package is the assembled
-Flutter app: routing, DI composition, app-only features, ObjectBox entities, and
-Firebase bootstrap stay there. Reusable infrastructure lives in `packages/` and
-is consumed through package entry points such as `package:network/network.dart`.
+Flutter app — the composition root: routing, DI composition, app-only features
+(`auth`, `home`, `notifications`, `profile`, `splash`), and Firebase bootstrap
+stay there. Reusable infrastructure and self-contained feature slices live in
+`packages/` and are consumed through package entry points such as
+`package:network/network.dart`.
 
 Workspace packages own their third-party implementation details. For example,
 the root app depends on `network`, not directly on `dio` or `retrofit`;
@@ -166,24 +167,96 @@ the root app depends on `network`, not directly on `dio` or `retrofit`;
 keeps platform, storage, analytics, theme, and UI dependencies versioned in one
 place and avoids root-package dependency conflicts.
 
+Larger features have graduated out of `lib/` into their own packages:
+`features/bookmarks` and `features/collections` are self-contained
+data/domain/presentation slices, while `feature_notifications` extracts the
+notifications domain layer. Genuinely cross-feature contracts live in
+`shared_contracts` (domain projections and reader interfaces) and `shared_ui`
+(the app-wide `Session`/`SessionScope` and shared widgets), promoted only on the
+rule of three. ObjectBox entities and the generated bindings are centralized in
+the `database` package, and localization (ARB sources + gen-l10n) lives in
+`localization`, shared by the app shell and every feature package.
+
 All shared UI lives in `packages/app_ui` and is consumed through
 `package:app_ui/app_ui.dart`; add new generic widgets there. Package-owned tests
 live beside their package in `packages/<name>/test`, while root app tests stay
 under `test/`.
 
-<p align="center">
-  <img src="doc/svg/workspace_package_dependency_graph.svg" alt="Workspace Package Dependency Graph">
-</p>
+**Workspace dependency graph** — how the packages and the app depend on each
+other. The arrows point from a package to what it depends on; dependency
+direction is `features → shared → ui → infra → architecture`. The root `app`
+(composition root) wires everything together.
 
-<p align="center">
-  <img src="doc/svg/package_external_dependencies.svg" alt="Package External Dependencies">
-</p>
+```mermaid
+graph TD
+  app["lib/ · app (composition root)"]
+
+  subgraph Features
+    bookmarks[features/bookmarks]
+    collections[features/collections]
+    feature_notifications
+  end
+
+  subgraph Shared["Shared contracts"]
+    shared_ui
+    shared_contracts
+  end
+
+  subgraph Infra["Infra & UI"]
+    network
+    database
+    sync
+    config
+    analytics
+    app_platform
+    theme
+    app_ui
+    storage
+    localization
+  end
+
+  architecture(["architecture · foundation"])
+
+  app --> bookmarks & collections & feature_notifications
+  app --> shared_ui & theme & app_ui & app_platform
+  app --> analytics & network & database & sync & config & storage & localization
+
+  bookmarks --> collections
+  bookmarks --> network & sync & database & analytics & app_platform & app_ui
+  bookmarks --> shared_ui & shared_contracts & localization & architecture
+  collections --> network & sync & database & app_ui
+  collections --> shared_ui & shared_contracts & localization & architecture
+  feature_notifications --> architecture
+
+  shared_ui --> shared_contracts
+  shared_contracts --> architecture
+
+  network --> config
+  database --> sync
+  analytics --> architecture
+  app_platform --> analytics & architecture
+  theme --> analytics & architecture
+```
+
+**External dependency encapsulation** — each infrastructure package owns its
+third-party libraries so the app (and other packages) depend on the workspace
+package, never the raw dependency.
+
+```mermaid
+graph LR
+  network --> dio & retrofit & firebase_performance
+  database --> objectbox & path_provider
+  config --> firebase_remote_config
+  analytics --> firebase_analytics
+  app_platform --> camera & image_picker & permission_handler & share_plus & video_player
+  app_platform --> firebase_messaging & firebase_crashlytics & flutter_local_notifications
+  theme --> flutter_bloc & flex_color_scheme
+  app_ui --> google_fonts & cached_network_image & photo_view & carousel_slider & flutter_slidable & flutter_animate
+  storage --> flutter_secure_storage & shared_preferences
+  localization --> intl
+```
 
 ### 📁 Feature Slice (Clean Architecture)
-
-<p align="center">
-  <img src="doc/svg/feature_slice_clean_architecture.svg" alt="Feature Slice Clean Architecture">
-</p>
 
 ```
 feature/
@@ -582,8 +655,9 @@ Shared app components live in `packages/app_ui` and are exported through
 | `AppTextField`      | Label, prefix icon, validation, autofill hints                   |
 
 Feature-specific widgets stay inside their feature slice. For example, bookmark
-video playback widgets live under `lib/features/bookmarks/presentation/widgets/`
-because they are tied to bookmark attachment behavior.
+video playback widgets live under
+`packages/features/bookmarks/lib/src/presentation/widgets/` because they are tied
+to bookmark attachment behavior.
 
 <br>
 
@@ -818,21 +892,25 @@ How the pieces stay consistent:
 
 ## 🌐 Localization (i18n)
 
-Translations are managed using ARB (Application Resource Bundle) files located under [lib/l10n/](lib/l10n/).
+Translations live in the `localization` package — ARB (Application Resource
+Bundle) sources under [packages/localization/lib/l10n/](packages/localization/lib/l10n/),
+configured by [packages/localization/l10n.yaml](packages/localization/l10n.yaml).
+English and Vietnamese ship out of the box.
 
 ### 🛠 Generating Translations
 
-Since `generate: true` is enabled in [pubspec.yaml](pubspec.yaml), Flutter automatically updates the generated localization files whenever you run packages commands:
+The gen-l10n output is generated alongside the ARB sources in the
+`localization` package:
 
 ```bash
 # Generate localization resources manually
-fvm flutter gen-l10n
+(cd packages/localization && fvm flutter gen-l10n)
 ```
 
-Generated localizations are emitted into `lib/l10n/`. Import
-`package:flutter_starter_template/l10n/app_localizations.dart` and use
+Import `package:localization/localization.dart` and use
 `AppLocalizations.of(context)` (or the `context.l10n` extension) to access
-localized strings.
+localized strings. The package is shared by the app shell and every feature
+package.
 
 <br>
 
