@@ -120,10 +120,12 @@ echo "✓ dependencies installed"
 
 # --- 6. code generation -----------------------------------------------------
 # Generated files (*.g.dart, *.freezed.dart, etc.) are git-ignored, so a fresh
-# clone won't compile until they're produced.
+# clone won't compile until they're produced. Feature packages own internal
+# codegen the app-root build_runner can't reach, so generation is centralized in
+# tool/codegen.sh (builds each feature package, then the app root).
 if [[ "$run_codegen" -eq 1 ]]; then
   echo "▶ setup: generating code (build_runner)…"
-  dart run build_runner build --delete-conflicting-outputs
+  ./tool/codegen.sh
   echo "✓ code generated"
 else
   echo "• skipping code generation (--no-codegen) — the tree won't compile" \
