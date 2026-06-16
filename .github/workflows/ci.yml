@@ -266,6 +266,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # connectivity_plus 7.x compiles against the iOS 26 SDK: it references
+      # NWPath.isUltraConstrained behind an `if #available(iOS 26.0, *)`, but
+      # the symbol must still exist at compile time. The macos-15 runner's
+      # default Xcode is older and lacks that SDK, so select the latest stable
+      # Xcode (which ships the iOS 26 SDK). Bump runner/Xcode together with the
+      # SDK requirement if a plugin later needs a newer one.
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
