@@ -55,8 +55,11 @@ jobs:
           channel: stable
           cache: true
 
+      # --enforce-lockfile makes CI resolve exactly what pubspec.lock pins, so a
+      # stale or uncommitted lockfile fails the build instead of silently
+      # resolving newer versions.
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       # NOTE: we deliberately do NOT cache .dart_tool/build here. Generated
       # files are git-ignored, so the checkout has none; a restored build cache
@@ -76,6 +79,19 @@ jobs:
           if ! git diff --quiet --exit-code -- lib/objectbox.g.dart lib/objectbox-model.json; then
             echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' and commit lib/objectbox.g.dart + lib/objectbox-model.json."
             git diff --stat -- lib/objectbox.g.dart lib/objectbox-model.json
+            exit 1
+          fi
+
+      # Localizations are generated (generate: true) and the output under
+      # lib/l10n/ is tracked in git, so editing an .arb without regenerating
+      # AppLocalizations would drift undetected. Regenerate and fail if the
+      # tracked output changes — the same guard we use for the ObjectBox binding.
+      - name: Verify localizations are up to date
+        run: |
+          flutter gen-l10n
+          if ! git diff --quiet --exit-code -- lib/l10n/app_localizations*.dart; then
+            echo "::error::Generated localizations are out of date. Run 'flutter gen-l10n' and commit lib/l10n/app_localizations*.dart."
+            git diff --stat -- lib/l10n/app_localizations*.dart
             exit 1
           fi
 
@@ -148,6 +164,19 @@ jobs:
             **/firebase_options.dart
             lib/l10n/**
 
+      # Publish coverage to Codecov for PR comments and trend tracking. This is
+      # informational only — it never gates the build (fail_ci_if_error: false),
+      # and `always()` uploads even when the threshold above fails. Tokenless
+      # upload works for public repos; set CODECOV_TOKEN to authenticate if you
+      # hit rate limits.
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
   # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
   # the app, so Gradle/plugin/asset/manifest regressions slip past it and only
   # surface at release time. This job catches them per-PR by building an
@@ -216,7 +245,7 @@ jobs:
       # producing a broken tree.
       - name: Generate code
         run: |
-          flutter pub get
+          flutter pub get --enforce-lockfile
           dart run build_runner build --delete-conflicting-outputs
 
       # The app uses Android flavors (dev/staging/prod), so a flavor is
@@ -296,10 +325,48 @@ jobs:
       # broken tree.
       - name: Generate code
         run: |
-          flutter pub get
+          flutter pub get --enforce-lockfile
           dart run build_runner build --delete-conflicting-outputs
 
       # dev flavor maps to the shared dev.xcscheme. --no-codesign skips signing
       # so no certificates or provisioning profiles are needed.
       - name: Build iOS (no codesign)
         run: flutter build ios --debug --no-codesign --flavor dev
+
+  # Golden (pixel-comparison) tests are excluded from analyze-and-test because
+  # Flutter goldens are not stable across operating systems and that job runs on
+  # Ubuntu, while the baselines are generated on macOS. Run them here on macOS —
+  # matching the baselines — so UI regressions are caught in CI. They currently
+  # live in packages/app_ui, which has no codegen, so no build_runner is needed.
+  golden-tests:
+    name: Golden tests (macOS)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Run golden tests
+        working-directory: packages/app_ui
+        run: flutter test --tags golden
+
+      # On mismatch, the golden harness writes actual/diff PNGs under a
+      # `failures/` directory next to the baselines. Upload them so a reviewer
+      # can see exactly what changed.
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: golden-failures
+          path: 'packages/app_ui/test/**/failures/**'
+          if-no-files-found: ignore
