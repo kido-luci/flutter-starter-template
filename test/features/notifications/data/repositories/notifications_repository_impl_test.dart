@@ -1,8 +1,8 @@
 import 'package:architecture/architecture.dart';
 import 'package:database/database.dart';
 import 'package:feature_notifications/feature_notifications.dart';
-import 'package:flutter_starter_template/features/notifications/data/local/notifications_local_data_source.dart';
-import 'package:flutter_starter_template/features/notifications/data/repositories/notifications_repository_impl.dart';
+import 'package:feature_notifications/src/data/local/notifications_local_data_source.dart';
+import 'package:feature_notifications/src/data/repositories/notifications_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

@@ -1,5 +1,5 @@
 import 'package:database/database.dart';
-import 'package:feature_notifications/feature_notifications.dart';
+import '../../domain/entities/app_notification.dart';
 
 /// Maps the persistence [NotificationEntity] to the domain [AppNotification].
 ///

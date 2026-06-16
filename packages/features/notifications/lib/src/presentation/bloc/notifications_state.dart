@@ -1,6 +1,8 @@
 import 'package:architecture/architecture.dart';
-import 'package:feature_notifications/feature_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../domain/entities/app_notification.dart';
+import '../../domain/entities/user_activity.dart';
 
 part 'notifications_state.freezed.dart';
 
