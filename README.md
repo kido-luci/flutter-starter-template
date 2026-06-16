@@ -182,60 +182,59 @@ All shared UI lives in `packages/app_ui` and is consumed through
 live beside their package in `packages/<name>/test`, while root app tests stay
 under `test/`.
 
-**Workspace dependency graph** — how the packages and the app depend on each
-other. The arrows point from a package to what it depends on; dependency
-direction is `features → shared → ui → infra → architecture`. The root `app`
-(composition root) wires everything together.
+The workspace dependency graph is shown as three focused views — a layered
+overview, the infrastructure internals, and the feature packages — rather than
+one dense diagram. In every view, arrows point from a package **to what it
+depends on**.
+
+**1. Layered overview** — the mental model. Dependencies only ever point
+downward: `app → features → shared / infra → architecture`.
 
 ```mermaid
 graph TD
-  app["lib/ · app (composition root)"]
+  app["app · lib/ — composition root"]
+  features["Feature packages"]
+  shared["Shared contracts"]
+  infra["Infra & UI packages"]
+  architecture["architecture — foundation"]
 
-  subgraph Features
-    bookmarks[features/bookmarks]
-    collections[features/collections]
-    feature_notifications
-  end
+  app --> features & shared & infra
+  features --> shared & infra & architecture
+  shared --> architecture
+  infra --> architecture
+```
 
-  subgraph Shared["Shared contracts"]
-    shared_ui
-    shared_contracts
-  end
+**2. Infrastructure & shared contracts** — the inter-package edges within the
+lower layers. The leaf packages `sync`, `config`, `storage`, `app_ui`, and
+`localization` have no workspace dependencies (only third-party libs), so they
+don't appear here.
 
-  subgraph Infra["Infra & UI"]
-    network
-    database
-    sync
-    config
-    analytics
-    app_platform
-    theme
-    app_ui
-    storage
-    localization
-  end
-
-  architecture(["architecture · foundation"])
-
-  app --> bookmarks & collections & feature_notifications
-  app --> shared_ui & theme & app_ui & app_platform
-  app --> analytics & network & database & sync & config & storage & localization
-
-  bookmarks --> collections
-  bookmarks --> network & sync & database & analytics & app_platform & app_ui
-  bookmarks --> shared_ui & shared_contracts & localization & architecture
-  collections --> network & sync & database & app_ui
-  collections --> shared_ui & shared_contracts & localization & architecture
-  feature_notifications --> architecture
-
-  shared_ui --> shared_contracts
-  shared_contracts --> architecture
-
+```mermaid
+graph TD
+  shared_ui --> shared_contracts --> architecture
+  app_platform --> analytics --> architecture
+  theme --> analytics
+  app_platform --> architecture
+  theme --> architecture
   network --> config
   database --> sync
-  analytics --> architecture
-  app_platform --> analytics & architecture
-  theme --> analytics & architecture
+```
+
+**3. Feature packages** — what each feature depends on. `bookmarks` also reuses
+two capabilities from `collections`, so it depends on it directly.
+
+```mermaid
+graph TD
+  bookmarks["features/bookmarks"]
+  collections["features/collections"]
+  feature_notifications["feature_notifications"]
+
+  bookmarks --> collections
+  bookmarks --> network & database & sync & analytics & app_platform & app_ui
+  bookmarks --> shared_ui & shared_contracts & localization & architecture
+  collections --> network & database & sync & app_ui
+  collections --> shared_ui & shared_contracts & localization & architecture
+  feature_notifications --> architecture
 ```
 
 **External dependency encapsulation** — each infrastructure package owns its
