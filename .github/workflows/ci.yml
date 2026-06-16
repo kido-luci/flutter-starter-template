@@ -339,6 +339,16 @@ jobs:
           flutter pub get --enforce-lockfile
           dart run build_runner build --delete-conflicting-outputs
 
+      # The Xcode project has a FlutterFire build phase that runs
+      # `flutterfire upload-crashlytics-symbols`; without the CLI on PATH the
+      # phase fails with "flutterfire: command not found". Install it so the
+      # phase resolves — on a debug build there are no dSYMs to upload, so it
+      # no-ops. (The build-phase script already adds ~/.pub-cache/bin to PATH.)
+      - name: Install FlutterFire CLI
+        run: |
+          dart pub global activate flutterfire_cli
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
       # dev flavor maps to the shared dev.xcscheme. --no-codesign skips signing
       # so no certificates or provisioning profiles are needed.
       - name: Build iOS (no codesign)
