@@ -241,18 +241,55 @@ graph TD
 third-party libraries so the app (and other packages) depend on the workspace
 package, never the raw dependency.
 
+Each box is a workspace package; the libraries inside it are the third-party
+dependencies it encapsulates.
+
 ```mermaid
-graph LR
-  network --> dio & retrofit & firebase_performance
-  database --> objectbox & path_provider
-  config --> firebase_remote_config
-  analytics --> firebase_analytics
-  app_platform --> camera & image_picker & permission_handler & share_plus & video_player
-  app_platform --> firebase_messaging & firebase_crashlytics & flutter_local_notifications
-  theme --> flutter_bloc & flex_color_scheme
-  app_ui --> google_fonts & cached_network_image & photo_view & carousel_slider & flutter_slidable & flutter_animate
-  storage --> flutter_secure_storage & shared_preferences
-  localization --> intl
+graph TB
+  subgraph network
+    dio
+    retrofit
+    firebase_performance
+  end
+  subgraph database
+    objectbox
+    path_provider
+  end
+  subgraph app_platform
+    camera
+    image_picker
+    permission_handler
+    share_plus
+    video_player
+    firebase_messaging
+    firebase_crashlytics
+    flutter_local_notifications
+  end
+  subgraph app_ui
+    google_fonts
+    cached_network_image
+    photo_view
+    carousel_slider
+    flutter_slidable
+    flutter_animate
+  end
+  subgraph theme
+    flutter_bloc
+    flex_color_scheme
+  end
+  subgraph storage
+    flutter_secure_storage
+    shared_preferences
+  end
+  subgraph config
+    firebase_remote_config
+  end
+  subgraph analytics
+    firebase_analytics
+  end
+  subgraph localization
+    intl
+  end
 ```
 
 ### 📁 Feature Slice (Clean Architecture)
