@@ -329,6 +329,47 @@ jobs:
           </plist>
           EOF
 
+      # firebase.json (git-ignored) drives the FlutterFire Crashlytics build
+      # phase. Write a placeholder with "uploadDebugSymbols": false so the
+      # `flutterfire upload-crashlytics-symbols` phase reads it and skips the
+      # upload entirely — without it the phase throws PathNotFoundException, and
+      # with upload enabled it would need a real Firebase project. dSYM upload is
+      # a release concern handled in release.yml, not this smoke-test.
+      - name: Generate placeholder firebase.json
+        run: |
+          cat > firebase.json <<'EOF'
+          {
+            "flutter": {
+              "platforms": {
+                "android": {
+                  "default": {
+                    "projectId": "ci-placeholder",
+                    "appId": "1:000000000000:android:0000000000000000000000",
+                    "fileOutput": "android/app/google-services.json"
+                  }
+                },
+                "ios": {
+                  "default": {
+                    "projectId": "ci-placeholder",
+                    "appId": "1:000000000000:ios:0000000000000000000000",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                  }
+                },
+                "dart": {
+                  "lib/firebase_options.dart": {
+                    "projectId": "ci-placeholder",
+                    "configurations": {
+                      "android": "1:000000000000:android:0000000000000000000000",
+                      "ios": "1:000000000000:ios:0000000000000000000000"
+                    }
+                  }
+                }
+              }
+            }
+          }
+          EOF
+
       # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
       # `flutter build` does not run build_runner — so generate it here before
       # building. As elsewhere, we do NOT cache .dart_tool/build: a restored
