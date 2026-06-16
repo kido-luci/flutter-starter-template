@@ -223,3 +223,83 @@ jobs:
       # required. dev is the natural debug target.
       - name: Build debug APK
         run: flutter build apk --debug --flavor dev
+
+  # iOS counterpart of build-android: catches the CocoaPods/SPM/Podfile and
+  # native-plugin breakage class that only surfaces when Xcode actually
+  # assembles the app. --no-codesign skips certificates/provisioning entirely,
+  # so this needs no Apple secrets and the signed TestFlight build still lives
+  # in release.yml. macOS runners are free for public repos, so this runs on
+  # every PR; the only cost is wall-clock time (pod install + native compile).
+  build-ios:
+    name: Build iOS (debug, no codesign)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      # This project requires CocoaPods, not SPM (see CLAUDE.md). The setting is
+      # machine-global, so each runner must disable SPM before the first build.
+      - name: Disable Swift Package Manager
+        run: flutter config --no-enable-swift-package-manager
+
+      # GoogleService-Info.plist is git-ignored but the Xcode project references
+      # it as a bundled resource, so a fresh checkout fails with "Build input
+      # file cannot be found". As on Android, write a placeholder rather than
+      # restoring the real plist from a secret: Firebase reads it at runtime,
+      # never at compile time, so dummy values assemble fine and the job stays
+      # secret-free and fork-friendly.
+      - name: Generate placeholder GoogleService-Info.plist
+        run: |
+          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+          	<key>API_KEY</key>
+          	<string>AIzaPlaceholderCiKey0000000000000000000</string>
+          	<key>GCM_SENDER_ID</key>
+          	<string>000000000000</string>
+          	<key>BUNDLE_ID</key>
+          	<string>com.lucistudio.flutter_starter_template.dev</string>
+          	<key>PROJECT_ID</key>
+          	<string>ci-placeholder</string>
+          	<key>STORAGE_BUCKET</key>
+          	<string>ci-placeholder.appspot.com</string>
+          	<key>IS_ADS_ENABLED</key>
+          	<false/>
+          	<key>IS_ANALYTICS_ENABLED</key>
+          	<false/>
+          	<key>IS_APPINVITE_ENABLED</key>
+          	<true/>
+          	<key>IS_GCM_ENABLED</key>
+          	<true/>
+          	<key>IS_SIGNIN_ENABLED</key>
+          	<true/>
+          	<key>GOOGLE_APP_ID</key>
+          	<string>1:000000000000:ios:0000000000000000000000</string>
+          </dict>
+          </plist>
+          EOF
+
+      # Generated code (*.g.dart, *.freezed.dart, etc.) is git-ignored, and
+      # `flutter build` does not run build_runner — so generate it here before
+      # building. As elsewhere, we do NOT cache .dart_tool/build: a restored
+      # cache makes build_runner skip files it believes exist, producing a
+      # broken tree.
+      - name: Generate code
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      # dev flavor maps to the shared dev.xcscheme. --no-codesign skips signing
+      # so no certificates or provisioning profiles are needed.
+      - name: Build iOS (no codesign)
+        run: flutter build ios --debug --no-codesign --flavor dev
