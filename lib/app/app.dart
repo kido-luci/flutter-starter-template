@@ -4,15 +4,13 @@ import 'dart:developer' as developer;
 import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:app_ui/app_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:theme/theme.dart';
 
 import '../core/extensions/build_context_extensions.dart';
-import '../features/auth/presentation/auth_session.dart';
-import '../features/auth/presentation/bloc/auth_bloc.dart';
-import '../features/auth/presentation/bloc/auth_state.dart';
 import '../shared/presentation/session_scope.dart';
 import 'di/injection.dart';
 import 'feature_module.dart';

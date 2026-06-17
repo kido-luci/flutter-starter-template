@@ -36,6 +36,7 @@ workspace:
   - packages/shared_ui
   - packages/database
   - packages/localization
+  - packages/features/auth
   - packages/features/notifications
   - packages/features/collections
   - packages/features/bookmarks
@@ -60,6 +61,7 @@ dependencies:
   shared_ui: ^0.1.0
   database: ^0.1.0
   localization: ^0.1.0
+  feature_auth: ^0.1.0
   feature_notifications: ^0.1.0
   feature_collections: ^0.1.0
   feature_bookmarks: ^0.1.0

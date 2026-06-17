@@ -2,7 +2,7 @@ import 'package:architecture/architecture.dart';
 import 'package:injectable/injectable.dart';
 import 'package:network/network.dart';
 
-import '../../../../shared/domain/entities/auth_user.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';

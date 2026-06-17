@@ -1,7 +1,7 @@
 import 'package:architecture/architecture.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../../shared/domain/entities/auth_user.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import '../repositories/auth_repository.dart';
 
 typedef SignInParams = ({String username, String password});

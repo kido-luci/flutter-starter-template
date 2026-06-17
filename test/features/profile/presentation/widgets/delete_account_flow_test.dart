@@ -1,7 +1,7 @@
+import 'package:feature_auth/src/presentation/bloc/delete_account_cubit.dart';
+import 'package:feature_auth/src/presentation/bloc/delete_account_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/delete_account_cubit.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/delete_account_state.dart';
 import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter_starter_template/features/profile/presentation/widgets/profile_widgets.dart';

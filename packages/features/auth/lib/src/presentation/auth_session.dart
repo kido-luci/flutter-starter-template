@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../shared/domain/entities/auth_user.dart';
-import '../../../shared/domain/session.dart';
+import 'package:shared_contracts/shared_contracts.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'bloc/auth_bloc.dart';
 import 'bloc/auth_state.dart';
 

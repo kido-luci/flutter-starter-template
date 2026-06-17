@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
-
-import '../../../../shared/domain/entities/auth_user.dart';
 
 /// Persists the active authentication session — current user, access token,
 /// and refresh token — in platform-encrypted storage (Keychain on iOS,

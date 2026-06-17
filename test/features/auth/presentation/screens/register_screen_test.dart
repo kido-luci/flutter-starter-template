@@ -1,9 +1,9 @@
+import 'package:feature_auth/src/presentation/bloc/auth_bloc.dart';
+import 'package:feature_auth/src/presentation/bloc/auth_state.dart';
+import 'package:feature_auth/src/presentation/screens/login_screen.dart';
+import 'package:feature_auth/src/presentation/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/auth_state.dart';
-import 'package:flutter_starter_template/features/auth/presentation/screens/login_screen.dart';
-import 'package:flutter_starter_template/features/auth/presentation/screens/register_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';

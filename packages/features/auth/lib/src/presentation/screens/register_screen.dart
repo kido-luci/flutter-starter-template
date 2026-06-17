@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 
-import '../../../../app/router.dart';
-import '../../../../core/extensions/build_context_extensions.dart';
-import '../../../../gen/assets.gen.dart';
+import '../auth_routes.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 
@@ -50,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       context.pop();
       return;
     }
-    const LoginRoute().go(context);
+    context.go(AuthRoutes.login);
   }
 
   String _localizeFailure(Failure failure) => switch (failure) {
@@ -216,7 +215,9 @@ class _RegisterIntro extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.sm),
-          child: Assets.icons.logo.image(
+          child: Image.asset(
+            'assets/icons/logo.png',
+            package: 'feature_auth',
             width: 80,
             height: 80,
             excludeFromSemantics: true,
@@ -528,7 +529,7 @@ class _LoginPrompt extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: isSubmitting ? null : () => const LoginRoute().go(context),
+          onPressed: isSubmitting ? null : () => context.go(AuthRoutes.login),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             minimumSize: const Size(48, 48),

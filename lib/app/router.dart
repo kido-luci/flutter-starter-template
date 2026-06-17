@@ -1,16 +1,12 @@
 import 'dart:async';
 
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/auth/presentation/bloc/auth_bloc.dart';
-import '../features/auth/presentation/bloc/auth_state.dart';
-import '../features/auth/presentation/screens/change_password_screen.dart';
-import '../features/auth/presentation/screens/login_screen.dart';
-import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/splash/presentation/screens/splash_screen.dart';
