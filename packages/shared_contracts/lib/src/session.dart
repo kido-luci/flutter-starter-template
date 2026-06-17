@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_contracts/shared_contracts.dart';
+
+import 'auth_user.dart';
 
 /// Application-wide authenticated session, readable by any feature.
 ///
 /// Decouples feature UI from the auth feature's presentation layer: features
-/// depend on this contract (in `shared_ui`) instead of reaching into
+/// depend on this contract (in `shared_contracts`) instead of reaching into
 /// `AuthBloc`. The auth feature provides the implementation.
 ///
 /// Listenable so widgets can rebuild on session changes via

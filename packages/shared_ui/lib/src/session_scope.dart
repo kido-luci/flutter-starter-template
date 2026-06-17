@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
-
-import 'session.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 
 /// Exposes the app-wide [Session] to the widget tree.
 ///
