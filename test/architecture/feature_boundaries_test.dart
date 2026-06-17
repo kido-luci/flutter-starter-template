@@ -15,9 +15,10 @@
 // the contract to `shared_*` and remove the entry (the staleness test below
 // will remind you if a whitelisted edge disappears).
 //
-// This complements `package_layering_test`, which only ranks the top-level
-// `packages/` and does not recurse into `packages/features/*`; this scan is
-// what keeps the feature packages from depending on one another.
+// This complements `package_layering_test`: that test ranks the feature
+// packages and enforces their dependency *direction* (a feature may only
+// depend on strictly lower layers), while this scan enforces the *capability
+// allowlist* — which specific feature-to-feature edges are permitted at all.
 //
 // A pure file-scan test on purpose: no third-party dependency, runs inside the
 // normal `fvm flutter test` / CI flow, and can't break when the analyzer or
