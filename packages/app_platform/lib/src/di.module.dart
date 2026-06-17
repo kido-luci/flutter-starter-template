@@ -6,6 +6,7 @@
 import 'dart:async' as _i687;
 
 import 'package:analytics/analytics.dart' as _i548;
+import 'package:app_platform/src/crash/crash_reporting_service.dart' as _i631;
 import 'package:app_platform/src/media/camera_service.dart' as _i883;
 import 'package:app_platform/src/media/image_picker_service.dart' as _i315;
 import 'package:app_platform/src/media/media_module.dart' as _i888;
@@ -33,6 +34,9 @@ class AppPlatformPackageModule extends _i526.MicroPackageModule {
     final mediaModule = _$MediaModule();
     final notificationsModule = _$NotificationsModule();
     final shareModule = _$ShareModule();
+    gh.singleton<_i631.CrashReportingService>(
+      () => _i631.CrashReportingService(),
+    );
     gh.lazySingleton<_i883.CameraService>(() => _i883.CameraService());
     gh.lazySingleton<_i183.ImagePicker>(() => mediaModule.imagePicker);
     gh.lazySingleton<_i430.VideoPlayerService>(

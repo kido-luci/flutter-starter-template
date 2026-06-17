@@ -3,7 +3,6 @@
 
 import 'package:app_platform/app_platform.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../firebase_options.dart';
@@ -15,29 +14,16 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 @singleton
 class FirebaseService {
+  /// Initializes the Firebase app with the platform-specific generated options
+  /// and registers the background message handler.
+  ///
+  /// Crash reporting (the global error-capture handlers) is installed
+  /// separately via `CrashReportingService.install()` once this completes.
   Future<void> init() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    // Keep dev/debug crashes out of production Crashlytics. Release builds
-    // collect; debug builds only log locally.
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-      !kDebugMode,
-    );
-
-    FlutterError.onError = (errorDetails) {
-      // Still surface the red-screen / console dump in debug so developers see
-      // the error; recordFlutterFatalError is a no-op when collection is off.
-      FlutterError.presentError(errorDetails);
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    };
-
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
   }
 }
