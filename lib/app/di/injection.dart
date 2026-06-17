@@ -10,6 +10,7 @@ import 'package:injectable/injectable.dart';
 import 'package:network/network.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
+import 'package:sync_connectivity_plus/sync_connectivity_plus.dart';
 import 'package:theme/theme.dart';
 
 import 'injection.config.dart';
@@ -32,6 +33,7 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(CorePlatformPackageModule),
     ExternalModule(CoreStoragePackageModule),
     ExternalModule(CoreThemePackageModule),
+    ExternalModule(SyncConnectivityPlusPackageModule),
     ExternalModule(SharedContractsPackageModule),
     ExternalModule(FeatureAuthPackageModule),
     ExternalModule(FeatureNotificationsPackageModule),

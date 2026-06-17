@@ -40,6 +40,7 @@ const _layers = <String, int>{
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
   'database': 1, // centralized ObjectBox persistence -> sync
   'feature_notifications': 1, // notifications domain layer -> architecture
+  'sync_connectivity_plus': 1, // connectivity_plus adapter -> sync
   // 2 — composed infra built on the primitives.
   'shared_ui': 2, // cross-feature presentation contracts -> shared_contracts
   'network': 2, // -> config
