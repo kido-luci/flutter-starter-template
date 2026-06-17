@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:theme/theme.dart';
 
-import '../../../../app/router.dart';
-import '../../../../core/extensions/build_context_extensions.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_state.dart';
 part 'profile_header.dart';

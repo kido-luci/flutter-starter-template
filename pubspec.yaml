@@ -43,6 +43,7 @@ workspace:
   - packages/features/bookmarks
   - packages/features/splash
   - packages/features/home
+  - packages/features/profile
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -71,6 +72,7 @@ dependencies:
   feature_bookmarks: ^0.1.0
   feature_splash: ^0.1.0
   feature_home: ^0.1.0
+  feature_profile: ^0.1.0
 
   flutter:
     sdk: flutter
