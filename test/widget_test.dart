@@ -8,9 +8,8 @@ import 'package:flutter_starter_template/app/app.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
 import 'package:flutter_starter_template/app/feature_module.dart';
 import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
-import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
-import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
 import 'package:theme/theme.dart';
 

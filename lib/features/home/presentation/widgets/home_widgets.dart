@@ -2,12 +2,11 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_contracts/shared_contracts.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/extensions/build_context_extensions.dart';
-import '../../../../shared/domain/bookmark_stats.dart';
-import '../../../../shared/domain/collections.dart';
-import '../../../../shared/presentation/collection_visuals.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_state.dart';
 part 'home_welcome.dart';

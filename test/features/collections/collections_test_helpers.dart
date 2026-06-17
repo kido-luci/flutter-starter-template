@@ -7,8 +7,7 @@ import 'package:feature_collections/src/domain/usecases/get_collection.dart';
 import 'package:feature_collections/src/domain/usecases/list_collections.dart';
 import 'package:feature_collections/src/domain/usecases/list_local_collections.dart';
 import 'package:feature_collections/src/domain/usecases/update_collection.dart';
-import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
-import 'package:flutter_starter_template/shared/domain/bookmark_summaries.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import 'package:test_utils/test_utils.dart';
 
 class MockCollectionsRepository extends Mock implements CollectionsRepository {}
