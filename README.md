@@ -115,22 +115,16 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── app/
 │   │   ├── app.dart                  # MaterialApp.router + providers + SessionScope
 │   │   ├── router.dart               # TypedGoRoute + auth redirect
+│   │   ├── features.dart             # Optional-feature registry (sync controllers)
 │   │   ├── di/                       # App-level get_it + injectable wiring
 │   │   └── widgets/                  # App-level shell widgets
 │   ├── core/
-│   │   ├── data/database/            # ObjectBox app-store bootstrap
-│   │   ├── data/sync/                # App-level sync wiring/adapters
-│   │   ├── di/                       # get_it + injectable app graph
+│   │   ├── data/database/            # ObjectBox app-store bootstrap (@preResolve)
+│   │   ├── data/sync/                # App-level sync cursor store
+│   │   ├── di/                       # App-wide service module (Uuid, …)
 │   │   ├── extensions/               # App-specific convenience extensions
 │   │   └── platform/firebase/        # App bootstrap for Firebase services
-│   ├── features/                     # App-only feature slices
-│   │   ├── auth/                     # Sign-in, sign-out, session restore
-│   │   ├── home/                     # Home dashboard
-│   │   ├── notifications/            # Notification & activity feed (data + presentation)
-│   │   ├── profile/                  # User info + account actions
-│   │   └── splash/                   # Session restoration gate
-│   ├── gen/                          # flutter_gen asset references
-│   └── shared/                       # App-level shared domain/presentation contracts
+│   └── gen/                          # flutter_gen asset references
 ├── packages/                         # Dart Pub Workspace members
 │   ├── architecture/                 # Failure, Result, UseCase primitives
 │   ├── network/                      # Dio, Retrofit, retry/performance interceptors
@@ -140,26 +134,32 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── analytics/                    # Analytics service + route observer
 │   ├── app_platform/                 # Camera, picker, permissions, notifications, share
 │   ├── sync/                         # Reusable offline-first sync engine (scheduler + delta CRUD)
+│   ├── sync_connectivity_plus/       # connectivity_plus adapter for the sync engine
 │   ├── theme/                        # ThemeBloc and persisted theme state
 │   ├── app_ui/                       # Design system, theme, layout, reusable widgets
 │   ├── shared_ui/                    # Cross-feature presentation contracts (Session/SessionScope) + shared widgets
 │   ├── shared_contracts/             # Cross-feature domain contracts & reader interfaces
 │   ├── localization/                 # ARB sources + gen-l10n AppLocalizations + context.l10n
-│   ├── feature_notifications/        # Notifications domain layer (entities, contracts, use cases)
-│   ├── features/
-│   │   ├── bookmarks/                # Bookmarks feature — data/domain/presentation package
-│   │   └── collections/             # Collections feature — data/domain/presentation package
-│   └── test_utils/                   # Shared mocks, images, and mocktail export
-├── test/                             # Root app tests only
+│   ├── test_utils/                   # Shared mocks, images, and mocktail export
+│   └── features/                     # Self-contained feature packages (data/domain/presentation)
+│       ├── auth/                     # Sign-in, sign-out, session restore
+│       ├── splash/                   # Session restoration gate (presentation only)
+│       ├── home/                     # Home dashboard (presentation only)
+│       ├── profile/                  # User info + account actions
+│       ├── notifications/            # Notification & activity feed
+│       ├── bookmarks/                # Bookmarks — offline-first CRUD
+│       └── collections/             # Collections — offline-first CRUD
+├── test/                             # Root app + feature tests
 └── integration_test/                 # Device/emulator integration tests
 ```
 
-The repository uses Dart Pub Workspaces. The root package is the assembled
-Flutter app — the composition root: routing, DI composition, app-only features
-(`auth`, `home`, `notifications`, `profile`, `splash`), and Firebase bootstrap
-stay there. Reusable infrastructure and self-contained feature slices live in
-`packages/` and are consumed through package entry points such as
-`package:network/network.dart`.
+The repository uses Dart Pub Workspaces. The root package (`lib/`) is the
+assembled Flutter app — a thin composition root: routing, DI composition,
+optional-feature wiring, and Firebase bootstrap. It owns no feature code.
+Every feature lives as a self-contained package under `packages/features/`, and
+reusable infrastructure lives in `packages/`, both consumed through package
+entry points such as `package:network/network.dart` and
+`package:feature_home/feature_home.dart`.
 
 Workspace packages own their third-party implementation details. For example,
 the root app depends on `network`, not directly on `dio` or `retrofit`;
@@ -167,15 +167,20 @@ the root app depends on `network`, not directly on `dio` or `retrofit`;
 keeps platform, storage, analytics, theme, and UI dependencies versioned in one
 place and avoids root-package dependency conflicts.
 
-Larger features have graduated out of `lib/` into their own packages:
-`features/bookmarks` and `features/collections` are self-contained
-data/domain/presentation slices, while `feature_notifications` extracts the
-notifications domain layer. Genuinely cross-feature contracts live in
-`shared_contracts` (domain projections and reader interfaces) and `shared_ui`
-(the app-wide `Session`/`SessionScope` and shared widgets), promoted only on the
-rule of three. ObjectBox entities and the generated bindings are centralized in
-the `database` package, and localization (ARB sources + gen-l10n) lives in
-`localization`, shared by the app shell and every feature package.
+Every feature is a `feature_<name>` package under `packages/features/` with its
+own `data/domain/presentation` layers and a micro-package DI module
+(`Feature<Name>PackageModule`) the app wires at composition time. Data-less
+features such as `home` and `splash` ship only a presentation layer. Genuinely
+cross-feature contracts live in `shared_contracts` (domain projections and
+reader interfaces) and `shared_ui` (the app-wide `Session`/`SessionScope` and
+shared widgets), promoted only on the rule of three. A feature may not import
+another feature except through a documented single-consumer **capability**
+(e.g. `bookmarks` embeds two `collections` widgets, `profile` surfaces `auth`'s
+delete-account flow); both rules are enforced by the architecture guardrail
+tests under `test/architecture/`. ObjectBox entities and the generated bindings
+are centralized in the `database` package, and localization (ARB sources +
+gen-l10n) lives in `localization`, shared by the app shell and every feature
+package.
 
 All shared UI lives in `packages/app_ui` and is consumed through
 `package:app_ui/app_ui.dart`; add new generic widgets there. Package-owned tests
@@ -220,21 +225,31 @@ graph TD
   database --> sync
 ```
 
-**3. Feature packages** — what each feature depends on. `bookmarks` also reuses
-two capabilities from `collections`, so it depends on it directly.
+**3. Feature packages** — every feature is a package under `packages/features/`.
+The only feature→feature edges are the two documented capabilities: `bookmarks`
+reuses two `collections` widgets, and `profile` surfaces `auth`'s delete-account
+flow. Infra edges are summarized per feature.
 
 ```mermaid
 graph TD
+  auth["features/auth"]
+  splash["features/splash"]
+  home["features/home"]
+  profile["features/profile"]
+  notifications["features/notifications"]
   bookmarks["features/bookmarks"]
   collections["features/collections"]
-  feature_notifications["feature_notifications"]
 
+  profile --> auth
   bookmarks --> collections
-  bookmarks --> network & database & sync & analytics & app_platform & app_ui
-  bookmarks --> shared_ui & shared_contracts & localization & architecture
-  collections --> network & database & sync & app_ui
-  collections --> shared_ui & shared_contracts & localization & architecture
-  feature_notifications --> architecture
+
+  auth --> network & storage & analytics & config
+  bookmarks --> network & database & sync & analytics & app_platform
+  collections --> network & database & sync
+  notifications --> network & database & sync
+  home --> shared_contracts
+  profile --> analytics & theme
+  splash --> shared_ui & app_ui & localization
 ```
 
 **External dependency encapsulation** — each infrastructure package owns its
@@ -294,19 +309,30 @@ graph TB
 
 ### 📁 Feature Slice (Clean Architecture)
 
+Each feature package keeps its layers under `lib/src/`, with a barrel
+(`lib/feature_<name>.dart`) exporting only the public surface (DI module, domain,
+screens, capability widgets). Data-less features (`home`, `splash`) ship only
+`presentation/`.
+
 ```
-feature/
-├── data/
-│   ├── datasources/        Remote (Retrofit) + Local (ObjectBox / secure storage)
-│   ├── models/             Freezed DTOs with toDomain() mappers
-│   └── repositories/       Concrete implementations
-├── domain/
-│   ├── entities/           Pure Dart classes — zero framework deps
-│   ├── repositories/       Abstract interfaces
-│   └── usecases/           Single‑purpose, injectable
-└── presentation/
-    ├── bloc/               Bloc + freezed state
-    └── screens/            Stateless/Stateful widgets
+packages/features/<name>/
+├── lib/
+│   ├── feature_<name>.dart      Public barrel (DI module, domain, screens)
+│   └── src/
+│       ├── data/
+│       │   ├── datasources/     Remote (Retrofit) + Local (ObjectBox / secure storage)
+│       │   ├── models/          Freezed DTOs with toDomain() mappers
+│       │   └── repositories/    Concrete implementations
+│       ├── domain/
+│       │   ├── entities/        Pure Dart classes — zero framework deps
+│       │   ├── repositories/    Abstract interfaces
+│       │   └── usecases/        Single‑purpose, injectable
+│       ├── presentation/
+│       │   ├── bloc/            Bloc + freezed state
+│       │   └── screens/         Stateless/Stateful widgets
+│       ├── di.dart              @InjectableInit.microPackage() anchor
+│       └── locator.dart         Shared GetIt instance
+└── pubspec.yaml                 name: feature_<name>, resolution: workspace
 ```
 
 <br>
@@ -610,7 +636,7 @@ that reuses only the scheduler.
 The full model — the shared engine, local‑first writes, the scheduler, and
 push/pull with revision‑based delta sync, tombstones, and conflict detection —
 is documented in
-[`lib/features/README.md`](lib/features/README.md#-offlinefirst-sync).
+[`packages/features/README.md`](packages/features/README.md#-offlinefirst-sync).
 
 <br>
 

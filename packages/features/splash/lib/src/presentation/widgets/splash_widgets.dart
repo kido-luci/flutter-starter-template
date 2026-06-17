@@ -29,6 +29,7 @@ class SplashContent extends StatelessWidget {
               ),
               child: Image.asset(
                 'assets/icons/logo.png',
+                package: 'feature_splash',
                 width: 72,
                 height: 72,
                 fit: BoxFit.cover,

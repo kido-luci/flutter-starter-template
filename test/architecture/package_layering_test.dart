@@ -47,6 +47,18 @@ const _layers = <String, int>{
   'theme': 2, // -> analytics, architecture
   // 3 — shared test harness, sits on top of what it provides fakes for.
   'test_utils': 3, // -> analytics, app_platform, storage
+  // 4 — base feature packages: the top runtime layer (only the app composes
+  //     them), each depending on no sibling feature.
+  'feature_auth': 4,
+  'feature_collections': 4,
+  'feature_home': 4,
+  'feature_notifications': 4,
+  'feature_splash': 4,
+  // 5 — feature packages that surface a single sibling's capability; each
+  //     depends on exactly one lower feature (the capability provider). The
+  //     allowed edges are documented in feature_boundaries_test.
+  'feature_bookmarks': 5, // -> feature_collections
+  'feature_profile': 5, // -> feature_auth
 };
 
 void main() {
@@ -113,15 +125,29 @@ void main() {
 }
 
 /// Maps each workspace package name to the lines of its `pubspec.yaml`.
+///
+/// Descends one extra level into container directories that have no pubspec of
+/// their own (e.g. `packages/features/`), so the nested feature packages are
+/// ranked and checked like every other workspace package.
 Map<String, List<String>> _discoverPackages(Directory packagesDir) {
   final result = <String, List<String>>{};
-  for (final entity in packagesDir.listSync()) {
-    if (entity is! Directory) continue;
-    final pubspec = File('${entity.path}/pubspec.yaml');
-    if (!pubspec.existsSync()) continue;
+
+  void add(Directory dir) {
+    final pubspec = File('${dir.path}/pubspec.yaml');
+    if (!pubspec.existsSync()) return;
     final lines = pubspec.readAsLinesSync();
     final name = _packageName(lines);
     if (name != null) result[name] = lines;
+  }
+
+  for (final entity in packagesDir.listSync()) {
+    if (entity is! Directory) continue;
+    if (File('${entity.path}/pubspec.yaml').existsSync()) {
+      add(entity);
+    } else {
+      // Container directory (e.g. packages/features/) — descend one level.
+      entity.listSync().whereType<Directory>().forEach(add);
+    }
   }
   return result;
 }

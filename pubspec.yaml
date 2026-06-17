@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.2.0+1
 
 environment:
   sdk: ^3.12.0
@@ -154,10 +154,6 @@ dev_dependencies:
   # Generates configureDependencies() registration code for get_it
   # from @injectable annotations.
   injectable_generator: ^3.0.2
-
-  # Generates immutable classes, copyWith, equality, and union/sealed
-  # variants from @freezed annotations.
-  freezed: ^3.2.5
 
   # Generates type-safe references to assets and fonts declared below
   # (output: lib/gen/assets.gen.dart). Use e.g. Assets.images.logo instead
