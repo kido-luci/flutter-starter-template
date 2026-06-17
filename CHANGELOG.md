@@ -5,6 +5,64 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-17
+
+Completes the move to a fully package-based architecture. Every feature now
+lives in its own workspace package; the root app (`lib/`) holds no feature code.
+
+### Changed
+
+- **Feature packages** — `home`, `profile`, and `splash` extracted from
+  `lib/features/` into `packages/features/`, joining `auth`, `notifications`,
+  `bookmarks`, and `collections`. `lib/features/` is removed and the app is now
+  a pure composition root (routing, DI, Firebase bootstrap).
+- **Splash decoupling** — the splash screen no longer reaches into app routing.
+  It restores the session and hands control back through an `onRestored`
+  callback the app wires, and resolves its logo against its own package asset
+  bundle so the package is self-contained.
+- **App shell** — the three per-feature sync wrappers collapsed into one
+  closure-based adapter, and the `bookmarks → collections` capability imports
+  are annotated as the documented single-consumer exception.
+
+### Added
+
+- **Architecture guardrails for feature packages** — `package_layering_test`
+  now ranks and direction-checks the nested `packages/features/*` packages, and
+  `feature_boundaries_test` enforces the cross-feature capability allowlist
+  (`bookmarks → collections`, `profile → auth`) at the package level.
+
+### Removed
+
+- Unused app-level `freezed` dev-dependency — the app declares no `@freezed`
+  types (feature packages keep their own generator).
+
+## [1.1.0] - 2026-06-17
+
+Began the move to a package-based architecture and hardened CI.
+
+### Added
+
+- **Feature packages** — `auth`, `notifications`, `bookmarks`, and `collections`
+  extracted into `packages/features/`, with prerequisite packages
+  `shared_contracts` (cross-feature domain projections and reader interfaces),
+  `shared_ui` (the app-wide `Session`/`SessionScope` and shared widgets),
+  `database` (centralized ObjectBox entities and bindings), and `localization`
+  (ARB sources + gen-l10n `AppLocalizations`).
+- **CI build smoke-tests** — Android and iOS debug builds, an l10n guard,
+  lockfile enforcement, golden tests, and Codecov coverage reporting.
+- **Scaffold CLI** — a `flutter-starter-template-cli` tool for generating new
+  projects from the template.
+
+### Changed
+
+- Removed the `lib/shared/` shim layer in favor of the `shared_contracts` /
+  `shared_ui` packages, and pruned app-level dependencies now owned by packages.
+- Aligned per-package DI module naming to `<Name>PackageModule`.
+
+### Removed
+
+- `lib/shared/` (replaced by the `shared_contracts` and `shared_ui` packages).
+
 ## [1.0.0] - 2026-06-08
 
 First stable release of the Flutter starter template.
@@ -41,4 +99,6 @@ First stable release of the Flutter starter template.
   backend deps, and the pre-push hook).
 - **Tooling** — Dart & CodeGraph MCP servers and vendored agent skills.
 
+[1.2.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.2.0
+[1.1.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.1.0
 [1.0.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.0.0
