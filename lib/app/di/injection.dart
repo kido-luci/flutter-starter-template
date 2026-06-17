@@ -27,12 +27,12 @@ final GetIt getIt = GetIt.instance;
 /// listed before them too.
 @InjectableInit(
   externalPackageModulesBefore: [
-    ExternalModule(CoreAnalyticsPackageModule),
-    ExternalModule(CoreConfigPackageModule),
-    ExternalModule(CoreNetworkPackageModule),
-    ExternalModule(CorePlatformPackageModule),
-    ExternalModule(CoreStoragePackageModule),
-    ExternalModule(CoreThemePackageModule),
+    ExternalModule(AnalyticsPackageModule),
+    ExternalModule(ConfigPackageModule),
+    ExternalModule(NetworkPackageModule),
+    ExternalModule(AppPlatformPackageModule),
+    ExternalModule(StoragePackageModule),
+    ExternalModule(ThemePackageModule),
     ExternalModule(SyncConnectivityPlusPackageModule),
     ExternalModule(SharedContractsPackageModule),
     ExternalModule(FeatureAuthPackageModule),
