@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_collections/feature_collections.dart';
+import 'package:feature_home/feature_home.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:feature_splash/feature_splash.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/home/presentation/screens/home_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import 'widgets/app_shell.dart';
 

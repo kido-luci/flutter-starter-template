@@ -1,5 +1,5 @@
 import 'package:architecture/architecture.dart';
-import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
+import 'package:feature_home/feature_home.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 import '../../../../test_utils.dart';

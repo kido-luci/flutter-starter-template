@@ -2,11 +2,11 @@ import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 import 'package:shared_ui/shared_ui.dart';
 
-import '../../../../app/router.dart';
-import '../../../../core/extensions/build_context_extensions.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_state.dart';
 part 'home_welcome.dart';
@@ -61,7 +61,7 @@ class _HomeBodyState extends State<HomeBody> {
         ),
         child: FloatingActionButton(
           heroTag: 'home-add-bookmark-fab',
-          onPressed: () => const BookmarkNewRoute().push<void>(context),
+          onPressed: () => context.push<void>('/bookmarks/new'),
           tooltip: context.l10n.bookmarksAddTooltip,
           child: const FaIcon(FontAwesomeIcons.plus),
         ).animateScale(delay: 500.ms),
@@ -98,11 +98,11 @@ class _HomeBodyState extends State<HomeBody> {
                         const SizedBox(height: AppSpacing.md),
                         _QuickActions(
                           onAdd: () =>
-                              const BookmarkNewRoute().push<void>(context),
+                              context.push<void>('/bookmarks/new'),
                           onLibrary: () =>
-                              const BookmarksListRoute().push<void>(context),
+                              context.push<void>('/bookmarks'),
                           onTags: () =>
-                              const BookmarksListRoute().push<void>(context),
+                              context.push<void>('/bookmarks'),
                         ).animateSlideUp(delay: 160.ms),
                         const SizedBox(height: AppSpacing.md),
                         ListenableBuilder(
@@ -151,7 +151,7 @@ class _HomeBodyState extends State<HomeBody> {
                         _WeeklyDigestPanel(
                           recentCount: state.recentBookmarks,
                           onPressed: () =>
-                              const BookmarksListRoute().push<void>(context),
+                              context.push<void>('/bookmarks'),
                         ).animateSlideUp(delay: 520.ms),
                       ],
                     ),

@@ -4,6 +4,7 @@ import 'package:config/config.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_collections/feature_collections.dart';
+import 'package:feature_home/feature_home.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -39,6 +40,7 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(FeatureNotificationsPackageModule),
     ExternalModule(FeatureCollectionsPackageModule),
     ExternalModule(FeatureBookmarksPackageModule),
+    ExternalModule(FeatureHomePackageModule),
   ],
 )
 Future<void> configureDependencies() async {
