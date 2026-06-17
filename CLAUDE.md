@@ -73,56 +73,70 @@ npx skills add dart-lang/skills --skill '*' --agent universal
 
 When a task matches a skill name (e.g. setting up routing → `flutter-setup-declarative-routing`, JSON serialization → `flutter-implement-json-serialization`, adding tests → `flutter-add-widget-test` / `dart-add-unit-test`), invoke the skill rather than improvising — it encodes the team's preferred workflow.
 
-## Code organization: `core` vs `ui` vs `shared` vs `features`
+## Code organization: app shell vs. workspace packages
 
-`lib/` is split into top-level areas with distinct responsibilities. Place
-new code by asking what kind of thing it is, not which feature happens to need
-it first.
+The repository is a Dart pub workspace. The root app (`lib/`) is a thin
+composition root; everything reusable or feature-owned lives in `packages/`.
+Place new code by asking what kind of thing it is, not which feature happens to
+need it first.
 
-- **`lib/core/`** — cross-cutting, *non-visual* infrastructure with no business
-  meaning: network, DI, error types, the base `UseCase`, analytics,
-  notifications, media, permissions, layout/extension primitives.
-- **`lib/ui/`** — the *design system*: generic visual building blocks with no
-  business meaning — `theme/` (theming + `ThemeBloc`), `widgets/` (reusable
-  generic widgets), `animation/`. Split out of `core/` because it's large and
-  self-contained.
-- **`lib/features/<feature>/`** — everything owned by a single feature, in its
-  own `data/domain/presentation` layers. As a default, a feature must **not**
-  import another feature's `presentation` layer — *shared state* is read through
-  a `shared` contract instead (see the session example below). The one
-  deliberate exception is a *capability*: a self-contained presentation object
-  (e.g. a `Cubit`) that one feature surfaces inside another. While only a single
-  consumer exists, importing it directly is allowed and preferred over inventing
-  a `shared` abstraction; the moment a **second** consumer appears, the
-  rule of three applies and the contract is promoted to `shared`. If a feature
-  needs a sibling's `domain` contract, that too is a signal it may belong in
-  `shared`.
-- **`lib/shared/`** — *business* vocabulary genuinely used by 2+ features
-  (e.g. `domain/entities/auth_user.dart`). Mirrors the feature layer layout
-  (`domain/`, `data/`). Dependency direction is
-  `features → shared → ui → core`.
+- **`lib/` (root app)** — the composition root only: routing
+  (`lib/app/router.dart`), DI composition (`lib/app/di/`), optional-feature
+  wiring (`lib/app/features.dart`), Firebase bootstrap, and the small
+  app-coupled glue under `lib/core/` (the ObjectBox `@preResolve` store module,
+  the sync cursor store, the app-wide service module, app extensions). It owns
+  no feature code.
+- **`packages/features/<name>/`** (Dart package `feature_<name>`) — everything
+  owned by a single feature, under `lib/src/{data,domain,presentation}` with a
+  barrel (`lib/feature_<name>.dart`) exporting only its public surface and a
+  micro-package DI module (`Feature<Name>PackageModule`). Data-less features
+  (`home`, `splash`) ship only `presentation/`. A feature must **not** import
+  another feature except through a documented single-consumer *capability*: a
+  self-contained presentation object (e.g. a `Cubit` or widget) one feature
+  surfaces inside another. While only one consumer exists, importing the other
+  `feature_<name>` package directly is allowed and preferred over inventing a
+  shared abstraction; the moment a **second** consumer appears, the rule of
+  three applies and the contract is promoted to a `shared_*` package. Both rules
+  are enforced by `test/architecture/feature_boundaries_test.dart` (the
+  capability allowlist) and `package_layering_test.dart` (dependency direction).
+- **`packages/shared_contracts/`** — pure-Dart *business* vocabulary used by 2+
+  features (e.g. `AuthUser`, the cross-feature reader interfaces). No Flutter.
+- **`packages/shared_ui/`** — cross-feature *presentation* contracts that need
+  Flutter: the app-wide `Session`/`SessionScope` and shared widgets.
+- **`packages/app_ui/`** — the *design system*: generic visual building blocks
+  with no business meaning. **`packages/theme/`** owns theming + `ThemeBloc`.
+- **Infra packages** — `network`, `storage`, `analytics`, `app_platform`,
+  `config`, `database`, `localization`, `sync`, … each owning its third-party
+  dependencies behind a package entry point (the app depends on `network`, not
+  on `dio`).
 
-Promote a type into `shared` only on the **rule of three**: when ≥2 features
-actually depend on it today (not "might someday") and its contract is stable.
-Until then it stays in its owning feature. Keep `shared` a small, deliberate set
-of contracts — never a catch-all dumping ground.
+Dependency direction is `app → features → shared_contracts / shared_ui →
+app_ui / infra → architecture`.
+
+Promote a type into `shared_contracts` / `shared_ui` only on the **rule of
+three**: when ≥2 features actually depend on it today (not "might someday") and
+its contract is stable. Until then it stays in its owning feature package. Keep
+the shared packages a small, deliberate set of contracts — never a catch-all
+dumping ground.
 
 **Worked example — the session.** "Who is logged in" is app-wide state read by
 `home`, `profile`, and `splash`. Rather than have those features import the auth
-feature's `AuthBloc` (a presentation-layer type), they depend on the
-`Session` contract in `lib/shared/domain/session.dart` (current user + the
-`restore`/`signOut`/`clearSession` lifecycle). The auth feature provides the
-implementation (`AuthSession`, an adapter over `AuthBloc`); the composition root
-(`lib/app/app.dart`) wires it and exposes it via `SessionScope` (an
-`InheritedWidget`, read with `SessionScope.of(context)` + `ListenableBuilder`).
-The composition root (`lib/app/`) may depend on features directly — the
-"no cross-feature presentation import" rule applies to feature code, not to the
-app shell that wires features together. Feature-specific *capabilities* (e.g.
-auth's `DeleteAccountCubit`, surfaced in profile) stay in their owning feature
-and are imported directly — this is the single-consumer capability exception
-above, and `profile`'s own UI still owns the reaction (its snackbars, its
-`clearSession()` call). Only genuinely shared *state* goes through `shared`,
-and a capability graduates there once a second feature needs it.
+feature's `AuthBloc` (a presentation-layer type), they depend on the `Session`
+contract in `package:shared_ui` (current user + the `restore`/`signOut`/
+`clearSession` lifecycle). The auth feature provides the implementation
+(`AuthSession`, an adapter over `AuthBloc`, in
+`packages/features/auth/lib/src/presentation/auth_session.dart`); the
+composition root (`lib/app/app.dart`) wires it and exposes it via `SessionScope`
+(an `InheritedWidget`, read with `SessionScope.of(context)` +
+`ListenableBuilder`). The composition root (`lib/app/`) may depend on feature
+packages directly — the "no cross-feature import" rule applies to feature code,
+not to the app shell that wires features together. Feature-specific
+*capabilities* (e.g. auth's `DeleteAccountCubit`, surfaced in profile) stay in
+their owning package and are imported directly through the barrel — this is the
+single-consumer capability exception above, and `profile`'s own UI still owns
+the reaction (its snackbars, its `clearSession()` call). Only genuinely shared
+*state* goes through a shared package, and a capability graduates there once a
+second feature needs it.
 
 ---
 
