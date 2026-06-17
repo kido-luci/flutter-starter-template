@@ -18,7 +18,13 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.commandcode/**'
       - 'skills-lock.json'
+      - '.antigravityrules'
+      - '.coderabbit.yaml'
+      - '.githooks/**'
+      - '.gitattributes'
+      - '.gitmodules'
       - '.github/dependabot.yml'
       # Submodule pointer bumps (incl. Dependabot's). CI never checks out
       # submodules and neither is part of the Flutter build, so a gitlink
@@ -38,7 +44,13 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.commandcode/**'
       - 'skills-lock.json'
+      - '.antigravityrules'
+      - '.coderabbit.yaml'
+      - '.githooks/**'
+      - '.gitattributes'
+      - '.gitmodules'
       - '.github/dependabot.yml'
       # Submodule pointer bumps (incl. Dependabot's). CI never checks out
       # submodules and neither is part of the Flutter build, so a gitlink
