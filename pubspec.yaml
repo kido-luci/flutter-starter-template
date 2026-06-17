@@ -86,11 +86,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Locale-aware formatting (dates, numbers, plurals) and runtime backing
-  # for the generated AppLocalizations class. Pinned to the version the pinned
-  # Flutter SDK's flutter_localizations resolves to, for reproducible builds.
-  intl: ^0.20.2
-
   # DI annotations (@injectable, @singleton, @module) — drives registration
   # codegen on top of get_it via injectable_generator.
   injectable: ^3.0.0
@@ -98,30 +93,14 @@ dependencies:
   # Service-locator container that holds the DI graph injectable generates.
   get_it: ^9.2.1
 
-  # Runtime annotations (@JsonSerializable, @JsonKey) consumed by
-  # json_serializable to generate fromJson/toJson.
-  json_annotation: ^4.12.0
-
   # Runtime annotations (@freezed) consumed by freezed to generate
   # immutable data classes and sealed unions (used by auth models).
   freezed_annotation: ^3.1.0
 
-  # Launches URLs in the system browser (used by the bookmarks feature's
-  # "Open" action).
-  url_launcher: ^6.3.2
-
-  # Embedded NoSQL object database. Backs the local-only bookmarks store —
-  # entities are annotated with @Entity() and queried via the generated
-  # objectbox.g.dart bindings.
-  objectbox: ^5.3.2
-
   # Native ObjectBox runtime libraries bundled into the iOS/Android app.
-  # On first build, an install script downloads the per-platform binaries.
+  # Pulled in transitively via package:database, but kept explicit here so the
+  # native binaries are guaranteed to link into the final app build.
   objectbox_flutter_libs: ^5.3.2
-
-  # Provides the platform-appropriate application documents directory used
-  # by ObjectBox to locate its store file on device.
-  path_provider: ^2.1.6
 
   # Client-side UUID generation for offline-first creates: the app mints a
   # stable id locally and the server accepts it on POST /api/bookmarks.
@@ -141,7 +120,6 @@ dependencies:
 
   vector_graphics: ^1.2.2
   font_awesome_flutter: ^11.0.0
-  flutter_staggered_grid_view: ^0.7.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -156,9 +134,6 @@ dev_dependencies:
   # High-level testing utilities for Bloc: blocTest helper, wait
   # for states, and verify exact emission sequences.
   bloc_test: ^10.0.0
-
-  # Recommended lint set, activated via analysis_options.yaml.
-  flutter_lints: ^6.0.0
 
   # Codegen for typed route classes (TypedGoRoute) — strongly-typed navigation.
   go_router_builder: ^4.3.0
@@ -175,20 +150,9 @@ dev_dependencies:
   # from @injectable annotations.
   injectable_generator: ^3.0.2
 
-  # Generates the concrete API client implementation from
-  # retrofit-annotated abstract classes.
-  retrofit_generator: ^10.2.7
-
-  # Generates fromJson/toJson from @JsonSerializable annotations.
-  json_serializable: ^6.14.0
-
   # Generates immutable classes, copyWith, equality, and union/sealed
   # variants from @freezed annotations.
   freezed: ^3.2.5
-
-  # Generates the ObjectBox binding (lib/objectbox.g.dart) and schema
-  # (lib/objectbox-model.json) from @Entity-annotated classes.
-  objectbox_generator: ^5.3.2
 
   # Generates type-safe references to assets and fonts declared below
   # (output: lib/gen/assets.gen.dart). Use e.g. Assets.images.logo instead

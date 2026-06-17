@@ -723,14 +723,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.0"
-  flutter_lints:
-    dependency: "direct dev"
-    description:
-      name: flutter_lints
-      sha256: "3105dc8492f6183fb076ccf1f351ac3d60564bff92e20bfc4af9cc1651f4e7e1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
   flutter_local_notifications:
     dependency: transitive
     description:
@@ -849,7 +841,7 @@ packages:
     source: hosted
     version: "4.0.3"
   flutter_staggered_grid_view:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_staggered_grid_view
       sha256: "19e7abb550c96fbfeb546b23f3ff356ee7c59a019a651f8f102a4ba9b7349395"
@@ -1117,7 +1109,7 @@ packages:
     source: sdk
     version: "0.0.0"
   intl:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: intl
       sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
@@ -1149,7 +1141,7 @@ packages:
     source: hosted
     version: "1.0.1"
   json_annotation:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: json_annotation
       sha256: "2a743920d81b7910627f68ee2c9ac1fc0bfee32b9fc3403587d7c6791ca12f80"
@@ -1157,7 +1149,7 @@ packages:
     source: hosted
     version: "4.12.0"
   json_serializable:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: json_serializable
       sha256: ffcd10cde35a93b2abbbcc26bd9971f4ca93763e8abe78d855e3c4177797e501
@@ -1196,14 +1188,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.10"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: "12f842a479589fea194fe5c5a3095abc7be0c1f2ddfa9a0e76aed1dbd26a87df"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.0"
   logging:
     dependency: transitive
     description:
@@ -1277,7 +1261,7 @@ packages:
     source: hosted
     version: "2.0.2"
   objectbox:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: objectbox
       sha256: f68d74bfdfa6758cebf4cd319db1f4a4386c79ba8896d19e2e999faf041bac78
@@ -1293,7 +1277,7 @@ packages:
     source: hosted
     version: "5.3.2"
   objectbox_generator:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: objectbox_generator
       sha256: b5f6b9e6062635689d777ba2b3a16548991eb1e61007baf607022537e3bc0436
@@ -1357,7 +1341,7 @@ packages:
     source: hosted
     version: "1.1.0"
   path_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path_provider
       sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825
@@ -1581,7 +1565,7 @@ packages:
     source: hosted
     version: "4.9.2"
   retrofit_generator:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: retrofit_generator
       sha256: "0c6468f776e449de3886b0d68fa668943e005d884e618487fdf8b1323becdf88"
@@ -1890,7 +1874,7 @@ packages:
     source: hosted
     version: "1.4.0"
   url_launcher:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: url_launcher
       sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
