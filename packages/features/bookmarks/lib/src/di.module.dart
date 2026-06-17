@@ -51,67 +51,86 @@ import 'package:sync/sync.dart' as _i846;
 import 'package:uuid/uuid.dart' as _i706;
 
 class FeatureBookmarksPackageModule extends _i526.MicroPackageModule {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     final bookmarksRemoteModule = _$BookmarksRemoteModule();
-    gh.lazySingleton<_i436.BookmarksRemoteDataSource>(() =>
-        bookmarksRemoteModule
-            .provideBookmarksRemoteDataSource(gh<_i372.Dio>()));
+    gh.lazySingleton<_i436.BookmarksRemoteDataSource>(
+      () => bookmarksRemoteModule.provideBookmarksRemoteDataSource(
+        gh<_i372.Dio>(),
+      ),
+    );
     gh.lazySingleton<_i524.BookmarksLocalDataSource>(
-        () => _i524.ObjectBoxBookmarksDataSource(gh<_i252.Store>()));
+      () => _i524.ObjectBoxBookmarksDataSource(gh<_i252.Store>()),
+    );
     gh.lazySingleton<_i699.BookmarksSyncController>(
-        () => _i353.BookmarksSyncService(
-              gh<_i524.BookmarksLocalDataSource>(),
-              gh<_i436.BookmarksRemoteDataSource>(),
-              gh<_i846.ConnectivitySource>(),
-              gh<_i846.SyncCursorStore>(),
-            ));
+      () => _i353.BookmarksSyncService(
+        gh<_i524.BookmarksLocalDataSource>(),
+        gh<_i436.BookmarksRemoteDataSource>(),
+        gh<_i846.ConnectivitySource>(),
+        gh<_i846.SyncCursorStore>(),
+      ),
+    );
     gh.lazySingleton<_i263.BookmarksRepository>(
-        () => _i967.BookmarksRepositoryImpl(
-              gh<_i524.BookmarksLocalDataSource>(),
-              gh<_i699.BookmarksSyncController>(),
-              gh<_i706.Uuid>(),
-            ));
+      () => _i967.BookmarksRepositoryImpl(
+        gh<_i524.BookmarksLocalDataSource>(),
+        gh<_i699.BookmarksSyncController>(),
+        gh<_i706.Uuid>(),
+      ),
+    );
     gh.factory<_i806.CreateBookmarkUseCase>(
-        () => _i806.CreateBookmarkUseCase(gh<_i263.BookmarksRepository>()));
+      () => _i806.CreateBookmarkUseCase(gh<_i263.BookmarksRepository>()),
+    );
     gh.factory<_i135.DeleteBookmarkUseCase>(
-        () => _i135.DeleteBookmarkUseCase(gh<_i263.BookmarksRepository>()));
+      () => _i135.DeleteBookmarkUseCase(gh<_i263.BookmarksRepository>()),
+    );
     gh.factory<_i118.GetBookmarkUseCase>(
-        () => _i118.GetBookmarkUseCase(gh<_i263.BookmarksRepository>()));
+      () => _i118.GetBookmarkUseCase(gh<_i263.BookmarksRepository>()),
+    );
     gh.factory<_i416.ListBookmarksUseCase>(
-        () => _i416.ListBookmarksUseCase(gh<_i263.BookmarksRepository>()));
-    gh.factory<_i1010.ListLocalBookmarksUseCase>(() =>
-        _i1010.ListLocalBookmarksUseCase(gh<_i263.BookmarksRepository>()));
+      () => _i416.ListBookmarksUseCase(gh<_i263.BookmarksRepository>()),
+    );
+    gh.factory<_i1010.ListLocalBookmarksUseCase>(
+      () => _i1010.ListLocalBookmarksUseCase(gh<_i263.BookmarksRepository>()),
+    );
     gh.factory<_i310.UpdateBookmarkUseCase>(
-        () => _i310.UpdateBookmarkUseCase(gh<_i263.BookmarksRepository>()));
-    gh.factory<_i1005.BookmarkDetailBloc>(() => _i1005.BookmarkDetailBloc(
-          gh<_i118.GetBookmarkUseCase>(),
-          gh<_i135.DeleteBookmarkUseCase>(),
-          gh<_i548.AnalyticsService>(),
-          gh<_i199.ShareService>(),
-        ));
-    gh.factory<_i330.BookmarksListBloc>(() => _i330.BookmarksListBloc(
-          gh<_i416.ListBookmarksUseCase>(),
-          gh<_i1010.ListLocalBookmarksUseCase>(),
-          gh<_i135.DeleteBookmarkUseCase>(),
-          gh<_i699.BookmarksSyncController>(),
-          gh<_i548.AnalyticsService>(),
-          gh<_i199.ShareService>(),
-        ));
+      () => _i310.UpdateBookmarkUseCase(gh<_i263.BookmarksRepository>()),
+    );
+    gh.factory<_i1005.BookmarkDetailBloc>(
+      () => _i1005.BookmarkDetailBloc(
+        gh<_i118.GetBookmarkUseCase>(),
+        gh<_i135.DeleteBookmarkUseCase>(),
+        gh<_i548.AnalyticsService>(),
+        gh<_i199.ShareService>(),
+      ),
+    );
+    gh.factory<_i330.BookmarksListBloc>(
+      () => _i330.BookmarksListBloc(
+        gh<_i416.ListBookmarksUseCase>(),
+        gh<_i1010.ListLocalBookmarksUseCase>(),
+        gh<_i135.DeleteBookmarkUseCase>(),
+        gh<_i699.BookmarksSyncController>(),
+        gh<_i548.AnalyticsService>(),
+        gh<_i199.ShareService>(),
+      ),
+    );
     gh.lazySingleton<_i856.BookmarkStatsReader>(
-        () => _i808.BookmarkStatsService(gh<_i416.ListBookmarksUseCase>()));
+      () => _i808.BookmarkStatsService(gh<_i416.ListBookmarksUseCase>()),
+    );
     gh.lazySingleton<_i856.BookmarkSummariesReader>(
-        () => _i976.BookmarkSummariesService(gh<_i416.ListBookmarksUseCase>()));
-    gh.factory<_i278.BookmarkFormBloc>(() => _i278.BookmarkFormBloc(
-          gh<_i118.GetBookmarkUseCase>(),
-          gh<_i806.CreateBookmarkUseCase>(),
-          gh<_i310.UpdateBookmarkUseCase>(),
-          gh<_i548.AnalyticsService>(),
-          gh<_i199.ImagePickerService>(),
-          gh<_i199.PermissionService>(),
-          gh<_i856.ActivityNotifier>(),
-        ));
+      () => _i976.BookmarkSummariesService(gh<_i416.ListBookmarksUseCase>()),
+    );
+    gh.factory<_i278.BookmarkFormBloc>(
+      () => _i278.BookmarkFormBloc(
+        gh<_i118.GetBookmarkUseCase>(),
+        gh<_i806.CreateBookmarkUseCase>(),
+        gh<_i310.UpdateBookmarkUseCase>(),
+        gh<_i548.AnalyticsService>(),
+        gh<_i199.ImagePickerService>(),
+        gh<_i199.PermissionService>(),
+        gh<_i856.ActivityNotifier>(),
+      ),
+    );
   }
 }
 
