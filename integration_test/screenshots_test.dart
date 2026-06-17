@@ -31,11 +31,11 @@
 import 'dart:async';
 
 import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
+import 'package:feature_home/feature_home.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/router.dart';
-import 'package:flutter_starter_template/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
