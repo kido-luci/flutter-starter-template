@@ -97,12 +97,9 @@ class _HomeBodyState extends State<HomeBody> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         _QuickActions(
-                          onAdd: () =>
-                              context.push<void>('/bookmarks/new'),
-                          onLibrary: () =>
-                              context.push<void>('/bookmarks'),
-                          onTags: () =>
-                              context.push<void>('/bookmarks'),
+                          onAdd: () => context.push<void>('/bookmarks/new'),
+                          onLibrary: () => context.push<void>('/bookmarks'),
+                          onTags: () => context.push<void>('/bookmarks'),
                         ).animateSlideUp(delay: 160.ms),
                         const SizedBox(height: AppSpacing.md),
                         ListenableBuilder(
@@ -150,8 +147,7 @@ class _HomeBodyState extends State<HomeBody> {
                         const SizedBox(height: AppSpacing.xl),
                         _WeeklyDigestPanel(
                           recentCount: state.recentBookmarks,
-                          onPressed: () =>
-                              context.push<void>('/bookmarks'),
+                          onPressed: () => context.push<void>('/bookmarks'),
                         ).animateSlideUp(delay: 520.ms),
                       ],
                     ),
