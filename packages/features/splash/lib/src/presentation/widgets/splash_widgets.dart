@@ -1,8 +1,6 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/extensions/build_context_extensions.dart';
-import '../../../../gen/assets.gen.dart';
+import 'package:localization/localization.dart';
 
 class SplashContent extends StatelessWidget {
   const SplashContent({super.key});
@@ -29,7 +27,8 @@ class SplashContent extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Assets.icons.logo.image(
+              child: Image.asset(
+                'assets/icons/logo.png',
                 width: 72,
                 height: 72,
                 fit: BoxFit.cover,

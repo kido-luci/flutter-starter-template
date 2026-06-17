@@ -1,5 +1,5 @@
+import 'package:feature_profile/src/presentation/bloc/profile_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_starter_template/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../test_utils.dart';

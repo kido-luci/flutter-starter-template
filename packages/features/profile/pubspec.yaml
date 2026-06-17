@@ -1,0 +1,43 @@
+name: feature_profile
+description: >-
+  Profile feature for the Flutter starter template: the account/settings
+  presentation layer as a self-contained workspace package.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Workspace packages.
+  architecture: ^0.1.0
+  analytics: ^0.1.0
+  app_ui: ^0.1.0
+  shared_ui: ^0.1.0
+  theme: ^0.1.0
+  localization: ^0.1.0
+  # Capability: profile surfaces auth's delete-account flow (single consumer).
+  feature_auth: ^0.1.0
+
+  # Third-party.
+  flutter_bloc: ^9.1.1
+  bloc_concurrency: ^0.3.0
+  go_router: ^17.3.0
+  injectable: ^3.0.0
+  get_it: ^9.2.1
+  package_info_plus: ^10.1.0
+  font_awesome_flutter: ^11.0.0
+  freezed_annotation: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  build_runner: ^2.15.0
+  freezed: ^3.2.5
+  injectable_generator: ^3.0.2

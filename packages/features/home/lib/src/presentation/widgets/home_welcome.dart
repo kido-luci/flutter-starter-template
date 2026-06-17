@@ -281,7 +281,7 @@ class _SuggestedBookmarkCard extends StatelessWidget {
 
     return _ElevatedSurface(
       child: InkWell(
-        onTap: () => BookmarkDetailRoute(bookmark.id).push<void>(context),
+        onTap: () => context.push<void>('/bookmarks/${bookmark.id}'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -346,13 +346,13 @@ class _FeaturedCollectionsSection extends StatelessWidget {
               ? context.l10n.homeCreateCollection
               : context.l10n.homeViewAllBookmarks,
           onActionPressed: collections.isEmpty
-              ? () => const CollectionNewRoute().push<void>(context)
-              : () => const CollectionsListRoute().push<void>(context),
+              ? () => context.push<void>('/collections/new')
+              : () => context.push<void>('/collections'),
         ),
         const SizedBox(height: AppSpacing.md),
         if (collections.isEmpty)
           _CollectionCreateCard(
-            onTap: () => const CollectionNewRoute().push<void>(context),
+            onTap: () => context.push<void>('/collections/new'),
           )
         else
           SingleChildScrollView(
@@ -397,7 +397,7 @@ class _CollectionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: InkWell(
-          onTap: () => CollectionDetailRoute(collection.id).push<void>(context),
+          onTap: () => context.push<void>('/collections/${collection.id}'),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(

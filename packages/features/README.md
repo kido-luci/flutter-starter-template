@@ -1,12 +1,19 @@
 # Features
 
-This directory contains the distinct feature modules of the application, structured using a feature-first approach combined with Clean Architecture.
+This directory contains the distinct feature modules of the application, each a
+self-contained workspace package (Dart package `feature_<name>`), structured
+using a feature-first approach combined with Clean Architecture.
 
-Each folder in this directory represents an independent, cohesive feature of the app (e.g., `auth`, `home`, `profile`, `bookmarks`, `splash`).
+Each subdirectory is an independent, cohesive feature of the app (e.g., `auth`,
+`home`, `profile`, `bookmarks`, `collections`, `notifications`, `splash`). The
+host app composes them in `lib/app/` (router, DI) and reads any genuinely shared
+state through the `shared_contracts` / `shared_ui` packages.
 
 ## Clean Architecture Structure
 
-Inside each feature directory, you will typically find the following three layers:
+Inside each feature package's `lib/src/`, you will typically find the following
+three layers (data-less features such as `home` and `splash` have only
+`presentation/`):
 
 ### 1. `domain/`
 The innermost layer containing the core business logic of the feature. It should be independent of any external packages, frameworks, or UI code.
@@ -28,13 +35,13 @@ The UI layer responsible for displaying information to the user and capturing us
 
 ## Best Practices
 
-- **Feature Independence:** Features should be as isolated as possible. As a default, a feature must **not** import another feature's `presentation` layer — shared *state* is read through a contract in `lib/shared/` instead. The one deliberate exception is a *capability* (a self-contained presentation object one feature surfaces inside another); while only a single consumer exists, importing it directly is allowed.
+- **Feature Independence:** Features should be as isolated as possible. As a default, a feature package must **not** import another `feature_<name>` package — shared *state* is read through a `shared_contracts` contract instead. The one deliberate exception is a *capability* (a self-contained presentation object one feature surfaces inside another); while only a single consumer exists, importing it directly is allowed. The `feature_boundaries_test` enforces this and whitelists the current exceptions.
 - **Shared Code:** Pick the destination by what kind of thing it is:
-  - *Business* vocabulary used by 2+ features (e.g. the session, shared entities) → `lib/shared/`, on the **rule of three** (promote only when ≥2 features depend on it today).
-  - *Cross-cutting, non-visual* infrastructure → `lib/core/` (app-coupled) or a workspace package (reusable).
-  - *Generic visual* building blocks → the `app_ui` package.
+  - *Business* vocabulary used by 2+ features (e.g. the session, shared entities) → the `shared_contracts` package, on the **rule of three** (promote only when ≥2 features depend on it today).
+  - *Cross-cutting, non-visual* infrastructure → `lib/core/` (app-coupled) or a workspace package such as `network` / `storage` / `sync` (reusable).
+  - *Generic visual* building blocks → the `app_ui` package; cross-feature visual/session contracts → `shared_ui`.
 - **Immutability:** Use immutable models and `Freezed` unions for state management and domain entities.
-- **Dependency Injection:** Dependencies are injected using `get_it` + `injectable` (composition root in `lib/core/di/`).
+- **Dependency Injection:** Dependencies are injected using `get_it` + `injectable`. Each feature package exposes a micro-package module (`Feature<Name>PackageModule`) that the app wires in `lib/app/di/injection.dart`.
 
 ## 📶 Offline‑First Sync
 

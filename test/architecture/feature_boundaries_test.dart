@@ -1,71 +1,73 @@
 // Architecture guardrail: enforces the cross-feature import boundary
 // documented in CLAUDE.md ("a feature must not import another feature").
 //
-// A file under `lib/features/<A>/` may not import code from another feature
-// `lib/features/<B>/` (whether through a `package:` or a relative import).
-// Shared state must be read through a `shared/` contract, and shared infra
-// through the workspace packages instead.
+// Features now live as workspace packages under `packages/features/<name>`
+// (Dart package `feature_<name>`). A feature package may not import another
+// feature package — shared *state* is read through a `shared_contracts`
+// contract and shared visuals come from `shared_ui`, so a direct
+// `package:feature_<other>` import is a boundary crossing.
 //
 // The one documented escape hatch is the "capability" exception: a
 // presentation object that one feature deliberately surfaces inside another
-// while it has a single consumer. Those exact imports are whitelisted in
+// while it has a single consumer. Those exact edges are whitelisted in
 // [_allowedCrossFeatureImports]. When you intentionally add such a capability,
-// add its import here with a comment; when a second consumer appears, promote
-// the contract to `shared/` and remove the entry (the staleness test below
-// will remind you if a whitelisted import disappears).
+// add its edge here with a comment; when a second consumer appears, promote
+// the contract to `shared_*` and remove the entry (the staleness test below
+// will remind you if a whitelisted edge disappears).
 //
-// This is a pure file-scan test on purpose: it has no third-party dependency,
-// runs inside the normal `fvm flutter test` / CI flow, and can't break when
-// the analyzer or pinned SDK is upgraded.
+// This complements `package_layering_test`, which only ranks the top-level
+// `packages/` and does not recurse into `packages/features/*`; this scan is
+// what keeps the feature packages from depending on one another.
+//
+// A pure file-scan test on purpose: no third-party dependency, runs inside the
+// normal `fvm flutter test` / CI flow, and can't break when the analyzer or
+// pinned SDK is upgraded.
 
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// The package name from `pubspec.yaml`, used to detect absolute
-/// `package:flutter_starter_template/features/...` imports.
-const _packageName = 'flutter_starter_template';
-
-/// Documented capability exceptions, keyed by the importing feature.
+/// Documented capability exceptions, keyed by the importing feature package.
 ///
-/// Each value is the set of import targets (paths relative to `lib/features/`)
-/// that feature is allowed to reach into. Keep this list minimal and
-/// commented — every entry is a deliberate exception to the boundary rule.
+/// Each value is the set of feature packages it is allowed to import. Keep this
+/// list minimal and commented — every entry is a deliberate exception to the
+/// boundary rule.
 const _allowedCrossFeatureImports = <String, Set<String>>{
-  // Note: `profile` surfaces auth's account-deletion capability
-  // (DeleteAccountCubit, single consumer). Now that auth is a workspace package,
-  // this is a package-level dependency (profile -> feature_auth) declared in
-  // pubspec, not an in-app cross-feature import — so it no longer appears in
-  // this scan. The DeleteAccountCubit worked example in CLAUDE.md still applies.
-  //
-  // Note: bookmarks' two collections capabilities (the "add to collection"
-  // sheet and the embedded collections list) are likewise a package-level
-  // dependency (feature_bookmarks -> feature_collections), enforced by the
-  // package_layering_test rather than this in-app feature scan.
+  // bookmarks surfaces collections' "add to collection" sheet and embedded
+  // collections list (single consumer). See the capability exception in
+  // CLAUDE.md; promote to shared_ui if a second consumer appears.
+  'feature_bookmarks': {'feature_collections'},
+  // profile surfaces auth's account-deletion flow (DeleteAccountCubit, single
+  // consumer). See the DeleteAccountCubit worked example in CLAUDE.md.
+  'feature_profile': {'feature_auth'},
 };
 
 void main() {
-  final featuresDir = Directory('lib/features');
+  final featuresDir = Directory('packages/features');
 
-  test('lib/features exists (run from the package root)', () {
+  test('packages/features exists (run from the package root)', () {
     expect(
       featuresDir.existsSync(),
       isTrue,
       reason:
-          'Expected to find lib/features relative to the current '
+          'Expected to find packages/features relative to the current '
           'directory. Run this test from the package root.',
     );
   });
 
-  final featureNames = featuresDir
-      .listSync()
-      .whereType<Directory>()
-      .map((dir) => _posix(dir.path).split('/').last)
-      .toSet();
+  // Maps each feature package directory to its Dart package name.
+  final featurePackages = <String, String>{};
+  for (final entity in featuresDir.listSync().whereType<Directory>()) {
+    final pubspec = File('${entity.path}/pubspec.yaml');
+    if (!pubspec.existsSync()) continue;
+    final name = _packageName(pubspec.readAsLinesSync());
+    if (name != null) featurePackages[_posix(entity.path)] = name;
+  }
+  final featurePackageNames = featurePackages.values.toSet();
 
   final crossFeatureImports = _collectCrossFeatureImports(
-    featuresDir,
-    featureNames,
+    featurePackages,
+    featurePackageNames,
   );
 
   test(
@@ -75,7 +77,7 @@ void main() {
           .where(
             (i) =>
                 !(_allowedCrossFeatureImports[i.sourceFeature]?.contains(
-                      i.targetPath,
+                      i.targetFeature,
                     ) ??
                     false),
           )
@@ -86,9 +88,9 @@ void main() {
         isEmpty,
         reason:
             'Cross-feature imports break the feature boundary documented in '
-            'CLAUDE.md. Read shared state through a shared/ contract, or — if '
-            'this is a deliberate single-consumer capability — add it to '
-            '_allowedCrossFeatureImports in this test.\n\n'
+            'CLAUDE.md. Read shared state through a shared_contracts contract, '
+            'or — if this is a deliberate single-consumer capability — add it '
+            'to _allowedCrossFeatureImports in this test.\n\n'
             '${violations.map((v) => '  $v').join('\n')}',
       );
     },
@@ -96,7 +98,7 @@ void main() {
 
   test('every allowlisted capability import still exists (no stale entries)', () {
     final actual = crossFeatureImports
-        .map((i) => '${i.sourceFeature} -> ${i.targetPath}')
+        .map((i) => '${i.sourceFeature} -> ${i.targetFeature}')
         .toSet();
 
     final stale = <String>[];
@@ -119,14 +121,13 @@ void main() {
   });
 }
 
-/// A single import that crosses from one feature into another.
+/// A single import that crosses from one feature package into another.
 class _CrossFeatureImport {
   _CrossFeatureImport({
     required this.file,
     required this.line,
     required this.sourceFeature,
     required this.targetFeature,
-    required this.targetPath,
     required this.uri,
   });
 
@@ -136,23 +137,17 @@ class _CrossFeatureImport {
   /// 1-based line number of the import directive.
   final int line;
 
-  /// Feature that owns [file].
+  /// Feature package that owns [file] (e.g. `feature_bookmarks`).
   final String sourceFeature;
 
-  /// Feature being imported.
+  /// Feature package being imported (e.g. `feature_collections`).
   final String targetFeature;
-
-  /// Import target relative to `lib/features/`
-  /// (e.g. `auth/presentation/bloc/delete_account_cubit.dart`).
-  final String targetPath;
 
   /// The raw import URI as written in source.
   final String uri;
 
   @override
-  String toString() =>
-      '$file:$line imports $sourceFeature -> $uri '
-      '(resolves to features/$targetPath)';
+  String toString() => '$file:$line imports $sourceFeature -> $targetFeature';
 }
 
 /// Matches `import '...'` / `export '...'` and captures the URI.
@@ -160,102 +155,62 @@ final _importDirective = RegExp(
   r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
 );
 
+/// Matches the package segment of a `package:feature_<name>/...` URI.
+final _featurePackageUri = RegExp('^package:(feature_[a-z0-9_]+)/');
+
 List<_CrossFeatureImport> _collectCrossFeatureImports(
-  Directory featuresDir,
-  Set<String> featureNames,
+  Map<String, String> featurePackages,
+  Set<String> featurePackageNames,
 ) {
   final results = <_CrossFeatureImport>[];
 
-  final dartFiles = featuresDir
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.dart'));
+  featurePackages.forEach((dirPath, ownName) {
+    final libDir = Directory('$dirPath/lib');
+    if (!libDir.existsSync()) return;
 
-  for (final file in dartFiles) {
-    final relPath = _posix(file.path);
-    final sourceFeature = _featureOf(relPath, featureNames);
-    if (sourceFeature == null) continue;
+    final dartFiles = libDir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart'));
 
-    final lines = file.readAsLinesSync();
-    for (var i = 0; i < lines.length; i++) {
-      final match = _importDirective.firstMatch(lines[i]);
-      if (match == null) continue;
+    for (final file in dartFiles) {
+      final relPath = _posix(file.path);
+      final lines = file.readAsLinesSync();
+      for (var i = 0; i < lines.length; i++) {
+        final match = _importDirective.firstMatch(lines[i]);
+        if (match == null) continue;
 
-      final uri = match.group(1)!;
-      final targetPath = _resolveFeatureTarget(uri, relPath);
-      if (targetPath == null) continue;
+        final uri = match.group(1)!;
+        final pkgMatch = _featurePackageUri.firstMatch(uri);
+        if (pkgMatch == null) continue;
 
-      final targetFeature = targetPath.split('/').first;
-      if (targetFeature == sourceFeature) continue;
+        final targetFeature = pkgMatch.group(1)!;
+        if (targetFeature == ownName) continue;
+        if (!featurePackageNames.contains(targetFeature)) continue;
 
-      results.add(
-        _CrossFeatureImport(
-          file: relPath,
-          line: i + 1,
-          sourceFeature: sourceFeature,
-          targetFeature: targetFeature,
-          targetPath: targetPath,
-          uri: uri,
-        ),
-      );
+        results.add(
+          _CrossFeatureImport(
+            file: relPath,
+            line: i + 1,
+            sourceFeature: ownName,
+            targetFeature: targetFeature,
+            uri: uri,
+          ),
+        );
+      }
     }
-  }
+  });
 
   return results;
 }
 
-/// Returns the feature segment that owns [relPath], or `null` if the path is
-/// not directly under a known feature.
-String? _featureOf(String relPath, Set<String> featureNames) {
-  const prefix = 'lib/features/';
-  if (!relPath.startsWith(prefix)) return null;
-  final rest = relPath.substring(prefix.length);
-  final feature = rest.split('/').first;
-  return featureNames.contains(feature) ? feature : null;
-}
-
-/// Resolves an import [uri] (from a file at [fromRelPath]) to its target path
-/// relative to `lib/features/`, or `null` if it doesn't point into a feature.
-String? _resolveFeatureTarget(String uri, String fromRelPath) {
-  const featuresPrefix = 'lib/features/';
-
-  // Absolute package import into this package's features.
-  const packageFeatures = 'package:$_packageName/features/';
-  if (uri.startsWith(packageFeatures)) {
-    return uri.substring(packageFeatures.length);
+/// Reads the `name:` field from a pubspec's lines.
+String? _packageName(List<String> lines) {
+  for (final line in lines) {
+    final match = RegExp(r'^name:\s*(\S+)').firstMatch(line);
+    if (match != null) return match.group(1);
   }
-
-  // Any other package: import (flutter, workspace packages, ...) is fine.
-  if (uri.startsWith('package:') || uri.startsWith('dart:')) return null;
-
-  // Relative import: resolve against the importing file's directory.
-  final fromDir = _posix(_dirname(fromRelPath));
-  final resolved = _normalize('$fromDir/$uri');
-  if (!resolved.startsWith(featuresPrefix)) return null;
-  return resolved.substring(featuresPrefix.length);
-}
-
-String _dirname(String path) {
-  final i = path.lastIndexOf('/');
-  return i < 0 ? '.' : path.substring(0, i);
-}
-
-/// Normalizes a POSIX-style path, collapsing `.` and `..` segments.
-String _normalize(String path) {
-  final out = <String>[];
-  for (final part in path.split('/')) {
-    if (part.isEmpty || part == '.') continue;
-    if (part == '..') {
-      if (out.isNotEmpty && out.last != '..') {
-        out.removeLast();
-      } else {
-        out.add(part);
-      }
-    } else {
-      out.add(part);
-    }
-  }
-  return out.join('/');
+  return null;
 }
 
 /// Converts a filesystem path to POSIX separators so the test behaves the same

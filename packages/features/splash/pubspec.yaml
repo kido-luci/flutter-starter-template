@@ -1,0 +1,28 @@
+name: feature_splash
+description: >-
+  Splash feature for the Flutter starter template: the bootstrap screen shown
+  while the session is restored, as a self-contained workspace package.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Workspace packages.
+  app_ui: ^0.1.0
+  shared_ui: ^0.1.0
+  localization: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/icons/

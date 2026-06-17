@@ -5,7 +5,7 @@ import 'package:feature_auth/feature_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../app/di/injection.dart';
+import '../../locator.dart';
 import '../bloc/profile_bloc.dart';
 import '../widgets/profile_widgets.dart';
 

@@ -39,7 +39,6 @@ const _layers = <String, int>{
   'localization': 1, // gen-l10n AppLocalizations; no workspace package deps
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
   'database': 1, // centralized ObjectBox persistence -> sync
-  'feature_notifications': 1, // notifications domain layer -> architecture
   'sync_connectivity_plus': 1, // connectivity_plus adapter -> sync
   // 2 — composed infra built on the primitives.
   'shared_ui': 2, // cross-feature presentation contracts -> shared_contracts

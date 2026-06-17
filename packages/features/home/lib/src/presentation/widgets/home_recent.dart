@@ -121,7 +121,7 @@ class _BookmarkFeedCard extends StatelessWidget {
 
     return _ElevatedSurface(
       child: InkWell(
-        onTap: () => BookmarkDetailRoute(bookmark.id).push<void>(context),
+        onTap: () => context.push<void>('/bookmarks/${bookmark.id}'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
