@@ -18,10 +18,14 @@ place.
 | `sync` | Offline-first sync engine — scheduler + revision-based delta CRUD with conflict detection (pure Dart) |
 | `app_platform` | Device integrations — media, notifications, permissions, share |
 | `theme` | `ThemeBloc` + persisted theme state |
-| `test_utils` | Shared `mocktail` export, cross-package mocks/fakes, test images |
+| `shared_contracts` | Cross-feature *business* vocabulary (`AuthUser`, reader interfaces, the app-wide `Session` lifecycle) used by 2+ features |
+| `shared_ui` | Cross-feature *presentation* widgets needing Flutter — the `SessionScope` accessor + shared visuals |
+| `test_utils` | Shared `mocktail` export, cross-package mocks/fakes, shared fixtures, test images |
 
-Dependency direction is `features → shared → ui → core`. A package must not
-depend on the root app or on `lib/features/`.
+Dependency direction is `app → features → shared_contracts / shared_ui →
+app_ui / infra → architecture`. A package must not depend on the root app, and
+a feature must not depend on another feature outside the documented capability
+allowlist (enforced by `test/architecture/`).
 
 ## Dependency injection — the micro-package pattern
 
@@ -35,7 +39,7 @@ wiring so the app doesn't have to know its internals:
   (e.g. `analytics` → `CoreAnalyticsPackageModule`).
 - The barrel exports that module class.
 
-The app composes them in `lib/core/di/injection.dart` via
+The app composes them in `lib/app/di/injection.dart` via
 `@InjectableInit(externalPackageModulesBefore: [ExternalModule(...), ...])`.
 **Order matters**: a package whose types depend on another's must be listed
 after it (e.g. `network` after `config` because `NetworkModule` reads
@@ -47,6 +51,13 @@ package, then at the repo root to regenerate `injection.config.dart`.
 
 ## Conventions
 
-- Package-owned tests live beside each package under `packages/<name>/test`.
+- **All package-owned tests live beside their package** under
+  `packages/<name>/test` — infra packages and feature packages alike. Each
+  feature carries a `test/support.dart` with its own mocks/fixtures, re-exporting
+  `package:test_utils/test_utils.dart` for the shared doubles
+  (`FakeSession`, the `shared_contracts` reader mocks) and fixtures
+  (`testUser`, `testFailure`). Only genuinely app-level suites stay in the root
+  `test/` — the full-app `widget_test.dart` and the `architecture/` layering
+  and feature-boundary tests.
 - A type graduates from a feature into a workspace package / `shared` location only on
   the **rule of three** — when ≥2 consumers actually depend on it today.

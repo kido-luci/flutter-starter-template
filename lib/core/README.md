@@ -14,7 +14,7 @@ the DI composition root, the ObjectBox store, and Firebase bootstrap.
 Here is a breakdown of the subdirectories found in `core/`:
 
 - **`data/database/`**: The app's ObjectBox wrapper and its generated store binding (`object_box.dart`).
-- **`di/`**: Dependency Injection setup (`get_it` + `injectable`) that composes the app graph, wiring together services from the workspace packages and the feature modules.
+- **`di/`**: The app-services DI module (`app_services_module.dart`) registering app-coupled services. The composition root that wires the package and feature modules together lives in `lib/app/di/injection.dart`.
 - **`extensions/`**: App-specific convenience extensions used across features.
 - **`platform/firebase/`**: App bootstrap for Firebase services (`FirebaseService` — initialization, Crashlytics handlers, background messaging).
 
