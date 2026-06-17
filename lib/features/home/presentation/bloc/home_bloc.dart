@@ -2,9 +2,8 @@ import 'package:architecture/architecture.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 
-import '../../../../shared/domain/bookmark_stats.dart';
-import '../../../../shared/domain/collections.dart';
 import 'home_state.dart';
 
 part 'home_event.dart';

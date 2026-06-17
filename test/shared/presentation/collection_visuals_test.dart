@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_starter_template/shared/presentation/collection_visuals.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 void main() {
   test('palette tokens are unique and round-trip to their icons', () {

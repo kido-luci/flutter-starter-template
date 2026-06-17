@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 import '../../../../app/router.dart';
-import '../../../../shared/presentation/session_scope.dart';
 import '../widgets/splash_widgets.dart';
 
 /// Bootstrap screen shown while the session is restored.

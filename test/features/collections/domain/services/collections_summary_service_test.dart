@@ -1,7 +1,7 @@
 import 'package:architecture/architecture.dart';
 import 'package:feature_collections/src/domain/services/collections_summary_service.dart';
-import 'package:flutter_starter_template/shared/domain/collections.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 import 'package:test_utils/test_utils.dart';
 
 import '../../collections_test_helpers.dart';

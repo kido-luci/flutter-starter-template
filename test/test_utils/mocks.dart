@@ -10,12 +10,8 @@ import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_starter_template/shared/domain/activity_notifier.dart';
-import 'package:flutter_starter_template/shared/domain/bookmark_stats.dart';
-import 'package:flutter_starter_template/shared/domain/bookmark_summaries.dart';
-import 'package:flutter_starter_template/shared/domain/collections.dart';
-import 'package:flutter_starter_template/shared/domain/entities/auth_user.dart';
-import 'package:flutter_starter_template/shared/domain/session.dart';
+import 'package:shared_contracts/shared_contracts.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:test_utils/test_utils.dart';
 
 class MockNotificationsBloc
