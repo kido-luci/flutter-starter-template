@@ -121,7 +121,7 @@ dependencies:
 
   # Provides the platform-appropriate application documents directory used
   # by ObjectBox to locate its store file on device.
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
 
   # Client-side UUID generation for offline-first creates: the app mints a
   # stable id locally and the server accepts it on POST /api/bookmarks.
@@ -177,7 +177,7 @@ dev_dependencies:
 
   # Generates the concrete API client implementation from
   # retrofit-annotated abstract classes.
-  retrofit_generator: ^10.2.6
+  retrofit_generator: ^10.2.7
 
   # Generates fromJson/toJson from @JsonSerializable annotations.
   json_serializable: ^6.14.0
