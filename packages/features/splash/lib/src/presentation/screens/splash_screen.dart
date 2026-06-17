@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_ui/shared_ui.dart';
 
-import '../../../../app/router.dart';
 import '../widgets/splash_widgets.dart';
 
 /// Bootstrap screen shown while the session is restored.
 ///
-/// Owns the post-restore redirect: routes to `/` on success, `/login`
-/// otherwise. Enforces a minimum display time so the splash never flashes.
+/// Restores the session — enforcing a minimum display time so it never
+/// flashes — then hands control back to the host through [onRestored]. The
+/// host owns the routing decision (advancing the deep-link gate and
+/// navigating onward), keeping this feature free of app-level navigation
+/// state.
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({required this.onRestored, super.key});
+
+  /// Invoked once the session is restored and the minimum display time has
+  /// elapsed, with the still-mounted screen [BuildContext].
+  final void Function(BuildContext context) onRestored;
 
   static const Duration _minDisplay = Duration(seconds: 2);
 
@@ -31,8 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Future<void>.delayed(SplashScreen._minDisplay),
     ]);
     if (!mounted) return;
-    DeepLinkScope.of(context).splashCompleted = true;
-    const HomeRoute().go(context);
+    widget.onRestored(context);
   }
 
   @override
