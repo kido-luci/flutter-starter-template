@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
@@ -9,9 +8,6 @@ import 'package:uuid/uuid.dart';
 /// graph at runtime.
 @module
 abstract class AppServicesModule {
-  @lazySingleton
-  Connectivity provideConnectivity() => Connectivity();
-
   @lazySingleton
   Uuid provideUuid() => const Uuid();
 }

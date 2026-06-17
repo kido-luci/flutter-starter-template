@@ -30,6 +30,7 @@ workspace:
   - packages/app_platform
   - packages/storage
   - packages/sync
+  - packages/sync_connectivity_plus
   - packages/theme
   - packages/test_utils
   - packages/shared_contracts
@@ -56,6 +57,7 @@ dependencies:
   app_platform: ^0.1.0
   storage: ^0.1.0
   sync: ^0.1.0
+  sync_connectivity_plus: ^0.1.0
   theme: ^0.1.0
   shared_contracts: ^0.1.0
   shared_ui: ^0.1.0
@@ -106,9 +108,6 @@ dependencies:
   # stable id locally and the server accepts it on POST /api/bookmarks.
   uuid: ^4.5.3
 
-  # Reactive online/offline detection. The sync service subscribes and
-  # drains pending mutations when connectivity is restored.
-  connectivity_plus: ^7.1.1
   package_info_plus: ^10.1.0
 
   # SVG rendering. Pairs with flutter_gen_runner: SVGs placed in assets/icons/

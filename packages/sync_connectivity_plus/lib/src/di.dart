@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 /// Code-generation anchor for this micro-package's injectable registrations.
 ///
 /// Running `build_runner` generates `di.module.dart` next to this file,
-/// containing `ThemePackageModule`, which the host app wires into its own
-/// `@InjectableInit` via `externalPackageModulesBefore`.
+/// containing `SyncConnectivityPlusPackageModule`, which the host app wires
+/// into its own `@InjectableInit` via `externalPackageModulesBefore`.
 @InjectableInit.microPackage()
-void initThemePackage() {}
+void initSyncConnectivityPlusPackage() {}

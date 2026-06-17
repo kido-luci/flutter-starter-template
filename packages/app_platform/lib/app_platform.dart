@@ -7,7 +7,8 @@ export 'package:permission_handler/permission_handler.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:video_player/video_player.dart';
 
-export 'src/di.module.dart' show CorePlatformPackageModule;
+export 'src/crash/crash_reporting_service.dart';
+export 'src/di.module.dart' show AppPlatformPackageModule;
 export 'src/media/camera_service.dart';
 export 'src/media/image_picker_service.dart';
 export 'src/media/video_player_service.dart';

@@ -22,6 +22,9 @@ Future<void> main() async {
     await getIt<KeychainResetOnReinstall>().run();
 
     await getIt<FirebaseService>().init();
+    // Must follow FirebaseService.init() — Crashlytics needs the Firebase app
+    // initialized before the error handlers can record.
+    await getIt<CrashReportingService>().install();
 
     await getIt<RemoteConfigService>().init();
 
