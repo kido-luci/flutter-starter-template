@@ -3,10 +3,10 @@ import 'package:architecture/architecture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 
-import '../../../../app/router.dart';
-import '../../../../core/extensions/build_context_extensions.dart';
-import '../../../../gen/assets.gen.dart';
+import '../auth_routes.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 
@@ -265,7 +265,9 @@ class _BrandHeader extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.sm),
-          child: Assets.icons.logo.image(
+          child: Image.asset(
+            'assets/icons/logo.png',
+            package: 'feature_auth',
             width: 32,
             height: 32,
             excludeFromSemantics: true,
@@ -532,7 +534,7 @@ class _RegisterPrompt extends StatelessWidget {
         TextButton(
           onPressed: isSubmitting
               ? null
-              : () => const RegisterRoute().go(context),
+              : () => context.go(AuthRoutes.register),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             minimumSize: Size.zero,

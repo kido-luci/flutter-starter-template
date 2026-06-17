@@ -32,15 +32,14 @@ const _packageName = 'flutter_starter_template';
 /// that feature is allowed to reach into. Keep this list minimal and
 /// commented — every entry is a deliberate exception to the boundary rule.
 const _allowedCrossFeatureImports = <String, Set<String>>{
-  // `profile` surfaces auth's account-deletion capability (single consumer).
-  // See CLAUDE.md "Feature-specific capabilities" / the DeleteAccountCubit
-  // worked example.
-  'profile': {
-    'auth/presentation/bloc/delete_account_cubit.dart',
-    'auth/presentation/bloc/delete_account_state.dart',
-  },
+  // Note: `profile` surfaces auth's account-deletion capability
+  // (DeleteAccountCubit, single consumer). Now that auth is a workspace package,
+  // this is a package-level dependency (profile -> feature_auth) declared in
+  // pubspec, not an in-app cross-feature import — so it no longer appears in
+  // this scan. The DeleteAccountCubit worked example in CLAUDE.md still applies.
+  //
   // Note: bookmarks' two collections capabilities (the "add to collection"
-  // sheet and the embedded collections list) are now a package-level
+  // sheet and the embedded collections list) are likewise a package-level
   // dependency (feature_bookmarks -> feature_collections), enforced by the
   // package_layering_test rather than this in-app feature scan.
 };

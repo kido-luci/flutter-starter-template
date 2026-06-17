@@ -1,7 +1,7 @@
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/delete_account_cubit.dart';
-import 'package:flutter_starter_template/features/auth/presentation/bloc/delete_account_state.dart';
+import 'package:feature_auth/src/presentation/bloc/delete_account_cubit.dart';
+import 'package:feature_auth/src/presentation/bloc/delete_account_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../test_utils.dart';
