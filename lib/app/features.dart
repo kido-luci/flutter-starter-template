@@ -18,49 +18,44 @@ final class _BookmarksModule extends FeatureModule {
   const _BookmarksModule();
 
   @override
-  FeatureSyncController get syncController =>
-      _BookmarksSync(getIt<BookmarksSyncController>());
+  FeatureSyncController get syncController {
+    final ctrl = getIt<BookmarksSyncController>();
+    return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
+  }
 }
 
 final class _CollectionsModule extends FeatureModule {
   const _CollectionsModule();
 
   @override
-  FeatureSyncController get syncController =>
-      _CollectionsSync(getIt<CollectionsSyncController>());
+  FeatureSyncController get syncController {
+    final ctrl = getIt<CollectionsSyncController>();
+    return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
+  }
 }
 
 final class _NotificationsModule extends FeatureModule {
   const _NotificationsModule();
 
   @override
-  FeatureSyncController get syncController =>
-      _NotificationsSync(getIt<NotificationsSyncController>());
+  FeatureSyncController get syncController {
+    final ctrl = getIt<NotificationsSyncController>();
+    return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
+  }
 }
 
-final class _BookmarksSync implements FeatureSyncController {
-  const _BookmarksSync(this._ctrl);
-  final BookmarksSyncController _ctrl;
-  @override
-  Future<void> start() => _ctrl.start();
-  @override
-  Future<void> stop() => _ctrl.stop();
-}
+/// Adapts any feature's sync controller to [FeatureSyncController] without a
+/// bespoke wrapper class per feature. The controllers don't implement the
+/// interface directly so feature packages stay unaware of the app's lifecycle.
+final class _FeatureSync implements FeatureSyncController {
+  const _FeatureSync({required this.onStart, required this.onStop});
 
-final class _CollectionsSync implements FeatureSyncController {
-  const _CollectionsSync(this._ctrl);
-  final CollectionsSyncController _ctrl;
-  @override
-  Future<void> start() => _ctrl.start();
-  @override
-  Future<void> stop() => _ctrl.stop();
-}
+  final Future<void> Function() onStart;
+  final Future<void> Function() onStop;
 
-final class _NotificationsSync implements FeatureSyncController {
-  const _NotificationsSync(this._ctrl);
-  final NotificationsSyncController _ctrl;
   @override
-  Future<void> start() => _ctrl.start();
+  Future<void> start() => onStart();
+
   @override
-  Future<void> stop() => _ctrl.stop();
+  Future<void> stop() => onStop();
 }
