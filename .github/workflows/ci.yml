@@ -18,7 +18,19 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.commandcode/**'
       - 'skills-lock.json'
+      - '.antigravityrules'
+      - '.coderabbit.yaml'
+      - '.githooks/**'
+      - '.gitattributes'
+      - '.gitmodules'
+      - '.github/dependabot.yml'
+      # Submodule pointer bumps (incl. Dependabot's). CI never checks out
+      # submodules and neither is part of the Flutter build, so a gitlink
+      # change cannot affect these jobs.
+      - 'simple_backend_server'
+      - 'tool/cli'
   pull_request:
     branches: [main]
     paths-ignore:
@@ -32,7 +44,19 @@ on:
       - '.antigravitycli/**'
       - '.mcp/**'
       - '.codegraph/**'
+      - '.commandcode/**'
       - 'skills-lock.json'
+      - '.antigravityrules'
+      - '.coderabbit.yaml'
+      - '.githooks/**'
+      - '.gitattributes'
+      - '.gitmodules'
+      - '.github/dependabot.yml'
+      # Submodule pointer bumps (incl. Dependabot's). CI never checks out
+      # submodules and neither is part of the Flutter build, so a gitlink
+      # change cannot affect these jobs.
+      - 'simple_backend_server'
+      - 'tool/cli'
 
 # Cancel superseded runs on the same ref to save CI minutes.
 concurrency:
