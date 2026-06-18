@@ -51,11 +51,17 @@ class TokenRefresher {
         data: {'refresh_token': token},
       );
       final body = response.data;
-      if (body == null) {
+      final RefreshTokenResponse parsed;
+      try {
+        // A null or malformed body means the server gave us no usable tokens,
+        // even though the HTTP status looked fine. Treat it the same as a dead
+        // session rather than letting the parse error escape the refresher.
+        if (body == null) throw const FormatException('empty refresh body');
+        parsed = RefreshTokenResponse.fromJson(body);
+      } on Object {
         await _local.clearSession();
         return RefreshOutcome.invalidSession;
       }
-      final parsed = RefreshTokenResponse.fromJson(body);
       await _local.updateTokens(
         accessToken: parsed.accessToken,
         refreshToken: parsed.refreshToken,
