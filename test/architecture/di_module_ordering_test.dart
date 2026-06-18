@@ -61,7 +61,12 @@ void main() {
     );
   });
 
-  final order = _externalModuleOrder(injection.readAsStringSync());
+  // Read defensively at registration time: if the file is missing, fall back
+  // to empty so the existence test above still reports its friendly message
+  // instead of a raw FileSystemException aborting the whole suite load.
+  final order = _externalModuleOrder(
+    injection.existsSync() ? injection.readAsStringSync() : '',
+  );
   final rank = {for (var i = 0; i < order.length; i++) order[i]: i};
 
   test('externalPackageModulesBefore is non-empty and parsed', () {
