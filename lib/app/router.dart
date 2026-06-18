@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_bookmarks/feature_bookmarks.dart';
-import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:feature_profile/feature_profile.dart';
@@ -13,20 +12,6 @@ import 'package:go_router/go_router.dart';
 import 'widgets/app_shell.dart';
 
 part 'router.g.dart';
-
-/// Route data for showing [BookmarkFormScreen] outside the app shell.
-///
-/// The absolute path keeps the create flow free of persistent shell navigation.
-@TypedGoRoute<BookmarkNewRoute>(path: '/bookmarks/new', name: 'bookmark_new')
-class BookmarkNewRoute extends GoRouteData with $BookmarkNewRoute {
-  /// Creates a [BookmarkNewRoute].
-  const BookmarkNewRoute();
-
-  /// Builds the bookmark creation screen.
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const BookmarkFormScreen();
-}
 
 @TypedStatefulShellRoute<AppShellRouteData>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
@@ -138,117 +123,12 @@ class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
       const ChangePasswordScreen();
 }
 
-@TypedGoRoute<LoginRoute>(path: '/login', name: 'login')
-class LoginRoute extends GoRouteData with $LoginRoute {
-  const LoginRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const LoginScreen();
-}
-
-@TypedGoRoute<RegisterRoute>(path: '/register', name: 'register')
-class RegisterRoute extends GoRouteData with $RegisterRoute {
-  const RegisterRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const RegisterScreen();
-}
-
 class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
   const BookmarksListRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const BookmarksListScreen();
-}
-
-/// Route data for the bookmark detail, declared outside the app shell so the
-/// detail screen presents full-screen without the persistent bottom navigation
-/// bar (mirrors [BookmarkNewRoute]).
-@TypedGoRoute<BookmarkDetailRoute>(
-  path: '/bookmarks/:id',
-  name: 'bookmark_detail',
-)
-class BookmarkDetailRoute extends GoRouteData with $BookmarkDetailRoute {
-  const BookmarkDetailRoute(this.id);
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      BookmarkDetailScreen(id: id);
-}
-
-/// Route data for editing a bookmark, declared outside the app shell so the
-/// edit form presents full-screen without the persistent bottom navigation bar.
-@TypedGoRoute<BookmarkEditRoute>(
-  path: '/bookmarks/:id/edit',
-  name: 'bookmark_edit',
-)
-class BookmarkEditRoute extends GoRouteData with $BookmarkEditRoute {
-  const BookmarkEditRoute(this.id);
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      BookmarkFormScreen(id: id);
-}
-
-/// Route data for the standalone collections browser.
-@TypedGoRoute<CollectionsListRoute>(path: '/collections', name: 'collections')
-class CollectionsListRoute extends GoRouteData with $CollectionsListRoute {
-  const CollectionsListRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const CollectionsListScreen();
-}
-
-/// Route data for creating a collection. Declared above the `:id` route so the
-/// literal `new` segment matches first.
-@TypedGoRoute<CollectionNewRoute>(
-  path: '/collections/new',
-  name: 'collection_new',
-)
-class CollectionNewRoute extends GoRouteData with $CollectionNewRoute {
-  const CollectionNewRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const CollectionFormScreen();
-}
-
-/// Route data for the collection detail, shown full-screen (no shell).
-@TypedGoRoute<CollectionDetailRoute>(
-  path: '/collections/:id',
-  name: 'collection_detail',
-)
-class CollectionDetailRoute extends GoRouteData with $CollectionDetailRoute {
-  const CollectionDetailRoute(this.id);
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      CollectionDetailScreen(id: id);
-}
-
-/// Route data for editing a collection, shown full-screen (no shell).
-@TypedGoRoute<CollectionEditRoute>(
-  path: '/collections/:id/edit',
-  name: 'collection_edit',
-)
-class CollectionEditRoute extends GoRouteData with $CollectionEditRoute {
-  const CollectionEditRoute(this.id);
-
-  final String id;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      CollectionFormScreen(id: id);
 }
 
 /// Tracks deep-link targets and splash-screen completion so the redirect can
@@ -279,21 +159,27 @@ class DeepLinkScope extends InheritedWidget {
 }
 
 /// Builds the app router and wires auth redirects to [bloc] state changes.
+///
+/// [featureRoutes] are the non-shell routes contributed by the feature
+/// packages (and auth's login/register). They are mounted alongside the
+/// generated shell routes ([$appRoutes]) so adding a feature's screens never
+/// edits this file — the feature ships its own route table.
 ({GoRouter router, DeepLinkState deepLink}) buildRouterWithDeepLink(
   AuthBloc bloc, {
+  required List<RouteBase> featureRoutes,
   List<NavigatorObserver>? observers,
 }) {
   final deepLink = DeepLinkState();
   final homeLocation = const HomeRoute().location;
   final splashLocation = const SplashRoute().location;
-  final loginLocation = const LoginRoute().location;
-  final registerLocation = const RegisterRoute().location;
+  const loginLocation = AuthRoutes.login;
+  const registerLocation = AuthRoutes.register;
 
   final router = GoRouter(
     // No initialLocation — GoRouter resolves the platform deep-link URI on
     // cold start and the redirect below captures it before sending the user
     // through splash / auth.
-    routes: $appRoutes,
+    routes: [...$appRoutes, ...featureRoutes],
     observers: observers,
     refreshListenable: _BlocListenable(bloc.stream),
     redirect: (context, state) {

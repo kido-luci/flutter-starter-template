@@ -30,12 +30,13 @@
 
 import 'dart:async';
 
+import 'package:feature_auth/feature_auth.dart';
+import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
@@ -102,9 +103,9 @@ void main() {
     await tester.pumpAndSettle();
     await shot('register');
     // Back to login without registering (the demo account already exists).
-    const LoginRoute().go(
-      tester.element(find.text('Join Flutter Starter').first),
-    );
+    tester
+        .element(find.text('Join Flutter Starter').first)
+        .go(AuthRoutes.login);
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();
 
@@ -155,7 +156,9 @@ void main() {
     // rely on finding its title text in the lazy list).
     final first = bmBloc.state.items.first;
     unawaited(
-      BookmarkDetailRoute(first.id).push<void>(tester.element(bookmarksTitle)),
+      tester
+          .element(bookmarksTitle)
+          .push<void>(BookmarksRoutes.detail(first.id)),
     );
     await E2eApp.settle(tester);
     await tester.pumpAndSettle();

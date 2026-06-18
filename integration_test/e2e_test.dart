@@ -18,12 +18,15 @@ import 'dart:async';
 
 import 'package:feature_auth/src/presentation/bloc/auth_bloc.dart';
 import 'package:feature_auth/src/presentation/bloc/auth_state.dart';
+import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_bookmarks/src/presentation/bloc/bookmark_form/bookmark_form_bloc.dart';
 import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks_list_bloc.dart';
+import 'package:feature_collections/feature_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'support/e2e_app.dart';
@@ -320,7 +323,7 @@ Future<void> _openCollectionsListFromHome(WidgetTester tester) async {
   // popped — don't await it here, or the test would deadlock waiting for a
   // pop that hasn't happened yet.
   unawaited(
-    const CollectionsListRoute().push<void>(tester.element(homeAppBarTitle)),
+    tester.element(homeAppBarTitle).push<void>(CollectionsRoutes.list),
   );
   await E2eApp.settle(tester);
   await tester.pumpAndSettle();
@@ -332,7 +335,7 @@ Future<void> _openBookmarkDetail(WidgetTester tester, String title) async {
   final bloc = context.read<BookmarksListBloc>();
   final bookmark = bloc.state.items.firstWhere((item) => item.title == title);
 
-  unawaited(BookmarkDetailRoute(bookmark.id).push<void>(context));
+  unawaited(context.push<void>(BookmarksRoutes.detail(bookmark.id)));
   await E2eApp.settle(tester);
   await tester.pumpAndSettle();
   final detailTitle = find.descendant(
