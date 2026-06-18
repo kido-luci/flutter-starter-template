@@ -5,6 +5,40 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-06-18
+
+Adds the `fst add-feature` generator and the seams it builds on, making a new
+feature a one-command operation. No behavior change to the running app.
+
+### Added
+
+- **`fst add-feature` generator** — a new CLI command (in
+  `flutter-starter-template-cli`, adopted here via the `tool/cli` submodule and
+  the `# fst:` / `// fst:` wiring markers) that scaffolds a presentation-only
+  feature package and wires it into the workspace, the dependency list, the
+  injectable DI graph, and `enabledFeatures` in one step.
+- **Pluggable feature routing** — `FeatureModule` gains a `routes` getter, so a
+  feature contributes its own non-shell routes (plain `GoRoute` lists built from
+  its path constants) instead of the app router declaring them.
+- **DI module-ordering guard** — a pure file-scan architecture test that locks
+  the load-bearing order of `externalPackageModulesBefore` (`shared_contracts`
+  before `notifications`, `auth` before the other features), so a reorder that
+  would only fail at runtime fails fast in CI.
+
+### Changed
+
+- **Non-shell routes relocated to their features** — the bookmark, collection,
+  and auth (login/register) route classes moved out of `lib/app/router.dart`
+  into their owning packages. The app shell keeps only the typed bottom-nav
+  `StatefulShellRoute` (tabs plus the nested change-password route) and the boot
+  splash route, so adding a feature's screens no longer edits the router.
+- **Feature barrels narrowed to the consumed surface** — `bookmarks`,
+  `collections`, and `notifications` stop exporting their domain repositories
+  and use cases (resolved only through DI). Each package's public API is now the
+  entity, sync controller, screens, and routes the app actually uses; in-package
+  tests reach the now-internal types through `src/` imports, matching the
+  existing `collections` convention.
+
 ## [1.3.0] - 2026-06-18
 
 Structure cleanup that sharpens the package boundaries and co-locates tests with
@@ -128,6 +162,7 @@ First stable release of the Flutter starter template.
   backend deps, and the pre-push hook).
 - **Tooling** — Dart & CodeGraph MCP servers and vendored agent skills.
 
+[1.4.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.4.0
 [1.3.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.3.0
 [1.2.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.2.0
 [1.1.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.1.0
