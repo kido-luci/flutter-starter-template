@@ -3,6 +3,7 @@ import 'package:feature_auth/src/data/datasources/auth_local_data_source.dart';
 import 'package:feature_auth/src/data/datasources/auth_remote_data_source.dart';
 import 'package:feature_auth/src/data/models/auth_user_dto.dart';
 import 'package:feature_auth/src/data/models/refresh_token_request.dart';
+import 'package:feature_auth/src/data/models/register_request.dart';
 import 'package:feature_auth/src/data/models/sign_in_request.dart';
 import 'package:feature_auth/src/data/models/sign_in_response.dart';
 import 'package:feature_auth/src/data/network/token_refresher.dart';
@@ -19,6 +20,8 @@ class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
 class MockTokenRefresher extends Mock implements TokenRefresher {}
 
 class FakeSignInRequest extends Fake implements SignInRequest {}
+
+class FakeRegisterRequest extends Fake implements RegisterRequest {}
 
 class FakeRefreshTokenRequest extends Fake implements RefreshTokenRequest {}
 
@@ -40,6 +43,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(FakeSignInRequest());
+    registerFallbackValue(FakeRegisterRequest());
     registerFallbackValue(FakeRefreshTokenRequest());
     registerFallbackValue(FakeAuthUser());
   });
@@ -139,6 +143,50 @@ void main() {
       final err = result as Err<AuthUser>;
       expect(err.failure, isA<UnknownFailure>());
       expect(err.failure.message, 'Network error');
+    });
+
+    test('returns UnknownFailure and does not persist on a malformed '
+        'response body', () async {
+      // A malformed 200 body makes retrofit throw a (non-Dio) parse error; it
+      // must be mapped to a Result, not allowed to escape into AuthBloc.
+      when(() => mockRemote.signIn(any())).thenThrow(TypeError());
+
+      final result = await repository.signIn(
+        username: 'alice',
+        password: 'pass',
+      );
+
+      expect(result, isA<Err<AuthUser>>());
+      expect((result as Err<AuthUser>).failure, isA<UnknownFailure>());
+      verifyNever(
+        () => mockLocal.setSession(
+          user: any(named: 'user'),
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      );
+    });
+  });
+
+  group('register', () {
+    test('returns UnknownFailure and does not persist on a malformed '
+        'response body', () async {
+      when(() => mockRemote.register(any())).thenThrow(TypeError());
+
+      final result = await repository.register(
+        username: 'alice',
+        password: 'pass',
+      );
+
+      expect(result, isA<Err<AuthUser>>());
+      expect((result as Err<AuthUser>).failure, isA<UnknownFailure>());
+      verifyNever(
+        () => mockLocal.setSession(
+          user: any(named: 'user'),
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      );
     });
   });
 
