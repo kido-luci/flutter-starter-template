@@ -5,6 +5,35 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-18
+
+Structure cleanup that sharpens the package boundaries and co-locates tests with
+the code they exercise. No behavior change.
+
+### Changed
+
+- **`Session` contract relocated** — moved from `shared_ui` to
+  `shared_contracts`, alongside the other cross-feature business contracts.
+  `SessionScope` (the `InheritedWidget`) stays in `shared_ui` and reads the
+  contract across the boundary. `shared_contracts` gains a Flutter dependency
+  for `Session`'s `Listenable`.
+- **Feature tests moved beside their packages** — each feature's tests now live
+  under `packages/features/<name>/test/` with a self-contained
+  `test/support.dart`. Cross-feature test doubles (`FakeSession`, the
+  `shared_contracts` reader mocks) and shared fixtures (`testUser`,
+  `testFailure`) are promoted into the `test_utils` package. The root `test/`
+  keeps only the app-level `widget_test` and the `architecture/` layering and
+  feature-boundary suites.
+- **Docs reconciled** — `CLAUDE.md`, `packages/README.md`, `test/README.md`, and
+  `lib/core/README.md` updated for the new `Session` location, the
+  package-owned test convention, and the corrected DI composition-root path
+  (`lib/app/di/injection.dart`).
+
+### Fixed
+
+- Three feature tests imported the root app package solely for `getIt`; they now
+  resolve it from each feature's own locator, removing a cross-layer coupling.
+
 ## [1.2.0] - 2026-06-17
 
 Completes the move to a fully package-based architecture. Every feature now
@@ -99,6 +128,7 @@ First stable release of the Flutter starter template.
   backend deps, and the pre-push hook).
 - **Tooling** — Dart & CodeGraph MCP servers and vendored agent skills.
 
+[1.3.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.3.0
 [1.2.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.2.0
 [1.1.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.1.0
 [1.0.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.0.0
