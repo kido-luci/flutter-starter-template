@@ -23,6 +23,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Shared test doubles (FakeSession) and fixtures.
+  test_utils: ^0.1.0
+
 flutter:
   assets:
     - assets/icons/
