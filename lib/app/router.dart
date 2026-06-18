@@ -251,7 +251,7 @@ String? resolveSplashRedirect({
       deepLink.pendingRedirect = null;
       if (target != requestedUri) return target;
     }
-    // Leaving splash or login/register — restore the captured deep link.
+    // No pending deep link; bounce off splash/login/register to home.
     if (location == splashLocation ||
         location == loginLocation ||
         location == registerLocation) {
