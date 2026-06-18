@@ -31,8 +31,16 @@ class FakeSession extends ChangeNotifier implements Session {
   Future<void> restore() async {}
 
   @override
-  void signOut() {}
+  void signOut() {
+    currentUser = null;
+    isSigningOut = false;
+    notifyListeners();
+  }
 
   @override
-  void clearSession() {}
+  void clearSession() {
+    currentUser = null;
+    isSigningOut = false;
+    notifyListeners();
+  }
 }

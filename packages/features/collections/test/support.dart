@@ -41,8 +41,8 @@ final testCollection = Collection(
   icon: 'e8d4',
   color: 0xFF6366F1,
   bookmarkIds: const [],
-  createdAt: DateTime(2025, 1, 1),
-  updatedAt: DateTime(2025, 1, 1),
+  createdAt: DateTime.utc(2025, 1, 1),
+  updatedAt: DateTime.utc(2025, 1, 1),
 );
 
 Collection buildCollection({

@@ -27,8 +27,8 @@ final testBookmark = Bookmark(
   url: 'https://flutter.dev',
   description: 'Flutter website',
   tags: ['dev'],
-  createdAt: DateTime(2025, 1, 1),
-  updatedAt: DateTime(2025, 1, 1),
+  createdAt: DateTime.utc(2025, 1, 1),
+  updatedAt: DateTime.utc(2025, 1, 1),
 );
 
 final testBookmark2 = Bookmark(
@@ -37,6 +37,6 @@ final testBookmark2 = Bookmark(
   url: 'https://dart.dev',
   description: 'Dart website',
   tags: ['lang'],
-  createdAt: DateTime(2025, 1, 2),
-  updatedAt: DateTime(2025, 1, 2),
+  createdAt: DateTime.utc(2025, 1, 2),
+  updatedAt: DateTime.utc(2025, 1, 2),
 );
