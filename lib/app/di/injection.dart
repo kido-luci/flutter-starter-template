@@ -43,6 +43,7 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(FeatureBookmarksPackageModule),
     ExternalModule(FeatureHomePackageModule),
     ExternalModule(FeatureProfilePackageModule),
+    // fst:feature-modules — `fst add-feature` inserts new feature modules above
   ],
 )
 Future<void> configureDependencies() async {

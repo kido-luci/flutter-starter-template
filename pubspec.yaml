@@ -44,6 +44,7 @@ workspace:
   - packages/features/splash
   - packages/features/home
   - packages/features/profile
+  # fst:features — `fst add-feature` inserts new feature packages above this line
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -73,6 +74,7 @@ dependencies:
   feature_splash: ^0.1.0
   feature_home: ^0.1.0
   feature_profile: ^0.1.0
+  # fst:feature-deps — `fst add-feature` inserts new feature deps above this line
 
   flutter:
     sdk: flutter
