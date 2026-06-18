@@ -121,6 +121,26 @@ void main() {
     verify(() => local.clearSession()).called(1);
   });
 
+  test(
+    'clears session (invalidSession) on a malformed body, without throwing',
+    () async {
+      when(() => local.refreshToken).thenReturn('old');
+      // A 200 with a non-null body missing the required token fields: parsing
+      // throws a (non-Dio) error that must be treated as an unusable body, not
+      // allowed to escape the refresher.
+      stubPost(() => okResponse({'unexpected': 'shape'}));
+
+      expect(await refresher.refresh(), RefreshOutcome.invalidSession);
+      verify(() => local.clearSession()).called(1);
+      verifyNever(
+        () => local.updateTokens(
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      );
+    },
+  );
+
   test('single-flight: concurrent callers share one POST', () async {
     when(() => local.refreshToken).thenReturn('old');
     final completer = Completer<Response<Map<String, dynamic>>>();
