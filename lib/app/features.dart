@@ -1,6 +1,7 @@
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 import 'package:feature_collections/feature_collections.dart';
 import 'package:feature_notifications/feature_notifications.dart';
+import 'package:go_router/go_router.dart';
 
 import 'di/injection.dart';
 import 'feature_module.dart';
@@ -22,6 +23,9 @@ final class _BookmarksModule extends FeatureModule {
     final ctrl = getIt<BookmarksSyncController>();
     return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
   }
+
+  @override
+  Iterable<RouteBase> get routes => bookmarksRoutes;
 }
 
 final class _CollectionsModule extends FeatureModule {
@@ -32,6 +36,9 @@ final class _CollectionsModule extends FeatureModule {
     final ctrl = getIt<CollectionsSyncController>();
     return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
   }
+
+  @override
+  Iterable<RouteBase> get routes => collectionsRoutes;
 }
 
 final class _NotificationsModule extends FeatureModule {

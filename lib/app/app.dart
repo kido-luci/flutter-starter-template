@@ -59,13 +59,18 @@ class _AppState extends State<App> {
     _authBloc = widget.authBloc ?? getIt<AuthBloc>();
     _themeBloc = widget.themeBloc ?? getIt<ThemeBloc>();
     _session = widget.session ?? AuthSession(_authBloc);
+    final features = widget.features ?? enabledFeatures;
     final result = buildRouterWithDeepLink(
       _authBloc,
+      featureRoutes: [
+        ...authRoutes,
+        for (final f in features) ...f.routes,
+      ],
       observers: widget.navigatorObservers ?? [getIt<AnalyticsRouteObserver>()],
     );
     _router = result.router;
     _deepLink = result.deepLink;
-    _syncControllers = (widget.features ?? enabledFeatures)
+    _syncControllers = features
         .map((f) => f.syncController)
         .whereType<FeatureSyncController>()
         .toList(growable: false);
