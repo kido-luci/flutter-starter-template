@@ -41,6 +41,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return Ok(user);
     } on DioException catch (e) {
       return Err(_mapDioError(e));
+    } on Object {
+      // A malformed response body makes the parse throw a non-Dio error; map
+      // it to a failure instead of letting it escape into the bloc.
+      return const Err(UnknownFailure('Unexpected server response'));
     }
   }
 
@@ -62,6 +66,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return Ok(user);
     } on DioException catch (e) {
       return Err(_mapDioError(e));
+    } on Object {
+      // A malformed response body makes the parse throw a non-Dio error; map
+      // it to a failure instead of letting it escape into the bloc.
+      return const Err(UnknownFailure('Unexpected server response'));
     }
   }
 
