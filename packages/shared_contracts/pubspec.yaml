@@ -12,6 +12,9 @@ environment:
 resolution: workspace
 
 dependencies:
+  flutter:
+    sdk: flutter
+
   architecture: ^0.1.0
   injectable: ^3.0.0
 

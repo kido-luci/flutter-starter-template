@@ -9,7 +9,12 @@ environment:
 resolution: workspace
 
 dependencies:
+  flutter:
+    sdk: flutter
+
   analytics: ^0.1.0
   app_platform: ^0.1.0
+  architecture: ^0.1.0
+  shared_contracts: ^0.1.0
   storage: ^0.1.0
   mocktail: ^1.0.5

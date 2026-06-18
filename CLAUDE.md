@@ -99,10 +99,13 @@ need it first.
   three applies and the contract is promoted to a `shared_*` package. Both rules
   are enforced by `test/architecture/feature_boundaries_test.dart` (the
   capability allowlist) and `package_layering_test.dart` (dependency direction).
-- **`packages/shared_contracts/`** — pure-Dart *business* vocabulary used by 2+
-  features (e.g. `AuthUser`, the cross-feature reader interfaces). No Flutter.
-- **`packages/shared_ui/`** — cross-feature *presentation* contracts that need
-  Flutter: the app-wide `Session`/`SessionScope` and shared widgets.
+- **`packages/shared_contracts/`** — cross-feature *business* vocabulary used by
+  2+ features (e.g. `AuthUser`, the reader interfaces, the app-wide `Session`
+  lifecycle contract). Depends on Flutter only for `Session`'s `Listenable`;
+  otherwise pure-Dart.
+- **`packages/shared_ui/`** — cross-feature *presentation* widgets that need
+  Flutter: the `SessionScope` accessor (which exposes the `Session` defined in
+  `shared_contracts`) and shared widgets.
 - **`packages/app_ui/`** — the *design system*: generic visual building blocks
   with no business meaning. **`packages/theme/`** owns theming + `ThemeBloc`.
 - **Infra packages** — `network`, `storage`, `analytics`, `app_platform`,
@@ -122,7 +125,7 @@ dumping ground.
 **Worked example — the session.** "Who is logged in" is app-wide state read by
 `home`, `profile`, and `splash`. Rather than have those features import the auth
 feature's `AuthBloc` (a presentation-layer type), they depend on the `Session`
-contract in `package:shared_ui` (current user + the `restore`/`signOut`/
+contract in `package:shared_contracts` (current user + the `restore`/`signOut`/
 `clearSession` lifecycle). The auth feature provides the implementation
 (`AuthSession`, an adapter over `AuthBloc`, in
 `packages/features/auth/lib/src/presentation/auth_session.dart`); the

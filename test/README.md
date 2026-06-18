@@ -6,18 +6,25 @@ The testing strategy emphasizes unit tests for logic and widget tests for UI com
 
 ## Directory Structure
 
-This `test/` directory holds **root app tests only** and mirrors the app's
-`lib/` structure. Reusable infrastructure now lives in workspace packages, and
-each package owns its tests under `packages/<name>/test` — so there is no
-`test/core/` here; those suites moved into the relevant workspace package / `app_ui`
-packages.
+This `test/` directory holds **app-level tests only**. Each feature and infra
+package owns its own tests under `packages/<name>/test` (each feature with a
+`test/support.dart` for its mocks/fixtures), so there are no `features/` or
+`core/` suites here — they live beside the packages they exercise.
 
-- `features/`: Tests for the app's features, organized by data, domain, and presentation layers.
-- `test_utils/`: Root-only test helpers.
-  - `mocks.dart`: Hand-written `mocktail` mocks/fakes for the app's repositories, use cases, and services (e.g. `MockSignIn`, `FakeSession`).
-  - `fixtures.dart`: Reusable test data used across multiple tests.
-- `test_utils.dart`: Barrel file. Re-exports `package:test_utils/test_utils.dart` (the shared `mocktail` export plus cross-package mocks/fakes) alongside the local `mocks.dart` and `fixtures.dart`.
-- `widget_test.dart`: An integration-style widget test that exercises the full app startup and sign-in flow.
+- `architecture/`: Guardrail tests over the whole workspace —
+  `package_layering_test.dart` (dependency direction) and
+  `feature_boundaries_test.dart` (no cross-feature imports outside the
+  capability allowlist).
+- `test_utils/`
+  - `mocks.dart`: The few cross-feature mocks the app-level `widget_test` needs
+    (auth use-case mocks, `MockNotificationsBloc`). Feature-local mocks live in
+    each feature package's `test/support.dart`; shared doubles
+    (`FakeSession`, the reader mocks) and fixtures (`testUser`, `testFailure`)
+    come from `package:test_utils`.
+- `test_utils.dart`: Barrel re-exporting `package:test_utils/test_utils.dart`
+  alongside the local `mocks.dart`.
+- `widget_test.dart`: An integration-style widget test that exercises the full
+  app startup and sign-in flow.
 
 ## Mocking Dependencies
 

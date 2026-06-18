@@ -34,6 +34,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  test_utils: ^0.1.0
+
   build_runner: ^2.15.0
   freezed: ^3.2.5
   injectable_generator: ^3.0.2
