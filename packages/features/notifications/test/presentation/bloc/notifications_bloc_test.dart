@@ -1,6 +1,9 @@
 import 'package:architecture/architecture.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:feature_notifications/feature_notifications.dart';
+import 'package:feature_notifications/src/domain/usecases/get_notifications_feed.dart';
+import 'package:feature_notifications/src/domain/usecases/get_notifications_feed_local.dart';
+import 'package:feature_notifications/src/domain/usecases/mark_notification_read.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support.dart';

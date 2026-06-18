@@ -1,4 +1,10 @@
 import 'package:feature_bookmarks/feature_bookmarks.dart';
+import 'package:feature_bookmarks/src/domain/usecases/create_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/delete_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/get_bookmark.dart';
+import 'package:feature_bookmarks/src/domain/usecases/list_bookmarks.dart';
+import 'package:feature_bookmarks/src/domain/usecases/list_local_bookmarks.dart';
+import 'package:feature_bookmarks/src/domain/usecases/update_bookmark.dart';
 import 'package:test_utils/test_utils.dart';
 
 export 'package:test_utils/test_utils.dart';
