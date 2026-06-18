@@ -45,6 +45,7 @@ To enable seamless local development and testing, this template is paired with a
 - [✨ What's Inside](#-whats-inside)
 - [🧬 Architecture](#-architecture)
   - [📁 Feature Slice (Clean Architecture)](#-feature-slice-clean-architecture)
+  - [🪄 Scaffolding a New Feature](#-scaffolding-a-new-feature)
 - [🚀 Quick Start](#-quick-start)
 - [🧪 Testing & Code Quality](#-testing--code-quality)
 - [🔄 Git Workflow & PRs](#-git-workflow--prs)
@@ -85,6 +86,7 @@ To enable seamless local development and testing, this template is paired with a
 | 📡 **REST**               | `Retrofit` + `Dio` typed clients with auth interceptor |
 | ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark & collection CRUD, uploads |
 | 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude, Cursor, Codex, Command Code, and Antigravity |
+| 🪄 **Feature Generator**  | `fst add-feature <name>` scaffolds a presentation feature package and wires the workspace, DI graph, and routing in one command |
 | 🚀 **Release CI**         | Fastlane lanes — iOS → TestFlight, Android → Play — flavor‑aware, wired to GitHub Actions |
 
 <br>
@@ -334,6 +336,36 @@ packages/features/<name>/
 │       └── locator.dart         Shared GetIt instance
 └── pubspec.yaml                 name: feature_<name>, resolution: workspace
 ```
+
+<br>
+
+### 🪄 Scaffolding a New Feature
+
+Rather than hand-create the package above, the project's `fst` CLI scaffolds and
+wires a presentation-only feature in one command. Run it from the **repo root**:
+
+```bash
+dart pub global activate flutter_starter_template_cli   # one-time — provides `fst`
+fst add-feature settings                                # or run bare to be prompted
+```
+
+This generates `packages/features/settings/` — a presentation-only slice with a
+screen routed at `/settings` — and wires it into every place the app needs to
+know about it:
+
+| Wired into | File |
+|---|---|
+| Workspace member + dependency | `pubspec.yaml` |
+| Injectable DI graph | `lib/app/di/injection.dart` |
+| `enabledFeatures` registry | `lib/app/features.dart` |
+
+It then runs `pub get` + code generation so the tree compiles immediately. Pass
+`--no-codegen` to skip that step and regenerate yourself later.
+
+The wiring edits land at the `# fst:` / `// fst:` markers in those files (so the
+generator never has to parse Dart) — leave the markers in place. The `fst` CLI
+source lives in [`tool/cli/`](tool/cli); it's the same tool as the `fst create`
+project scaffolder.
 
 <br>
 
