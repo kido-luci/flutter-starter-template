@@ -182,58 +182,87 @@ class DeepLinkScope extends InheritedWidget {
     routes: [...$appRoutes, ...featureRoutes],
     observers: observers,
     refreshListenable: _BlocListenable(bloc.stream),
-    redirect: (context, state) {
-      final location = state.matchedLocation;
-      final auth = bloc.state;
-
-      // ── Phase 1: Before splash completes ──
-      // Intercept every navigation until restoreSession and the splash
-      // minimum display time complete. The splash screen flips
-      // splashCompleted after both gates finish.
-      if (!deepLink.splashCompleted) {
-        // Already on splash — let it run.
-        if (location == splashLocation) return null;
-        // Any other location (deep link or default '/') — capture and
-        // send through splash first.
-        deepLink.pendingRedirect ??= state.uri.toString();
-        return splashLocation;
-      }
-
-      // ── Phase 2: Unauthenticated ──
-      // Splash completed with no session, or user signed out.
-      if (auth is AuthInitial || auth is AuthFailure) {
-        if (location == loginLocation || location == registerLocation) {
-          return null;
-        }
-        deepLink.pendingRedirect ??= state.uri.toString();
-        return loginLocation;
-      }
-
-      // ── Phase 3: Authenticated (incl. mid-sign-out) ──
-      // AuthSigningOut still holds a user; let the screen stay put until the
-      // op completes and AuthBloc emits AuthInitial.
-      if (auth is AuthAuthenticated || auth is AuthSigningOut) {
-        final target = deepLink.pendingRedirect;
-        if (target != null) {
-          deepLink.pendingRedirect = null;
-          if (target != state.uri.toString()) return target;
-        }
-        // Leaving splash or login/register — restore the captured deep link.
-        if (location == splashLocation ||
-            location == loginLocation ||
-            location == registerLocation) {
-          return homeLocation;
-        }
-        // Already on a valid, protected route — allow it.
-        return null;
-      }
-
-      // AuthSubmitting — don't interfere.
-      return null;
-    },
+    redirect: (context, state) => resolveSplashRedirect(
+      auth: bloc.state,
+      location: state.matchedLocation,
+      requestedUri: state.uri.toString(),
+      deepLink: deepLink,
+      splashLocation: splashLocation,
+      loginLocation: loginLocation,
+      registerLocation: registerLocation,
+      homeLocation: homeLocation,
+    ),
   );
 
   return (router: router, deepLink: deepLink);
+}
+
+/// Resolves the auth/splash redirect for a single navigation.
+///
+/// Pure decision function behind [buildRouterWithDeepLink]'s `redirect`: given
+/// the current [auth] state, the [location] GoRouter matched, the
+/// [requestedUri] the user is trying to reach, and the mutable [deepLink] gate,
+/// it returns the location to redirect to, or `null` to allow the navigation.
+/// Extracted so the three-phase state machine can be unit-tested without
+/// assembling a full [GoRouter] and widget tree.
+///
+/// Mutates [DeepLinkState.pendingRedirect] to capture a cold-start/deep-link
+/// target before splash/auth, then replays it once the user is authenticated.
+@visibleForTesting
+String? resolveSplashRedirect({
+  required AuthState auth,
+  required String location,
+  required String requestedUri,
+  required DeepLinkState deepLink,
+  required String splashLocation,
+  required String loginLocation,
+  required String registerLocation,
+  required String homeLocation,
+}) {
+  // ── Phase 1: Before splash completes ──
+  // Intercept every navigation until restoreSession and the splash minimum
+  // display time complete. The splash screen flips splashCompleted after both
+  // gates finish.
+  if (!deepLink.splashCompleted) {
+    // Already on splash — let it run.
+    if (location == splashLocation) return null;
+    // Any other location (deep link or default '/') — capture and send
+    // through splash first.
+    deepLink.pendingRedirect ??= requestedUri;
+    return splashLocation;
+  }
+
+  // ── Phase 2: Unauthenticated ──
+  // Splash completed with no session, or user signed out.
+  if (auth is AuthInitial || auth is AuthFailure) {
+    if (location == loginLocation || location == registerLocation) {
+      return null;
+    }
+    deepLink.pendingRedirect ??= requestedUri;
+    return loginLocation;
+  }
+
+  // ── Phase 3: Authenticated (incl. mid-sign-out) ──
+  // AuthSigningOut still holds a user; let the screen stay put until the op
+  // completes and AuthBloc emits AuthInitial.
+  if (auth is AuthAuthenticated || auth is AuthSigningOut) {
+    final target = deepLink.pendingRedirect;
+    if (target != null) {
+      deepLink.pendingRedirect = null;
+      if (target != requestedUri) return target;
+    }
+    // No pending deep link; bounce off splash/login/register to home.
+    if (location == splashLocation ||
+        location == loginLocation ||
+        location == registerLocation) {
+      return homeLocation;
+    }
+    // Already on a valid, protected route — allow it.
+    return null;
+  }
+
+  // AuthSubmitting / AuthRestoring — don't interfere.
+  return null;
 }
 
 /// Adapts a [Stream] to the [Listenable] contract GoRouter needs for
