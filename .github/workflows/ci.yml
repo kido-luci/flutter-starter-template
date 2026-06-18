@@ -1,62 +1,17 @@
 name: CI
 
+# Path filtering is done at the JOB level (see the `changes` gate below), NOT
+# here via `paths-ignore`. The four build jobs are *required* status checks: a
+# workflow skipped by `paths-ignore` never reports those contexts, so branch
+# protection waits on them forever and a docs-only PR can never merge. Starting
+# the workflow unconditionally and skipping the heavy jobs with an `if:` keeps
+# the same CI-minute savings (a skipped required check counts as passing) while
+# avoiding that deadlock.
 on:
   push:
     branches: [main]
-    # Skip analyze/test when a push touches only docs. Any change outside
-    # these paths (lib/, test/, packages/, pubspec.*, .github/workflows/, etc.)
-    # still triggers CI — workflow changes are deliberately NOT ignored so CI
-    # validates its own edits.
-    paths-ignore:
-      - '**/*.md'
-      - 'doc/**'
-      - 'LICENSE'
-      - '.mcp.json'
-      - '.agents/**'
-      - '.vscode/**'
-      - '.antigravity/**'
-      - '.antigravitycli/**'
-      - '.mcp/**'
-      - '.codegraph/**'
-      - '.commandcode/**'
-      - 'skills-lock.json'
-      - '.antigravityrules'
-      - '.coderabbit.yaml'
-      - '.githooks/**'
-      - '.gitattributes'
-      - '.gitmodules'
-      - '.github/dependabot.yml'
-      # Submodule pointer bumps (incl. Dependabot's). CI never checks out
-      # submodules and neither is part of the Flutter build, so a gitlink
-      # change cannot affect these jobs.
-      - 'simple_backend_server'
-      - 'tool/cli'
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**/*.md'
-      - 'doc/**'
-      - 'LICENSE'
-      - '.mcp.json'
-      - '.agents/**'
-      - '.vscode/**'
-      - '.antigravity/**'
-      - '.antigravitycli/**'
-      - '.mcp/**'
-      - '.codegraph/**'
-      - '.commandcode/**'
-      - 'skills-lock.json'
-      - '.antigravityrules'
-      - '.coderabbit.yaml'
-      - '.githooks/**'
-      - '.gitattributes'
-      - '.gitmodules'
-      - '.github/dependabot.yml'
-      # Submodule pointer bumps (incl. Dependabot's). CI never checks out
-      # submodules and neither is part of the Flutter build, so a gitlink
-      # change cannot affect these jobs.
-      - 'simple_backend_server'
-      - 'tool/cli'
 
 # Cancel superseded runs on the same ref to save CI minutes.
 concurrency:
@@ -69,8 +24,62 @@ permissions:
   contents: read
 
 jobs:
+  # Gate: decide whether the expensive build jobs need to run. `code` is true
+  # when any changed path could affect the Flutter build — i.e. anything outside
+  # the docs/tooling allowlist below. The heavy jobs gate on this output: for a
+  # docs-only change they are *skipped* (not absent), and a skipped required
+  # check satisfies branch protection, so the PR stays mergeable. This is the
+  # inverse of the former `paths-ignore` list — '**' selects everything, then
+  # the negations subtract paths that can't affect the build. Keep them in sync.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Filter paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!doc/**'
+              - '!LICENSE'
+              - '!.mcp.json'
+              - '!.agents/**'
+              - '!.vscode/**'
+              - '!.antigravity/**'
+              - '!.antigravitycli/**'
+              - '!.mcp/**'
+              - '!.codegraph/**'
+              - '!.commandcode/**'
+              - '!skills-lock.json'
+              - '!.antigravityrules'
+              - '!.coderabbit.yaml'
+              - '!.githooks/**'
+              - '!.gitattributes'
+              - '!.gitmodules'
+              - '!.github/dependabot.yml'
+              # Submodule pointer bumps (incl. Dependabot's). CI never checks out
+              # submodules and neither is part of the Flutter build, so a gitlink
+              # change cannot affect these jobs.
+              - '!simple_backend_server'
+              - '!tool/cli'
+
   analyze-and-test:
     name: Analyze & Test
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -224,6 +233,8 @@ jobs:
   # release.yml before shipping.
   build-android:
     name: Build Android (debug)
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -301,6 +312,8 @@ jobs:
   # every PR; the only cost is wall-clock time (pod install + native compile).
   build-ios:
     name: Build iOS (debug, no codesign)
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: macos-15
     steps:
       - name: Checkout
@@ -444,6 +457,8 @@ jobs:
   # live in packages/app_ui, which has no codegen, so no build_runner is needed.
   golden-tests:
     name: Golden tests (macOS)
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: macos-15
     steps:
       - name: Checkout
