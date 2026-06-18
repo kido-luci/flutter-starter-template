@@ -13,6 +13,7 @@ const List<FeatureModule> enabledFeatures = [
   _BookmarksModule(),
   _CollectionsModule(),
   _NotificationsModule(),
+  // fst:enabled-features — `fst add-feature` inserts new modules above this line
 ];
 
 final class _BookmarksModule extends FeatureModule {
@@ -50,6 +51,8 @@ final class _NotificationsModule extends FeatureModule {
     return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
   }
 }
+
+// fst:feature-module-classes — `fst add-feature` inserts new module classes above
 
 /// Adapts any feature's sync controller to [FeatureSyncController] without a
 /// bespoke wrapper class per feature. The controllers don't implement the
