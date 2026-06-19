@@ -161,7 +161,7 @@ dev_dependencies:
   # (output: lib/gen/assets.gen.dart). Use e.g. Assets.images.logo instead
   # of raw 'assets/images/logo.png' strings.
   flutter_gen_runner: ^5.14.1
-  very_good_analysis: ^10.2.0
+  very_good_analysis: ^10.3.0
 
   # Generates native launcher icons for all platforms from a single source
   # image. Run: dart run flutter_launcher_icons (config below).
