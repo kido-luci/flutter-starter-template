@@ -13,6 +13,10 @@ through this single package.
 
 Organized by capability under `lib/src/`:
 
+- **`crash/`** — `CrashReporter` port with a `FirebaseCrashReporter` adapter and
+  a `NoOpCrashReporter`. `CrashModule` binds it at the `// fst:crash-impl`
+  marker; `fst create --no-firebase` swaps it to the no-op. `main.dart` installs
+  the global error handlers through this port.
 - **`media/`** — `CameraService`, `ImagePickerService`, `VideoPlayerService`.
 - **`notifications/`** — `NotificationsService` (on-device scheduling +
   tap-to-navigate) and `FirebaseMessagingService` (FCM).

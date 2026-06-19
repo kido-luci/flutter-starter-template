@@ -22,3 +22,12 @@ events without depending on the SDK directly. Exported through
 `ThemeBloc` and `app_platform`'s messaging service), so this module must be
 registered **before** them in the app's DI composition. See
 [`packages/README.md`](../README.md) for the micro-package DI pattern.
+
+## Swapping the backend
+
+`AnalyticsService` is a port. The DI module binds it at the
+`// fst:analytics-impl` marker in `lib/src/analytics_module.dart` —
+`FirebaseAnalyticsService` by default, `NoOpAnalyticsService` when analytics is
+off. Change that one expression (or point it at your own adapter) to switch
+backends; `fst create --no-firebase` swaps it to the no-op automatically. The
+firebase_analytics dependency stays but is inert under the no-op binding.
