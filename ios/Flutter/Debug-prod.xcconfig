@@ -1,5 +1,5 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug-prod.xcconfig"
 #include "Generated.xcconfig"
 
-APP_DISPLAY_NAME = Flutter Starter Template
+APP_DISPLAY_NAME = Flutter Starter
 PRODUCT_BUNDLE_IDENTIFIER = com.luci-studio.flutterStarterTemplate
