@@ -2,13 +2,13 @@ import 'dart:developer' as developer;
 
 import 'package:app_platform/app_platform.dart';
 import 'package:config/config.dart';
-import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'package:flutter/material.dart';
 import 'package:storage/storage.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap_error_app.dart';
 import 'app/di/injection.dart';
+import 'app/firebase.dart';
 import 'core/platform/firebase/firebase_service.dart';
 
 Future<void> main() async {
@@ -21,15 +21,20 @@ Future<void> main() async {
     // across uninstalls) before session restore reads secure storage.
     await getIt<KeychainResetOnReinstall>().run();
 
-    await getIt<FirebaseService>().init();
-    // Must follow FirebaseService.init() — Crashlytics needs the Firebase app
-    // initialized before the error handlers can record.
-    await getIt<CrashReportingService>().install();
-
-    await getIt<RemoteConfigService>().init();
-
+    // Local notifications are not a Firebase service — always initialise.
     await getIt<NotificationsService>().init();
-    await getIt<FirebaseMessagingService>().init();
+
+    if (kFirebaseEnabled) {
+      await getIt<FirebaseService>().init();
+      await getIt<RemoteConfigService>().init();
+      await getIt<FirebaseMessagingService>().init();
+    }
+
+    // Crash reporting goes through the CrashReporter port. The no-op binding
+    // does nothing; the Firebase adapter requires Firebase initialised above,
+    // so this must follow the platform block.
+    await getIt<CrashReporter>().install();
+
     runApp(const App());
   } on Object catch (error, stackTrace) {
     await _reportBootstrapFailure(error, stackTrace);
@@ -38,8 +43,8 @@ Future<void> main() async {
 }
 
 /// Records a fatal bootstrap failure. Always logs via `dart:developer`; also
-/// reports to Crashlytics, but only if Firebase managed to initialize —
-/// otherwise the report itself would throw and mask the original error.
+/// reports through the [CrashReporter] port when one is registered — the no-op
+/// reporter (Firebase disabled) simply does nothing.
 Future<void> _reportBootstrapFailure(
   Object error,
   StackTrace stackTrace,
@@ -52,15 +57,15 @@ Future<void> _reportBootstrapFailure(
     stackTrace: stackTrace,
   );
 
-  if (Firebase.apps.isEmpty) return;
+  if (!getIt.isRegistered<CrashReporter>()) return;
   try {
-    await FirebaseCrashlytics.instance.recordError(
+    await getIt<CrashReporter>().recordError(
       error,
       stackTrace,
       reason: 'App bootstrap failed',
       fatal: true,
     );
   } on Object catch (_) {
-    // Crashlytics is best-effort here; the developer.log above still fired.
+    // Best-effort; the developer.log above already fired.
   }
 }

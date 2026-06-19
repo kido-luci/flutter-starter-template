@@ -5,6 +5,9 @@ import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:feature_auth/feature_auth.dart';
+// fst:feature:notifications:start
+import 'package:feature_notifications/feature_notifications.dart';
+// fst:feature:notifications:end
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -128,6 +131,9 @@ class _AppState extends State<App> {
             providers: [
               BlocProvider.value(value: _authBloc),
               BlocProvider.value(value: _themeBloc),
+              // fst:feature:notifications:start
+              BlocProvider.value(value: getIt<NotificationsBloc>()),
+              // fst:feature:notifications:end
             ],
             child: BlocBuilder<ThemeBloc, ThemeState>(
               builder: (context, themeState) => MaterialApp.router(

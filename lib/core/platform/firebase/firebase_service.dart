@@ -18,7 +18,7 @@ class FirebaseService {
   /// and registers the background message handler.
   ///
   /// Crash reporting (the global error-capture handlers) is installed
-  /// separately via `CrashReportingService.install()` once this completes.
+  /// separately via the `CrashReporter` port once this completes.
   Future<void> init() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

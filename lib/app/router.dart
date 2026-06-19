@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:feature_auth/feature_auth.dart';
+// fst:feature:bookmarks:start
 import 'package:feature_bookmarks/feature_bookmarks.dart';
+// fst:feature:bookmarks:end
 import 'package:feature_home/feature_home.dart';
+// fst:feature:notifications:start
 import 'package:feature_notifications/feature_notifications.dart';
+// fst:feature:notifications:end
 import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_splash/feature_splash.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +24,7 @@ part 'router.g.dart';
         TypedGoRoute<HomeRoute>(path: '/', name: 'home'),
       ],
     ),
+    // fst:feature:bookmarks:start
     TypedStatefulShellBranch<BookmarksBranchData>(
       routes: <TypedRoute<RouteData>>[
         TypedGoRoute<BookmarksListRoute>(
@@ -28,6 +33,8 @@ part 'router.g.dart';
         ),
       ],
     ),
+    // fst:feature:bookmarks:end
+    // fst:feature:notifications:start
     TypedStatefulShellBranch<NotificationsBranchData>(
       routes: <TypedRoute<RouteData>>[
         TypedGoRoute<NotificationsRoute>(
@@ -36,6 +43,7 @@ part 'router.g.dart';
         ),
       ],
     ),
+    // fst:feature:notifications:end
     TypedStatefulShellBranch<ProfileBranchData>(
       routes: <TypedRoute<RouteData>>[
         TypedGoRoute<ProfileRoute>(
@@ -67,13 +75,17 @@ class HomeBranchData extends StatefulShellBranchData {
   const HomeBranchData();
 }
 
+// fst:feature:bookmarks:start
 class BookmarksBranchData extends StatefulShellBranchData {
   const BookmarksBranchData();
 }
+// fst:feature:bookmarks:end
 
+// fst:feature:notifications:start
 class NotificationsBranchData extends StatefulShellBranchData {
   const NotificationsBranchData();
 }
+// fst:feature:notifications:end
 
 class ProfileBranchData extends StatefulShellBranchData {
   const ProfileBranchData();
@@ -99,6 +111,7 @@ class HomeRoute extends GoRouteData with $HomeRoute {
   Widget build(BuildContext context, GoRouterState state) => const HomeScreen();
 }
 
+// fst:feature:notifications:start
 class NotificationsRoute extends GoRouteData with $NotificationsRoute {
   const NotificationsRoute();
 
@@ -106,6 +119,7 @@ class NotificationsRoute extends GoRouteData with $NotificationsRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const NotificationsScreen();
 }
+// fst:feature:notifications:end
 
 class ProfileRoute extends GoRouteData with $ProfileRoute {
   const ProfileRoute();
@@ -123,6 +137,7 @@ class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
       const ChangePasswordScreen();
 }
 
+// fst:feature:bookmarks:start
 class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
   const BookmarksListRoute();
 
@@ -130,6 +145,7 @@ class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const BookmarksListScreen();
 }
+// fst:feature:bookmarks:end
 
 /// Tracks deep-link targets and splash-screen completion so the redirect can
 /// capture cold-start URIs and replay them after auth resolves.

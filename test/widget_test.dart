@@ -3,7 +3,9 @@ import 'package:checks/checks.dart';
 import 'package:feature_auth/src/presentation/bloc/auth_bloc.dart';
 import 'package:feature_auth/src/presentation/bloc/auth_state.dart';
 import 'package:feature_home/feature_home.dart';
+// fst:feature:notifications:start
 import 'package:feature_notifications/feature_notifications.dart';
+// fst:feature:notifications:end
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
 import 'package:flutter_starter_template/app/di/injection.dart';
@@ -79,9 +81,11 @@ void main() {
       return bloc;
     });
 
+    // fst:feature:notifications:start
     final notificationsBloc = MockNotificationsBloc();
     when(() => notificationsBloc.state).thenReturn(const NotificationsState());
     getIt.registerFactory<NotificationsBloc>(() => notificationsBloc);
+    // fst:feature:notifications:end
   });
 
   tearDown(() async {

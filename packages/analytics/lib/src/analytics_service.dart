@@ -1,6 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:injectable/injectable.dart';
 
 abstract class AnalyticsService {
   Future<void> logEvent(String name, {Map<String, Object>? parameters});
@@ -16,7 +15,6 @@ abstract class AnalyticsService {
   Future<void> setUserProperty({required String name, required String? value});
 }
 
-@LazySingleton(as: AnalyticsService)
 class FirebaseAnalyticsService implements AnalyticsService {
   FirebaseAnalyticsService(this._analytics);
 
@@ -63,4 +61,34 @@ class FirebaseAnalyticsService implements AnalyticsService {
       }
     }
   }
+}
+
+/// An [AnalyticsService] that records nothing.
+///
+/// The default binding when analytics tracking is disabled (e.g. a project
+/// scaffolded with `fst create --no-firebase`). To enable analytics, point the
+/// `// fst:analytics-impl` binding in `analytics_module.dart` at a real adapter.
+class NoOpAnalyticsService implements AnalyticsService {
+  const NoOpAnalyticsService();
+
+  @override
+  Future<void> logEvent(String name, {Map<String, Object>? parameters}) async {}
+
+  @override
+  Future<void> logLogin({required String method}) async {}
+
+  @override
+  Future<void> logSignUp({required String signUpMethod}) async {}
+
+  @override
+  Future<void> logScreenView({required String screenName}) async {}
+
+  @override
+  Future<void> setCurrentUser(String? userId) async {}
+
+  @override
+  Future<void> setUserProperty({
+    required String name,
+    required String? value,
+  }) async {}
 }

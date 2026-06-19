@@ -589,7 +589,23 @@ Drop these into your project:
 - `android/app/google-services.json`
 - `ios/Runner/GoogleService-Info.plist`
 
-Firebase initializes in `lib/main.dart` with Crashlytics fatal‑error reporting on both Flutter and platform threads.
+The Firebase **platform** (core, remote config, messaging) initializes in
+`lib/main.dart` behind the `kFirebaseEnabled` flag in `lib/app/firebase.dart`,
+with crash reporting installed through the `CrashReporter` port.
+
+### Optional & swappable
+
+Firebase is opt-out. `fst create --no-firebase` scaffolds a project that builds
+and runs with **no Firebase project at all**: it flips `kFirebaseEnabled` to
+`false`, swaps the analytics and crash bindings to no-ops, removes the Firebase
+Android Gradle plugins, and deletes the native credential files. Re-enable later
+by flipping the flag, restoring the bindings, and running `flutterfire configure`.
+
+Analytics and crash reporting are independent **ports** (`AnalyticsService`,
+`CrashReporter`), wired in the `analytics` and `app_platform` packages. Each has
+a Firebase adapter and a no-op, selected at a single `// fst:analytics-impl` /
+`// fst:crash-impl` binding — so you can keep one on Firebase and the other off,
+or plug in your own backend, by editing just that line.
 
 <br>
 
