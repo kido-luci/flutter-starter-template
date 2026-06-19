@@ -6,7 +6,8 @@
 import 'dart:async' as _i687;
 
 import 'package:analytics/analytics.dart' as _i548;
-import 'package:app_platform/src/crash/crash_reporting_service.dart' as _i631;
+import 'package:app_platform/src/crash/crash_module.dart' as _i1043;
+import 'package:app_platform/src/crash/crash_reporter.dart' as _i608;
 import 'package:app_platform/src/media/camera_service.dart' as _i883;
 import 'package:app_platform/src/media/image_picker_service.dart' as _i315;
 import 'package:app_platform/src/media/media_module.dart' as _i888;
@@ -31,11 +32,12 @@ class AppPlatformPackageModule extends _i526.MicroPackageModule {
   // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
+    final crashModule = _$CrashModule();
     final mediaModule = _$MediaModule();
     final notificationsModule = _$NotificationsModule();
     final shareModule = _$ShareModule();
-    gh.singleton<_i631.CrashReportingService>(
-      () => _i631.CrashReportingService(),
+    gh.lazySingleton<_i608.CrashReporter>(
+      () => crashModule.provideCrashReporter(),
     );
     gh.lazySingleton<_i883.CameraService>(() => _i883.CameraService());
     gh.lazySingleton<_i183.ImagePicker>(() => mediaModule.imagePicker);
@@ -71,6 +73,8 @@ class AppPlatformPackageModule extends _i526.MicroPackageModule {
     );
   }
 }
+
+class _$CrashModule extends _i1043.CrashModule {}
 
 class _$MediaModule extends _i888.MediaModule {}
 
