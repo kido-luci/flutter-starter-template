@@ -37,12 +37,20 @@ import 'package:flutter_test/flutter_test.dart';
 const _mustPrecede = <String, Set<String>>{
   // shared_contracts registers ActivityNotifier, consumed by the notifications
   // BLoC at construction.
+  // fst:feature:notifications:start
   'SharedContractsPackageModule': {'FeatureNotificationsPackageModule'},
+  // fst:feature:notifications:end
   // auth provides the authenticated Dio the other feature packages resolve.
   'FeatureAuthPackageModule': {
+    // fst:feature:notifications:start
     'FeatureNotificationsPackageModule',
+    // fst:feature:notifications:end
+    // fst:feature:collections:start
     'FeatureCollectionsPackageModule',
+    // fst:feature:collections:end
+    // fst:feature:bookmarks:start
     'FeatureBookmarksPackageModule',
+    // fst:feature:bookmarks:end
     'FeatureHomePackageModule',
     'FeatureProfilePackageModule',
   },

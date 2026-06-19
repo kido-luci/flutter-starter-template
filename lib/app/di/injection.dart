@@ -22,6 +22,7 @@ import 'package:sync_connectivity_plus/sync_connectivity_plus.dart';
 import 'package:theme/theme.dart';
 
 import 'injection.config.dart';
+import 'reader_fallbacks.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -59,4 +60,7 @@ final GetIt getIt = GetIt.instance;
 )
 Future<void> configureDependencies() async {
   await getIt.init();
+  // Fill in Null-Object readers for any feature dropped at scaffold time, so
+  // `home` keeps working when bookmarks/collections were excluded.
+  registerReaderFallbacks(getIt);
 }

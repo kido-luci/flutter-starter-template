@@ -34,10 +34,12 @@ import 'package:flutter_test/flutter_test.dart';
 /// list minimal and commented — every entry is a deliberate exception to the
 /// boundary rule.
 const _allowedCrossFeatureImports = <String, Set<String>>{
+  // fst:feature:bookmarks:start
   // bookmarks surfaces collections' "add to collection" sheet and embedded
   // collections list (single consumer). See the capability exception in
   // CLAUDE.md; promote to shared_ui if a second consumer appears.
   'feature_bookmarks': {'feature_collections'},
+  // fst:feature:bookmarks:end
   // profile surfaces auth's account-deletion flow (DeleteAccountCubit, single
   // consumer). See the DeleteAccountCubit worked example in CLAUDE.md.
   'feature_profile': {'feature_auth'},

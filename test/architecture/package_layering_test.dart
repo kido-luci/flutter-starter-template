@@ -50,14 +50,20 @@ const _layers = <String, int>{
   // 4 — base feature packages: the top runtime layer (only the app composes
   //     them), each depending on no sibling feature.
   'feature_auth': 4,
+  // fst:feature:collections:start
   'feature_collections': 4,
+  // fst:feature:collections:end
   'feature_home': 4,
+  // fst:feature:notifications:start
   'feature_notifications': 4,
+  // fst:feature:notifications:end
   'feature_splash': 4,
   // 5 — feature packages that surface a single sibling's capability; each
   //     depends on exactly one lower feature (the capability provider). The
   //     allowed edges are documented in feature_boundaries_test.
+  // fst:feature:bookmarks:start
   'feature_bookmarks': 5, // -> feature_collections
+  // fst:feature:bookmarks:end
   'feature_profile': 5, // -> feature_auth
 };
 
