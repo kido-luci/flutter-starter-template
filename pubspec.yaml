@@ -38,9 +38,15 @@ workspace:
   - packages/database
   - packages/localization
   - packages/features/auth
+  # fst:feature:notifications:start
   - packages/features/notifications
+  # fst:feature:notifications:end
+  # fst:feature:collections:start
   - packages/features/collections
+  # fst:feature:collections:end
+  # fst:feature:bookmarks:start
   - packages/features/bookmarks
+  # fst:feature:bookmarks:end
   - packages/features/splash
   - packages/features/home
   - packages/features/profile
@@ -68,9 +74,15 @@ dependencies:
   database: ^0.1.0
   localization: ^0.1.0
   feature_auth: ^0.1.0
+  # fst:feature:notifications:start
   feature_notifications: ^0.1.0
+  # fst:feature:notifications:end
+  # fst:feature:collections:start
   feature_collections: ^0.1.0
+  # fst:feature:collections:end
+  # fst:feature:bookmarks:start
   feature_bookmarks: ^0.1.0
+  # fst:feature:bookmarks:end
   feature_splash: ^0.1.0
   feature_home: ^0.1.0
   feature_profile: ^0.1.0
