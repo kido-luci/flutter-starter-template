@@ -7,9 +7,13 @@ import 'package:feature_collections/feature_collections.dart';
 // fst:feature:notifications:start
 import 'package:feature_notifications/feature_notifications.dart';
 // fst:feature:notifications:end
+// fst:feature:_infra:start
 import 'package:go_router/go_router.dart';
+// fst:feature:_infra:end
 
+// fst:feature:_infra:start
 import 'di/injection.dart';
+// fst:feature:_infra:end
 import 'feature_module.dart';
 
 /// All optional features enabled in this project.
@@ -72,6 +76,7 @@ final class _NotificationsModule extends FeatureModule {
 
 // fst:feature-module-classes — `fst add-feature` inserts new module classes above
 
+// fst:feature:_infra:start
 /// Adapts any feature's sync controller to [FeatureSyncController] without a
 /// bespoke wrapper class per feature. The controllers don't implement the
 /// interface directly so feature packages stay unaware of the app's lifecycle.
@@ -87,3 +92,5 @@ final class _FeatureSync implements FeatureSyncController {
   @override
   Future<void> stop() => onStop();
 }
+
+// fst:feature:_infra:end
