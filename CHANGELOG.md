@@ -5,6 +5,42 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-06-19
+
+Sharpens the scaffolding path so a project generated with `fst create` comes out
+as a true clean slate, and trims CI wall-clock. No behavior change to the running
+app.
+
+### Added
+
+- **Clean-slate generation** — `fst create` now removes the vendored submodules
+  (the demo backend and the CLI's own source) and the template's git history,
+  then runs `git init` so a new project starts from its own first commit, and
+  writes a minimal, project-specific `README.md` (via the `tool/cli` submodule).
+- **Firebase reconfigure warning** — after scaffolding, `fst create` warns that
+  `lib/firebase_options.dart` still points at the template's Firebase project and
+  prints the `flutterfire configure` steps to fix it.
+- **Widget test coverage** for the splash redirect, home, and profile screens.
+
+### Changed
+
+- **CI skips heavy jobs for non-build changes** — the job-level path filter now
+  uses `predicate-quantifier: every`, so docs-, tooling-, and submodule-only PRs
+  actually skip the Android/iOS/golden/test jobs instead of always running them.
+- **Faster native builds** — the Android job caches `~/.gradle` and the iOS job
+  caches `ios/Pods` + the CocoaPods download cache.
+- **Gradle wrapper** bumped 8.11.1 → 9.6.0, plus GitHub Actions dependency
+  bumps.
+- The identifier rewriter no longer walks `.git/`.
+- README documents the `fst add-feature` generator.
+
+### Fixed
+
+- **iOS flavor display names** aligned with Android so `fst create` renames them
+  cleanly — the prod iOS app no longer keeps a stray "Template" in its name.
+- **Auth** — malformed sign-in/register responses now map to a failure, and a
+  malformed token-refresh body no longer throws.
+
 ## [1.4.0] - 2026-06-18
 
 Adds the `fst add-feature` generator and the seams it builds on, making a new
@@ -162,6 +198,7 @@ First stable release of the Flutter starter template.
   backend deps, and the pre-push hook).
 - **Tooling** — Dart & CodeGraph MCP servers and vendored agent skills.
 
+[1.5.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.5.0
 [1.4.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.4.0
 [1.3.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.3.0
 [1.2.0]: https://github.com/kido-luci/flutter-starter-template/releases/tag/v1.2.0
