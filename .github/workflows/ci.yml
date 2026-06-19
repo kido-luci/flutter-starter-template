@@ -49,6 +49,13 @@ jobs:
         uses: dorny/paths-filter@v3
         id: filter
         with:
+          # Use the `every` quantifier so a path matches `code` only when it
+          # satisfies ALL patterns — i.e. it matches `**` AND is not excluded by
+          # any `!` negation below. The action's default (`some`) matches when
+          # ANY pattern hits, and since `**` always hits, the negations are dead
+          # and `code` is permanently true — so docs/tooling/submodule-only PRs
+          # never actually skip the heavy jobs. `every` makes the exclusions real.
+          predicate-quantifier: 'every'
           filters: |
             code:
               - '**'
@@ -250,6 +257,21 @@ jobs:
           channel: stable
           cache: true
 
+      # Cache Gradle's downloaded dependencies and wrapper so the Android build
+      # doesn't refetch the toolchain + dependencies every run. Keyed on the
+      # Gradle build files; restore-keys give a partial-cache fallback. Only
+      # external deps are cached here, not generated Dart — the build_runner
+      # caching caveat documented above does not apply to Gradle's cache.
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties', 'android/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       # The com.google.gms.google-services Gradle plugin parses
       # google-services.json at build time (it never contacts Firebase), and
       # the file is git-ignored — so a fresh checkout has none and Gradle fails
@@ -339,6 +361,20 @@ jobs:
           flutter-version: 3.44.0
           channel: stable
           cache: true
+
+      # Cache the installed Pods and the CocoaPods download cache so the
+      # `pod install` that `flutter build ios` runs doesn't refetch every pod
+      # each run. Keyed on the committed ios/Podfile.lock; restore-keys give a
+      # partial-cache fallback when the lockfile changes.
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       # This project requires CocoaPods, not SPM (see CLAUDE.md). The setting is
       # machine-global, so each runner must disable SPM before the first build.
