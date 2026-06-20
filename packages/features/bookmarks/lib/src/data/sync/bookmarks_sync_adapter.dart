@@ -1,6 +1,6 @@
 import 'package:database/database.dart';
 import 'package:network/network.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 import '../datasources/bookmarks_remote_data_source.dart';
 import '../local/bookmarks_local_data_source.dart';

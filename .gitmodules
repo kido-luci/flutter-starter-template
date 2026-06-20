@@ -4,3 +4,6 @@
 [submodule "tool/cli"]
 	path = tool/cli
 	url = https://github.com/kido-luci/flutter-starter-template-cli.git
+[submodule "packages/rev_sync"]
+	path = packages/rev_sync
+	url = https://github.com/kido-luci/rev_sync.git

@@ -1,6 +1,6 @@
 import 'package:database/database.dart';
 import 'package:network/network.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 import '../datasources/collections_remote_data_source.dart';
 import '../models/collection_dto.dart';

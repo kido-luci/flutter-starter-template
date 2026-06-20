@@ -1,6 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 /// Adapts `connectivity_plus` to the engine's [ConnectivitySource], collapsing
 /// the platform's list of links into a single online/offline signal.

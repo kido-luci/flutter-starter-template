@@ -38,7 +38,7 @@ The UI layer responsible for displaying information to the user and capturing us
 - **Feature Independence:** Features should be as isolated as possible. As a default, a feature package must **not** import another `feature_<name>` package — shared *state* is read through a `shared_contracts` contract instead. The one deliberate exception is a *capability* (a self-contained presentation object one feature surfaces inside another); while only a single consumer exists, importing it directly is allowed. The `feature_boundaries_test` enforces this and whitelists the current exceptions.
 - **Shared Code:** Pick the destination by what kind of thing it is:
   - *Business* vocabulary used by 2+ features (e.g. the session, shared entities) → the `shared_contracts` package, on the **rule of three** (promote only when ≥2 features depend on it today).
-  - *Cross-cutting, non-visual* infrastructure → `lib/core/` (app-coupled) or a workspace package such as `network` / `storage` / `sync` (reusable).
+  - *Cross-cutting, non-visual* infrastructure → `lib/core/` (app-coupled) or a workspace package such as `network` / `storage` / `rev_sync` (reusable).
   - *Generic visual* building blocks → the `app_ui` package; cross-feature visual/session contracts → `shared_ui`.
 - **Immutability:** Use immutable models and `Freezed` unions for state management and domain entities.
 - **Dependency Injection:** Dependencies are injected using `get_it` + `injectable`. Each feature package exposes a micro-package module (`Feature<Name>PackageModule`) that the app wires in `lib/app/di/injection.dart`.
@@ -48,13 +48,13 @@ The UI layer responsible for displaying information to the user and capturing us
 Writes commit to the local **ObjectBox** store first and the UI updates
 immediately — the network is reconciled in the background, so the app stays
 fully usable offline. The sync machinery is a single reusable engine in the
-**`sync` package** (`packages/sync`); `bookmarks` and `collections` drive it
+**`rev_sync` package** (`packages/rev_sync`); `bookmarks` and `collections` drive it
 through a thin per‑feature adapter, and `notifications` is a read‑state variant
 that reuses only the scheduler.
 
 ### 🧩 One shared engine
 
-`package:sync` is pure Dart (no Flutter/Dio/ObjectBox), so it is unit‑tested in
+`package:rev_sync` is pure Dart (no Flutter/Dio/ObjectBox), so it is unit‑tested in
 isolation. A feature plugs in by implementing three small contracts:
 
 - **`SyncLocalStore<T>`** — the local store (the ObjectBox data source).

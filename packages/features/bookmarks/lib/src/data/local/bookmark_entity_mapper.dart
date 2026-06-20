@@ -1,5 +1,5 @@
 import 'package:database/database.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 import '../../domain/entities/bookmark.dart';
 

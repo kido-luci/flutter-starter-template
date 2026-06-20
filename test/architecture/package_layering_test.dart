@@ -30,7 +30,7 @@ import 'package:flutter_test/flutter_test.dart';
 const _layers = <String, int>{
   // 0 — pure-Dart foundation; depends on nothing in the workspace.
   'architecture': 0,
-  'sync': 0, // offline-first sync engine; pure Dart, no workspace deps
+  'rev_sync': 0, // offline-first sync engine; pure Dart, no workspace deps
   // 1 — primitives: no workspace deps, or only on architecture.
   'config': 1, // firebase_remote_config wrapper
   'storage': 1, // shared_preferences / secure storage
@@ -38,8 +38,8 @@ const _layers = <String, int>{
   'app_ui': 1, // design tokens; no workspace package deps
   'localization': 1, // gen-l10n AppLocalizations; no workspace package deps
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
-  'database': 1, // centralized ObjectBox persistence -> sync
-  'sync_connectivity_plus': 1, // connectivity_plus adapter -> sync
+  'database': 1, // centralized ObjectBox persistence -> rev_sync
+  'sync_connectivity_plus': 1, // connectivity_plus adapter -> rev_sync
   // 2 — composed infra built on the primitives.
   'shared_ui': 2, // cross-feature presentation contracts -> shared_contracts
   'network': 2, // -> config

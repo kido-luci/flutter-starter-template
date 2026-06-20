@@ -29,7 +29,6 @@ workspace:
   - packages/network
   - packages/app_platform
   - packages/storage
-  - packages/sync
   - packages/sync_connectivity_plus
   - packages/theme
   - packages/test_utils
@@ -66,7 +65,8 @@ dependencies:
   network: ^0.1.0
   app_platform: ^0.1.0
   storage: ^0.1.0
-  sync: ^0.1.0
+  rev_sync:
+    path: packages/rev_sync
   sync_connectivity_plus: ^0.1.0
   theme: ^0.1.0
   shared_contracts: ^0.1.0

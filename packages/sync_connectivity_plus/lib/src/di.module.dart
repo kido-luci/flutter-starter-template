@@ -7,7 +7,7 @@ import 'dart:async' as _i687;
 
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:sync/sync.dart' as _i846;
+import 'package:rev_sync/rev_sync.dart' as _i846;
 import 'package:sync_connectivity_plus/src/connectivity_plus_module.dart'
     as _i462;
 import 'package:sync_connectivity_plus/src/connectivity_plus_source.dart'

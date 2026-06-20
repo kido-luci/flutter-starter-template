@@ -47,7 +47,7 @@ import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:network/network.dart' as _i372;
 import 'package:shared_contracts/shared_contracts.dart' as _i856;
-import 'package:sync/sync.dart' as _i846;
+import 'package:rev_sync/rev_sync.dart' as _i846;
 import 'package:uuid/uuid.dart' as _i706;
 
 class FeatureBookmarksPackageModule extends _i526.MicroPackageModule {

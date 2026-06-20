@@ -1,6 +1,6 @@
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
-export 'package:sync/sync.dart' show SyncStatus;
+export 'package:rev_sync/rev_sync.dart' show SyncStatus;
 
 /// The bookmarks sync status, aliased to the shared engine status so existing
 /// callers keep using `BookmarksSyncStatus.idle/syncing/error`.
