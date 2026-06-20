@@ -29,17 +29,19 @@ final GetIt getIt = GetIt.instance;
 /// Async because core database modules use `@preResolve` to open native
 /// resources before any consumer is constructed. Must be awaited from `main`.
 ///
-/// Order: `shared_contracts` registers `ActivityNotifier`, consumed by a
-/// feature BLoC, so it must be listed before the feature modules. `feature_auth`
-/// provides the authenticated `Dio` that the other feature packages resolve from
-/// the shared `GetIt`, so it is listed before them too.
+/// Ordering: `storage` provides the `AuthTokenStore` + `FlutterSecureStorage`
+/// that `network` builds the authenticated `Dio` on, so it is listed before
+/// `network`. `shared_contracts` registers `ActivityNotifier`, consumed by a
+/// feature BLoC, so it precedes the feature modules. The authenticated `Dio` is
+/// now provided by `network` (not by `feature_auth`), so no feature module
+/// needs to be ordered relative to `feature_auth` for it.
 @InjectableInit(
   externalPackageModulesBefore: [
     ExternalModule(AnalyticsPackageModule),
     ExternalModule(ConfigPackageModule),
+    ExternalModule(StoragePackageModule),
     ExternalModule(NetworkPackageModule),
     ExternalModule(AppPlatformPackageModule),
-    ExternalModule(StoragePackageModule),
     ExternalModule(ThemePackageModule),
     ExternalModule(SyncConnectivityPlusPackageModule),
     ExternalModule(SharedContractsPackageModule),

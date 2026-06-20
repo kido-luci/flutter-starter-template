@@ -2,18 +2,15 @@
 // modules in `lib/app/di/injection.dart`.
 //
 // `@InjectableInit(externalPackageModulesBefore: [...])` registers each
-// package module in list order. Most modules are order-independent, but two
-// constraints are load-bearing and currently documented only in a prose
+// package module in list order. Most modules are order-independent, but one
+// constraint is load-bearing and currently documented only in a prose
 // comment beside the list:
 //
 //   * `SharedContractsPackageModule` registers `ActivityNotifier`, which
 //     `feature_notifications`' BLoC resolves at construction — so it must be
 //     registered before `FeatureNotificationsPackageModule`.
-//   * `FeatureAuthPackageModule` provides the authenticated `Dio` the other
-//     feature packages resolve from the shared `GetIt` — so it must be
-//     registered before every other feature module.
 //
-// Reordering the list to violate either constraint compiles and analyzes
+// Reordering the list to violate this constraint compiles and analyzes
 // cleanly; it fails only at runtime, when a consumer resolves a not-yet-
 // registered dependency. This test turns that latent footgun into a fast,
 // deterministic failure: it parses the module order out of the source and
@@ -40,20 +37,6 @@ const _mustPrecede = <String, Set<String>>{
   // fst:feature:notifications:start
   'SharedContractsPackageModule': {'FeatureNotificationsPackageModule'},
   // fst:feature:notifications:end
-  // auth provides the authenticated Dio the other feature packages resolve.
-  'FeatureAuthPackageModule': {
-    // fst:feature:notifications:start
-    'FeatureNotificationsPackageModule',
-    // fst:feature:notifications:end
-    // fst:feature:collections:start
-    'FeatureCollectionsPackageModule',
-    // fst:feature:collections:end
-    // fst:feature:bookmarks:start
-    'FeatureBookmarksPackageModule',
-    // fst:feature:bookmarks:end
-    'FeatureHomePackageModule',
-    'FeatureProfilePackageModule',
-  },
 };
 
 void main() {
