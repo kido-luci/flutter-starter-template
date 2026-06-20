@@ -7,7 +7,7 @@ import 'package:feature_bookmarks/src/data/sync/bookmark_media_upload_sync.dart'
 import 'package:feature_bookmarks/src/data/sync/bookmarks_sync_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 import 'package:test_utils/test_utils.dart';
 
 class MockBookmarksLocalDataSource extends Mock

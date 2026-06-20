@@ -17,7 +17,8 @@ dependencies:
   # Workspace packages.
   architecture: ^0.1.0
   network: ^0.1.0
-  sync: ^0.1.0
+  rev_sync:
+    path: ../../rev_sync
   database: ^0.1.0
   app_ui: ^0.1.0
   shared_contracts: ^0.1.0

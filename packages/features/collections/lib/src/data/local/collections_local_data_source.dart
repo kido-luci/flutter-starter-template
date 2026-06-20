@@ -1,6 +1,6 @@
 import 'package:database/database.dart';
 import 'package:injectable/injectable.dart' hide Order;
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 /// ObjectBox-backed CRUD + sync helpers. All operations are synchronous on
 /// the ObjectBox side; wrapped in `Future` to keep the repository contract

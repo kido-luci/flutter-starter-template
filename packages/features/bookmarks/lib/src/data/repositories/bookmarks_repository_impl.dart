@@ -1,7 +1,7 @@
 import 'package:architecture/architecture.dart';
 import 'package:database/database.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/bookmark.dart';

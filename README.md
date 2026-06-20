@@ -677,7 +677,7 @@ Setup steps and the full list of required secrets live in
 Writes commit to the local **ObjectBox** store first and the UI updates
 immediately — the network is reconciled in the background, so the app stays
 fully usable offline. The sync machinery is a single reusable engine in the
-**`sync` package** (`packages/sync`); `bookmarks` and `collections` drive it
+**`rev_sync` package** (`packages/rev_sync`); `bookmarks` and `collections` drive it
 through a thin per‑feature adapter, and `notifications` is a read‑state variant
 that reuses only the scheduler.
 

@@ -1,5 +1,5 @@
 import 'package:objectbox/objectbox.dart' hide SyncState;
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 /// ObjectBox row for a bookmark. Mutable by necessity — ObjectBox writes back
 /// into instances during property loading, so this cannot be a Freezed/sealed

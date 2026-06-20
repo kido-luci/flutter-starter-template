@@ -5,7 +5,7 @@ import 'package:feature_collections/src/data/models/collection_request.dart';
 import 'package:feature_collections/src/data/sync/collections_sync_adapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 import '../../support.dart';
 

@@ -5,7 +5,7 @@ import 'package:feature_bookmarks/src/data/repositories/bookmarks_repository_imp
 import 'package:feature_bookmarks/src/domain/entities/bookmark.dart';
 import 'package:feature_bookmarks/src/domain/services/bookmarks_sync_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 import 'package:test_utils/test_utils.dart';
 import 'package:uuid/uuid.dart';
 

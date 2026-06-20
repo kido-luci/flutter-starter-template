@@ -4,7 +4,7 @@ import 'package:feature_collections/src/data/local/collections_local_data_source
 import 'package:feature_collections/src/data/repositories/collections_repository_impl.dart';
 import 'package:feature_collections/src/domain/entities/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../support.dart';

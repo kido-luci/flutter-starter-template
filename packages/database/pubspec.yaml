@@ -16,7 +16,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  sync: ^0.1.0
+  rev_sync:
+    path: ../rev_sync
   objectbox: ^5.3.2
   objectbox_flutter_libs: ^5.3.2
   path_provider: ^2.1.6

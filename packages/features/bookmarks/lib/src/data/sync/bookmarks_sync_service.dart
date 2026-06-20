@@ -1,6 +1,6 @@
 import 'package:database/database.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sync/sync.dart';
+import 'package:rev_sync/rev_sync.dart';
 
 import '../../domain/services/bookmarks_sync_controller.dart';
 import '../datasources/bookmarks_remote_data_source.dart';

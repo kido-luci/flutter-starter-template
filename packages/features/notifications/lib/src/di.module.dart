@@ -31,7 +31,7 @@ import 'package:feature_notifications/src/presentation/bloc/notifications_bloc.d
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:network/network.dart' as _i372;
 import 'package:shared_contracts/shared_contracts.dart' as _i856;
-import 'package:sync/sync.dart' as _i846;
+import 'package:rev_sync/rev_sync.dart' as _i846;
 
 class FeatureNotificationsPackageModule extends _i526.MicroPackageModule {
   // initializes the registration of main-scope dependencies inside of GetIt
