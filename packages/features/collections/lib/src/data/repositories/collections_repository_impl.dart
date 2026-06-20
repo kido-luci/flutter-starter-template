@@ -1,4 +1,5 @@
 import 'package:architecture/architecture.dart';
+import 'package:clock/clock.dart';
 import 'package:database/database.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rev_sync/rev_sync.dart';
@@ -47,7 +48,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
   @override
   Future<Result<Collection>> create(CollectionInput input) async {
     final normalized = _normalize(input);
-    final now = DateTime.now().toUtc();
+    final now = clock.now().toUtc();
     final entity = CollectionEntity(
       uuid: _uuid.v4(),
       name: normalized.name,
@@ -70,7 +71,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
       return const Err(NotFoundFailure('Collection not found.'));
     }
     final normalized = _normalize(input);
-    existing.applyInput(normalized, now: DateTime.now().toUtc());
+    existing.applyInput(normalized, now: clock.now().toUtc());
     // pendingCreate stays pendingCreate (still needs the initial POST). Every
     // other state — synced, an existing pendingUpdate, or a conflicted/failed
     // row the user is re-editing — becomes a pendingUpdate to (re)push.
@@ -95,7 +96,7 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
       return const Ok(null);
     }
     existing.syncState = SyncState.pendingDelete;
-    existing.updatedAt = DateTime.now().toUtc();
+    existing.updatedAt = clock.now().toUtc();
     await _local.put(existing);
     _sync.sync().fire();
     return const Ok(null);

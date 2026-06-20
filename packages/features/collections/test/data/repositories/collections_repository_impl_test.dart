@@ -1,4 +1,5 @@
 import 'package:architecture/architecture.dart';
+import 'package:clock/clock.dart';
 import 'package:database/database.dart';
 import 'package:feature_collections/src/data/local/collections_local_data_source.dart';
 import 'package:feature_collections/src/data/repositories/collections_repository_impl.dart';
@@ -106,6 +107,32 @@ void main() {
               as CollectionEntity;
       expect(captured.syncState, SyncState.pendingCreate);
       verify(() => mockSync.sync()).called(1);
+    });
+
+    test('stamps createdAt/updatedAt from the ambient clock', () async {
+      when(() => mockUuid.v4()).thenReturn('new-uuid');
+      when(() => mockLocal.putNew(any())).thenAnswer(
+        (invocation) async =>
+            invocation.positionalArguments[0] as CollectionEntity,
+      );
+
+      final fixed = DateTime.utc(2026, 1, 2, 3, 4, 5);
+      await withClock(Clock.fixed(fixed), () async {
+        await repository.create(
+          const CollectionInput(
+            name: 'Reading',
+            icon: 'f02d',
+            color: 0xFF0EA5E9,
+            bookmarkIds: ['b-1'],
+          ),
+        );
+      });
+
+      final captured =
+          verify(() => mockLocal.putNew(captureAny())).captured.single
+              as CollectionEntity;
+      expect(captured.createdAt, fixed);
+      expect(captured.updatedAt, fixed);
     });
   });
 
