@@ -8,8 +8,9 @@ import 'package:storage/storage.dart';
 /// and refresh token — in platform-encrypted storage (Keychain on iOS,
 /// EncryptedSharedPreferences/Keystore on Android).
 ///
-/// All getters cache in memory after the first read so the Dio interceptor's
-/// hot path doesn't hit native channels per request. `load` is awaited once
+/// The current user is cached in memory after the first read; access and
+/// refresh token caching is delegated to the injected `AuthTokenStore` in the
+/// `storage` package. `load` is awaited once
 /// during session restore (see `AuthRepositoryImpl.restoreSession`, driven by
 /// the splash screen) before any token-bearing request is made; it is a no-op
 /// on subsequent calls.
@@ -87,7 +88,10 @@ class SecureStorageAuthDataSource implements AuthLocalDataSource {
         key: _kUserKey,
         value: jsonEncode({'id': user.id, 'username': user.username}),
       ),
-      _tokens.updateTokens(accessToken: accessToken, refreshToken: refreshToken),
+      _tokens.updateTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      ),
     ]);
   }
 

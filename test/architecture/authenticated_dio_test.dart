@@ -14,8 +14,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('network declares the authenticated Dio provider', () {
-    final source =
-        File('packages/network/lib/src/network_module.dart').readAsStringSync();
+    final source = File(
+      'packages/network/lib/src/network_module.dart',
+    ).readAsStringSync();
     expect(
       RegExp(r'\bDio\s+provideDio\s*\(').hasMatch(source),
       isTrue,
@@ -40,8 +41,9 @@ void main() {
             file.path.endsWith('.config.dart')) {
           continue;
         }
-        if (RegExp(r'\bDio\s+provideDio\s*\(')
-            .hasMatch(file.readAsStringSync())) {
+        if (RegExp(
+          r'\bDio\s+provideDio\s*\(',
+        ).hasMatch(file.readAsStringSync())) {
           offenders.add(file.path);
         }
       }

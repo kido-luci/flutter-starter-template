@@ -55,15 +55,17 @@ void main() {
     });
   }
 
-  test('returns invalidSession and does not POST when no refresh token',
-      () async {
-    when(() => tokens.refreshToken).thenReturn(null);
+  test(
+    'returns invalidSession and does not POST when no refresh token',
+    () async {
+      when(() => tokens.refreshToken).thenReturn(null);
 
-    expect(await refresher.refresh(), RefreshOutcome.invalidSession);
-    verifyNever(
-      () => dio.post<Map<String, dynamic>>(any(), data: any(named: 'data')),
-    );
-  });
+      expect(await refresher.refresh(), RefreshOutcome.invalidSession);
+      verifyNever(
+        () => dio.post<Map<String, dynamic>>(any(), data: any(named: 'data')),
+      );
+    },
+  );
 
   test('refreshes and persists new tokens on success', () async {
     when(() => tokens.refreshToken).thenReturn('old');
@@ -117,20 +119,22 @@ void main() {
     verify(() => tokens.clearTokens()).called(1);
   });
 
-  test('clears tokens (invalidSession) on a malformed body, without throwing',
-      () async {
-    when(() => tokens.refreshToken).thenReturn('old');
-    stubPost(() => okResponse({'unexpected': 'shape'}));
+  test(
+    'clears tokens (invalidSession) on a malformed body, without throwing',
+    () async {
+      when(() => tokens.refreshToken).thenReturn('old');
+      stubPost(() => okResponse({'unexpected': 'shape'}));
 
-    expect(await refresher.refresh(), RefreshOutcome.invalidSession);
-    verify(() => tokens.clearTokens()).called(1);
-    verifyNever(
-      () => tokens.updateTokens(
-        accessToken: any(named: 'accessToken'),
-        refreshToken: any(named: 'refreshToken'),
-      ),
-    );
-  });
+      expect(await refresher.refresh(), RefreshOutcome.invalidSession);
+      verify(() => tokens.clearTokens()).called(1);
+      verifyNever(
+        () => tokens.updateTokens(
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      );
+    },
+  );
 
   test('single-flight: concurrent callers share one POST', () async {
     when(() => tokens.refreshToken).thenReturn('old');

@@ -80,31 +80,38 @@ void main() {
   });
 
   group('onError', () {
-    test('on 401: refreshes and retries with __auth_retried__ + new bearer',
-        () async {
-      when(() => tokens.accessToken).thenReturn('new-token');
-      when(() => refresher.refresh())
-          .thenAnswer((_) async => RefreshOutcome.refreshed);
-      final o = opts();
-      final err = err401(o);
-      final handler = _MockErrorHandler();
-      final retryResponse =
-          Response<dynamic>(requestOptions: o, statusCode: 200);
-      when(() => dio.fetch<dynamic>(any()))
-          .thenAnswer((_) async => retryResponse);
-      when(() => handler.resolve(any())).thenReturn(null);
-      when(() => handler.next(any())).thenReturn(null);
+    test(
+      'on 401: refreshes and retries with __auth_retried__ + new bearer',
+      () async {
+        when(() => tokens.accessToken).thenReturn('new-token');
+        when(
+          () => refresher.refresh(),
+        ).thenAnswer((_) async => RefreshOutcome.refreshed);
+        final o = opts();
+        final err = err401(o);
+        final handler = _MockErrorHandler();
+        final retryResponse = Response<dynamic>(
+          requestOptions: o,
+          statusCode: 200,
+        );
+        when(
+          () => dio.fetch<dynamic>(any()),
+        ).thenAnswer((_) async => retryResponse);
+        when(() => handler.resolve(any())).thenReturn(null);
+        when(() => handler.next(any())).thenReturn(null);
 
-      await interceptor.onError(err, handler);
+        await interceptor.onError(err, handler);
 
-      final captured =
-          verify(() => dio.fetch<dynamic>(captureAny())).captured;
-      final retriedOpts = captured.first as RequestOptions;
-      expect(retriedOpts.extra['__auth_retried__'], isTrue);
-      expect(retriedOpts.headers['Authorization'], 'Bearer new-token');
-      verify(() => handler.resolve(retryResponse)).called(1);
-      verifyNever(() => handler.next(any()));
-    });
+        final captured = verify(
+          () => dio.fetch<dynamic>(captureAny()),
+        ).captured;
+        final retriedOpts = captured.first as RequestOptions;
+        expect(retriedOpts.extra['__auth_retried__'], isTrue);
+        expect(retriedOpts.headers['Authorization'], 'Bearer new-token');
+        verify(() => handler.resolve(retryResponse)).called(1);
+        verifyNever(() => handler.next(any()));
+      },
+    );
 
     test('does not retry when __auth_retried__ flag is already set', () async {
       final o = opts(extra: {'__auth_retried__': true});
@@ -120,8 +127,9 @@ void main() {
     });
 
     test('does not retry when refresh returns networkError', () async {
-      when(() => refresher.refresh())
-          .thenAnswer((_) async => RefreshOutcome.networkError);
+      when(
+        () => refresher.refresh(),
+      ).thenAnswer((_) async => RefreshOutcome.networkError);
       final o = opts();
       final err = err401(o);
       final handler = _MockErrorHandler();
@@ -134,8 +142,9 @@ void main() {
     });
 
     test('does not retry when refresh returns invalidSession', () async {
-      when(() => refresher.refresh())
-          .thenAnswer((_) async => RefreshOutcome.invalidSession);
+      when(
+        () => refresher.refresh(),
+      ).thenAnswer((_) async => RefreshOutcome.invalidSession);
       final o = opts();
       final err = err401(o);
       final handler = _MockErrorHandler();
