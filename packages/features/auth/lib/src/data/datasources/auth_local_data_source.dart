@@ -32,36 +32,31 @@ abstract interface class AuthLocalDataSource {
 }
 
 const _kUserKey = 'auth.user';
-const _kAccessKey = 'auth.access_token';
-const _kRefreshKey = 'auth.refresh_token';
 
 @LazySingleton(as: AuthLocalDataSource)
 class SecureStorageAuthDataSource implements AuthLocalDataSource {
-  SecureStorageAuthDataSource(this._storage);
+  SecureStorageAuthDataSource(this._storage, this._tokens);
 
   final FlutterSecureStorage _storage;
+  final AuthTokenStore _tokens;
 
   AuthUser? _user;
-  String? _accessToken;
-  String? _refreshToken;
   bool _loaded = false;
 
   @override
   AuthUser? get currentUser => _user;
 
   @override
-  String? get accessToken => _accessToken;
+  String? get accessToken => _tokens.accessToken;
 
   @override
-  String? get refreshToken => _refreshToken;
+  String? get refreshToken => _tokens.refreshToken;
 
   @override
   Future<void> load() async {
     if (_loaded) return;
-    final values = await _storage.readAll();
-    _accessToken = values[_kAccessKey];
-    _refreshToken = values[_kRefreshKey];
-    final userJson = values[_kUserKey];
+    await _tokens.load();
+    final userJson = await _storage.read(key: _kUserKey);
     if (userJson != null) {
       try {
         final map = jsonDecode(userJson) as Map<String, dynamic>;
@@ -86,16 +81,13 @@ class SecureStorageAuthDataSource implements AuthLocalDataSource {
     required String refreshToken,
   }) async {
     _user = user;
-    _accessToken = accessToken;
-    _refreshToken = refreshToken;
     _loaded = true;
     await Future.wait([
       _storage.write(
         key: _kUserKey,
         value: jsonEncode({'id': user.id, 'username': user.username}),
       ),
-      _storage.write(key: _kAccessKey, value: accessToken),
-      _storage.write(key: _kRefreshKey, value: refreshToken),
+      _tokens.updateTokens(accessToken: accessToken, refreshToken: refreshToken),
     ]);
   }
 
@@ -103,24 +95,17 @@ class SecureStorageAuthDataSource implements AuthLocalDataSource {
   Future<void> updateTokens({
     required String accessToken,
     required String refreshToken,
-  }) async {
-    _accessToken = accessToken;
-    _refreshToken = refreshToken;
-    await Future.wait([
-      _storage.write(key: _kAccessKey, value: accessToken),
-      _storage.write(key: _kRefreshKey, value: refreshToken),
-    ]);
-  }
+  }) => _tokens.updateTokens(
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  );
 
   @override
   Future<void> clearSession() async {
     _user = null;
-    _accessToken = null;
-    _refreshToken = null;
     await Future.wait([
       _storage.delete(key: _kUserKey),
-      _storage.delete(key: _kAccessKey),
-      _storage.delete(key: _kRefreshKey),
+      _tokens.clearTokens(),
     ]);
   }
 }

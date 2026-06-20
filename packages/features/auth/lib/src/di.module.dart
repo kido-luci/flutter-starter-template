@@ -38,8 +38,11 @@ class FeatureAuthPackageModule extends _i526.MicroPackageModule {
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     final authNetworkModule = _$AuthNetworkModule();
-    gh.lazySingleton<_i887.AuthLocalDataSource>(() =>
-        _i887.SecureStorageAuthDataSource(gh<_i431.FlutterSecureStorage>()));
+    gh.lazySingleton<_i887.AuthLocalDataSource>(
+        () => _i887.SecureStorageAuthDataSource(
+              gh<_i431.FlutterSecureStorage>(),
+              gh<_i431.AuthTokenStore>(),
+            ));
     gh.lazySingleton<_i946.TokenRefresher>(() => _i946.TokenRefresher(
           gh<_i887.AuthLocalDataSource>(),
           gh<_i372.Dio>(instanceName: 'plain'),
