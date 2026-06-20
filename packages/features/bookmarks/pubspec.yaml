@@ -18,7 +18,7 @@ dependencies:
   architecture: ^0.1.0
   network: ^0.1.0
   rev_sync:
-    path: ../../rev_sync
+    path: ../../../published/rev_sync
   database: ^0.1.0
   analytics: ^0.1.0
   app_platform: ^0.1.0

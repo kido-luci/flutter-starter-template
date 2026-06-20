@@ -364,7 +364,7 @@ It then runs `pub get` + code generation so the tree compiles immediately. Pass
 
 The wiring edits land at the `# fst:` / `// fst:` markers in those files (so the
 generator never has to parse Dart) — leave the markers in place. The `fst` CLI
-source lives in [`tool/cli/`](tool/cli); it's the same tool as the `fst create`
+source lives in [`published/cli/`](published/cli); it's the same tool as the `fst create`
 project scaffolder.
 
 <br>
@@ -677,7 +677,7 @@ Setup steps and the full list of required secrets live in
 Writes commit to the local **ObjectBox** store first and the UI updates
 immediately — the network is reconciled in the background, so the app stays
 fully usable offline. The sync machinery is a single reusable engine in the
-**`rev_sync` package** (`packages/rev_sync`); `bookmarks` and `collections` drive it
+**`rev_sync` package** (`published/rev_sync`); `bookmarks` and `collections` drive it
 through a thin per‑feature adapter, and `notifications` is a read‑state variant
 that reuses only the scheduler.
 

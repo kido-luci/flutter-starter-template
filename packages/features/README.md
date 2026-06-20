@@ -48,7 +48,7 @@ The UI layer responsible for displaying information to the user and capturing us
 Writes commit to the local **ObjectBox** store first and the UI updates
 immediately — the network is reconciled in the background, so the app stays
 fully usable offline. The sync machinery is a single reusable engine in the
-**`rev_sync` package** (`packages/rev_sync`); `bookmarks` and `collections` drive it
+**`rev_sync` package** (`published/rev_sync`); `bookmarks` and `collections` drive it
 through a thin per‑feature adapter, and `notifications` is a read‑state variant
 that reuses only the scheduler.
 
