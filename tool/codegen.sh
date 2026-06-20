@@ -13,11 +13,20 @@
 # a tracked exception (committed, holds stable schema UIDs) and is regenerated +
 # verified separately in CI, so it is not built here.
 #
-# Uses the `dart` on PATH (the FVM-pinned SDK on dev machines, the action-managed
-# SDK in CI). Safe to call from any directory — it resolves the repo root itself.
+# Prefers the FVM-pinned SDK when `fvm` is installed (this template pins Flutter
+# via .fvmrc); otherwise falls back to the `dart` on PATH (the action-managed SDK
+# in CI). Safe to call from any directory — it resolves the repo root itself.
+#
+# The fvm shim lives here, not only in setup.sh: setup.sh's dart()/flutter()
+# functions don't propagate to this child process, and this script is also run
+# standalone (e.g. by `fst add-feature`).
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+if command -v fvm >/dev/null 2>&1; then
+  dart() { fvm dart "$@"; }
+fi
 
 run_pkg() {
   local dir="$1"

@@ -71,6 +71,13 @@ final class _NotificationsModule extends FeatureModule {
     final ctrl = getIt<NotificationsSyncController>();
     return _FeatureSync(onStart: ctrl.start, onStop: ctrl.stop);
   }
+
+  // Notifications' screen is mounted as a shell branch in router.dart, not via
+  // enabledFeatures — so it contributes no app-level routes. The explicit empty
+  // override also keeps go_router referenced when notifications is the only demo
+  // feature left after `fst create --exclude-feature bookmarks,collections`.
+  @override
+  Iterable<RouteBase> get routes => const <RouteBase>[];
 }
 // fst:feature:notifications:end
 
