@@ -10,8 +10,8 @@ import 'collections_sync_adapter.dart';
 /// Wires the collections feature onto the generic sync engine: a
 /// [SyncScheduler] (connectivity, single-flight, backoff, status) driving an
 /// [OfflineCrudSync] body built from the local store, the REST adapter, and the
-/// shared delta cursor. All sync mechanics live in `package:sync`; this is just
-/// composition.
+/// shared delta cursor. All sync mechanics live in `package:rev_sync`; this is
+/// just composition.
 @LazySingleton(as: CollectionsSyncController)
 class CollectionsSyncService implements CollectionsSyncController {
   CollectionsSyncService(

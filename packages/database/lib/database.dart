@@ -2,8 +2,8 @@
 /// `ObjectBox` store wrapper.
 ///
 /// `SyncState` from the generated ObjectBox bindings is hidden so it doesn't
-/// clash with the offline-first `SyncState` from `package:sync`, which is the
-/// one the entities and feature code use.
+/// clash with the offline-first `SyncState` from `package:rev_sync`, which is
+/// the one the entities and feature code use.
 library;
 
 export 'objectbox.g.dart' hide SyncState;

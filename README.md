@@ -75,7 +75,7 @@ To enable seamless local development and testing, this template is paired with a
 |---------------------------|----------------------------|
 | 🏛 **Clean Architecture** | Data / domain / presentation layers with full dependency inversion |
 | 🧩 **BLoC + Freezed**     | Bloc pattern with sealed state unions and exhaustive `when` |
-| 📶 **Offline‑First**      | Reusable `sync` engine — ObjectBox local writes → revision‑based delta sync → tombstones → conflict detection |
+| 📶 **Offline‑First**      | Reusable `rev_sync` engine — ObjectBox local writes → revision‑based delta sync → tombstones → conflict detection |
 | 🔐 **JWT Auth**           | Access + refresh tokens, auto‑refresh interceptor, secure storage |
 | 🧭 **Declarative Routing**| `go_router` with typed routes, auth guards, Universal Links & App Links |
 | 🎨 **Theming**            | Material 3, `FlexColorScheme`, Google Fonts (Inter), true black OLED dark mode |
@@ -212,7 +212,7 @@ graph TD
 ```
 
 **2. Infrastructure & shared contracts** — the inter-package edges within the
-lower layers. The leaf packages `sync`, `config`, `storage`, `app_ui`, and
+lower layers. The leaf packages `rev_sync`, `config`, `storage`, `app_ui`, and
 `localization` have no workspace dependencies (only third-party libs), so they
 don't appear here.
 
@@ -785,7 +785,7 @@ to bookmark attachment behavior.
 | **Networking**     | `network` (`Dio` · `Retrofit`)                                                                |
 | **Code Gen**       | `build_runner` · `freezed` · `json_serializable` · `retrofit_generator` · `injectable_generator` · `go_router_builder` · `flutter_gen_runner` · `objectbox_generator` |
 | **Local DB**       | `ObjectBox` (`objectbox` · `objectbox_flutter_libs`)                                               |
-| **Offline Sync**   | `sync` (revision delta engine, scheduler, conflict detection) · `connectivity_plus`               |
+| **Offline Sync**   | `rev_sync` (revision delta engine, scheduler, conflict detection) · `connectivity_plus`               |
 | **Secure Storage** | `storage` (`flutter_secure_storage` · `shared_preferences`)                                    |
 | **Auth**           | JWT — access + refresh tokens                                                                      |
 | **Theming**        | `theme` · Material 3 · `flex_color_scheme` · `google_fonts` (Inter)                           |
