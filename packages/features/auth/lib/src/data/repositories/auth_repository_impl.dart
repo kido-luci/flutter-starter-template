@@ -10,7 +10,6 @@ import '../models/change_password_request.dart';
 import '../models/refresh_token_request.dart';
 import '../models/register_request.dart';
 import '../models/sign_in_request.dart';
-import '../network/token_refresher.dart';
 
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
@@ -138,7 +137,9 @@ class AuthRepositoryImpl implements AuthRepository {
         // is what forced offline users to re-login.
         return Ok(user);
       case RefreshOutcome.invalidSession:
-        // The refresher already cleared storage on a genuine token rejection.
+        // Tokens were already cleared by the refresher; drop the now-orphaned
+        // persisted user too so storage doesn't keep a userless session blob.
+        await _local.clearSession();
         return const Err(NoSessionFailure('Session expired.'));
     }
   }

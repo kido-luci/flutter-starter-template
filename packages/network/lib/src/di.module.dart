@@ -30,6 +30,12 @@ class NetworkPackageModule extends _i526.MicroPackageModule {
           gh<_i431.AuthTokenStore>(),
           gh<_i361.Dio>(instanceName: 'plain'),
         ));
+    gh.lazySingleton<_i361.Dio>(() => networkModule.provideDio(
+          gh<_i431.AuthTokenStore>(),
+          gh<_i277.TokenRefresher>(),
+          gh<_i259.EnvConfig>(),
+          gh<_i346.FirebasePerformance>(),
+        ));
   }
 }
 

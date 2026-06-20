@@ -6,7 +6,6 @@ import 'package:feature_auth/src/data/models/refresh_token_request.dart';
 import 'package:feature_auth/src/data/models/register_request.dart';
 import 'package:feature_auth/src/data/models/sign_in_request.dart';
 import 'package:feature_auth/src/data/models/sign_in_response.dart';
-import 'package:feature_auth/src/data/network/token_refresher.dart';
 import 'package:feature_auth/src/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
@@ -289,10 +288,11 @@ void main() {
     });
 
     test(
-      'returns NoSessionFailure on invalidSession (refresher owns clearing)',
+      'returns NoSessionFailure and clears the orphaned user on invalidSession',
       () async {
         when(() => mockLocal.currentUser).thenReturn(testUser);
         when(() => mockLocal.refreshToken).thenReturn('refresh');
+        when(() => mockLocal.clearSession()).thenAnswer((_) async {});
         when(
           () => mockRefresher.refresh(),
         ).thenAnswer((_) async => RefreshOutcome.invalidSession);
@@ -303,9 +303,9 @@ void main() {
         final err = result as Err<AuthUser>;
         expect(err.failure, isA<NoSessionFailure>());
         expect(err.failure.message, 'Session expired.');
-        // The repository no longer double-clears: TokenRefresher already wiped
-        // storage on a genuine token rejection.
-        verifyNever(() => mockLocal.clearSession());
+        // The refresher already cleared the tokens; the repository drops the
+        // now-orphaned persisted user so storage keeps no userless session.
+        verify(() => mockLocal.clearSession()).called(1);
       },
     );
 
