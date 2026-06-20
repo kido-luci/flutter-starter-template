@@ -135,7 +135,7 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── config/                       # EnvConfig + Remote Config wrapper
 │   ├── analytics/                    # Analytics service + route observer
 │   ├── app_platform/                 # Camera, picker, permissions, notifications, share
-│   ├── sync/                         # Reusable offline-first sync engine (scheduler + delta CRUD)
+│   ├── rev_sync/                     # Reusable offline-first sync engine — published pkg, git submodule (path dep)
 │   ├── sync_connectivity_plus/       # connectivity_plus adapter for the sync engine
 │   ├── theme/                        # ThemeBloc and persisted theme state
 │   ├── app_ui/                       # Design system, theme, layout, reusable widgets
@@ -212,7 +212,7 @@ graph TD
 ```
 
 **2. Infrastructure & shared contracts** — the inter-package edges within the
-lower layers. The leaf packages `rev_sync`, `config`, `storage`, `app_ui`, and
+lower layers. The leaf packages `config`, `storage`, `app_ui`, and
 `localization` have no workspace dependencies (only third-party libs), so they
 don't appear here.
 
@@ -224,7 +224,7 @@ graph TD
   app_platform --> architecture
   theme --> architecture
   network --> config
-  database --> sync
+  database --> rev_sync
 ```
 
 **3. Feature packages** — every feature is a package under `packages/features/`.
@@ -246,9 +246,9 @@ graph TD
   bookmarks --> collections
 
   auth --> network & storage & analytics & config
-  bookmarks --> network & database & sync & analytics & app_platform
-  collections --> network & database & sync
-  notifications --> network & database & sync
+  bookmarks --> network & database & rev_sync & analytics & app_platform
+  collections --> network & database & rev_sync
+  notifications --> network & database & rev_sync
   home --> shared_contracts
   profile --> analytics & theme
   splash --> shared_ui & app_ui & localization
