@@ -8,6 +8,7 @@ import 'dart:async' as _i687;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
+import 'package:storage/src/auth_token_store.dart' as _i121;
 import 'package:storage/src/keychain_reset_on_reinstall.dart' as _i1049;
 import 'package:storage/src/secure_storage_module.dart' as _i837;
 import 'package:storage/src/shared_preferences_module.dart' as _i684;
@@ -24,6 +25,8 @@ class StoragePackageModule extends _i526.MicroPackageModule {
     );
     gh.lazySingleton<_i558.FlutterSecureStorage>(
         () => secureStorageModule.provideSecureStorage());
+    gh.lazySingleton<_i121.AuthTokenStore>(
+        () => _i121.SecureAuthTokenStore(gh<_i558.FlutterSecureStorage>()));
     gh.lazySingleton<_i1049.KeychainResetOnReinstall>(
         () => _i1049.KeychainResetOnReinstall(
               gh<_i460.SharedPreferences>(),
