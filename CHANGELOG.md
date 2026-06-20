@@ -5,6 +5,47 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-06-20
+
+Makes `fst create` customize a project from scratch — Firebase and the demo
+features become opt-out at scaffold time — and extracts the offline-first sync
+engine into its own published package. The template app itself runs unchanged
+(Firebase stays enabled by default).
+
+### Added
+
+- **Fully customizable `fst create`** — non-interactive flags (`--name`,
+  `--package-name`, `--bundle-id`, `--org`, `--yes`) for CI and scripts, plus
+  `--api-url` (sets `API_BASE_URL` in the staging and prod env files) and
+  `--icon` (installs a launcher icon).
+- **Optional Firebase** — `--[no-]firebase`: a generated project builds and runs
+  with no Firebase project. It gates the platform init, swaps the analytics and
+  crash-reporting bindings to no-ops, removes the Firebase Android Gradle
+  plugins, and deletes the bundled native credentials.
+- **Feature selection** — `--exclude-feature` (or an interactive multi-select)
+  drops the demo features (`bookmarks`, `collections`, `notifications`) and
+  excises their wiring; excluding `collections` also excludes `bookmarks`.
+- **Pluggable tracking ports** — `AnalyticsService` and `CrashReporter`
+  interfaces with NoOp and Firebase adapters, so analytics and crash reporting
+  can be kept independently or turned off.
+
+### Changed
+
+- **The offline-first sync engine is now the published `rev_sync` package** —
+  extracted from the in-repo `sync` workspace package to its own public repo,
+  vendored here as a git submodule at `packages/rev_sync` and consumed via a
+  path dependency. The engine itself is unchanged; only its home moved.
+- **`tool/codegen.sh` prefers the FVM-pinned SDK** when `fvm` is installed, so
+  code generation matches the project's pinned Flutter version.
+
+### Fixed
+
+- **Generated projects build under FVM** and stay valid after `fst create
+  --exclude-feature` removes every routed demo feature (`go_router` and the DI
+  wiring no longer go unused).
+- **Submodule pointer integrity** — re-pointing the `tool/cli` submodule after a
+  squash-merge no longer leaves the superproject referencing an orphaned commit.
+
 ## [1.5.0] - 2026-06-19
 
 Sharpens the scaffolding path so a project generated with `fst create` comes out
