@@ -1,4 +1,5 @@
 import 'package:architecture/architecture.dart';
+import 'package:clock/clock.dart';
 import 'package:database/database.dart';
 import 'package:feature_bookmarks/src/data/local/bookmarks_local_data_source.dart';
 import 'package:feature_bookmarks/src/data/repositories/bookmarks_repository_impl.dart';
@@ -172,6 +173,25 @@ void main() {
       expect(captured.uuid, 'new-uuid');
       expect(captured.syncState, SyncState.pendingCreate);
       expect(captured.syncStateCode, SyncState.pendingCreate.code);
+    });
+
+    test('create stamps createdAt/updatedAt from the ambient clock', () async {
+      final fixed = DateTime.utc(2026, 1, 2, 3, 4, 5);
+      when(() => mockUuid.v4()).thenReturn('clock-uuid');
+      when(() => mockLocal.putNew(any())).thenAnswer(
+        (invocation) async =>
+            invocation.positionalArguments[0] as BookmarkEntity,
+      );
+
+      await withClock(Clock.fixed(fixed), () async {
+        await repository.create(input);
+      });
+
+      final captured =
+          verify(() => mockLocal.putNew(captureAny())).captured.single
+              as BookmarkEntity;
+      expect(captured.createdAt, fixed);
+      expect(captured.updatedAt, fixed);
     });
   });
 

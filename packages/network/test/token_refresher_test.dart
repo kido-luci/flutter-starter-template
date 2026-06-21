@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:feature_auth/src/data/datasources/auth_local_data_source.dart';
-import 'package:feature_auth/src/data/network/token_refresher.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network/network.dart';
+import 'package:storage/storage.dart';
 import 'package:test_utils/test_utils.dart';
 
-class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
+class _MockTokenStore extends Mock implements AuthTokenStore {}
 
-class MockDio extends Mock implements Dio {}
+class _MockDio extends Mock implements Dio {}
 
 void main() {
-  late MockAuthLocalDataSource local;
-  late MockDio dio;
+  late _MockTokenStore tokens;
+  late _MockDio dio;
   late TokenRefresher refresher;
 
   Response<Map<String, dynamic>> okResponse(Map<String, dynamic>? body) =>
@@ -34,12 +33,12 @@ void main() {
   );
 
   setUp(() {
-    local = MockAuthLocalDataSource();
-    dio = MockDio();
-    refresher = TokenRefresher(local, dio);
-    when(() => local.clearSession()).thenAnswer((_) async {});
+    tokens = _MockTokenStore();
+    dio = _MockDio();
+    refresher = TokenRefresher(tokens, dio);
+    when(() => tokens.clearTokens()).thenAnswer((_) async {});
     when(
-      () => local.updateTokens(
+      () => tokens.updateTokens(
         accessToken: any(named: 'accessToken'),
         refreshToken: any(named: 'refreshToken'),
       ),
@@ -59,7 +58,7 @@ void main() {
   test(
     'returns invalidSession and does not POST when no refresh token',
     () async {
-      when(() => local.refreshToken).thenReturn(null);
+      when(() => tokens.refreshToken).thenReturn(null);
 
       expect(await refresher.refresh(), RefreshOutcome.invalidSession);
       verifyNever(
@@ -69,10 +68,9 @@ void main() {
   );
 
   test('refreshes and persists new tokens on success', () async {
-    when(() => local.refreshToken).thenReturn('old');
+    when(() => tokens.refreshToken).thenReturn('old');
     stubPost(
       () => okResponse({
-        'user': {'id': 'u1', 'username': 'alice'},
         'access_token': 'new-access',
         'refresh_token': 'new-refresh',
         'expires_in': 3600,
@@ -81,59 +79,56 @@ void main() {
 
     expect(await refresher.refresh(), RefreshOutcome.refreshed);
     verify(
-      () => local.updateTokens(
+      () => tokens.updateTokens(
         accessToken: 'new-access',
         refreshToken: 'new-refresh',
       ),
     ).called(1);
-    verifyNever(() => local.clearSession());
+    verifyNever(() => tokens.clearTokens());
   });
 
   test('keeps session (networkError) on connection error', () async {
-    when(() => local.refreshToken).thenReturn('old');
+    when(() => tokens.refreshToken).thenReturn('old');
     stubPost(() => dioError(type: DioExceptionType.connectionError));
 
     expect(await refresher.refresh(), RefreshOutcome.networkError);
-    verifyNever(() => local.clearSession());
+    verifyNever(() => tokens.clearTokens());
   });
 
   test('keeps session (networkError) on a 5xx server error', () async {
-    when(() => local.refreshToken).thenReturn('old');
+    when(() => tokens.refreshToken).thenReturn('old');
     stubPost(() => dioError(status: 503));
 
     expect(await refresher.refresh(), RefreshOutcome.networkError);
-    verifyNever(() => local.clearSession());
+    verifyNever(() => tokens.clearTokens());
   });
 
-  test('clears session (invalidSession) on 401', () async {
-    when(() => local.refreshToken).thenReturn('old');
+  test('clears tokens (invalidSession) on 401', () async {
+    when(() => tokens.refreshToken).thenReturn('old');
     stubPost(() => dioError(status: 401));
 
     expect(await refresher.refresh(), RefreshOutcome.invalidSession);
-    verify(() => local.clearSession()).called(1);
+    verify(() => tokens.clearTokens()).called(1);
   });
 
-  test('clears session (invalidSession) on a null body', () async {
-    when(() => local.refreshToken).thenReturn('old');
+  test('clears tokens (invalidSession) on a null body', () async {
+    when(() => tokens.refreshToken).thenReturn('old');
     stubPost(() => okResponse(null));
 
     expect(await refresher.refresh(), RefreshOutcome.invalidSession);
-    verify(() => local.clearSession()).called(1);
+    verify(() => tokens.clearTokens()).called(1);
   });
 
   test(
-    'clears session (invalidSession) on a malformed body, without throwing',
+    'clears tokens (invalidSession) on a malformed body, without throwing',
     () async {
-      when(() => local.refreshToken).thenReturn('old');
-      // A 200 with a non-null body missing the required token fields: parsing
-      // throws a (non-Dio) error that must be treated as an unusable body, not
-      // allowed to escape the refresher.
+      when(() => tokens.refreshToken).thenReturn('old');
       stubPost(() => okResponse({'unexpected': 'shape'}));
 
       expect(await refresher.refresh(), RefreshOutcome.invalidSession);
-      verify(() => local.clearSession()).called(1);
+      verify(() => tokens.clearTokens()).called(1);
       verifyNever(
-        () => local.updateTokens(
+        () => tokens.updateTokens(
           accessToken: any(named: 'accessToken'),
           refreshToken: any(named: 'refreshToken'),
         ),
@@ -142,7 +137,7 @@ void main() {
   );
 
   test('single-flight: concurrent callers share one POST', () async {
-    when(() => local.refreshToken).thenReturn('old');
+    when(() => tokens.refreshToken).thenReturn('old');
     final completer = Completer<Response<Map<String, dynamic>>>();
     when(
       () => dio.post<Map<String, dynamic>>(any(), data: any(named: 'data')),
@@ -153,12 +148,7 @@ void main() {
     expect(f1, same(f2));
 
     completer.complete(
-      okResponse({
-        'user': {'id': 'u1', 'username': 'alice'},
-        'access_token': 'a',
-        'refresh_token': 'r',
-        'expires_in': 1,
-      }),
+      okResponse({'access_token': 'a', 'refresh_token': 'r', 'expires_in': 1}),
     );
     await f1;
 
@@ -166,4 +156,23 @@ void main() {
       () => dio.post<Map<String, dynamic>>(any(), data: any(named: 'data')),
     ).called(1);
   });
+
+  test(
+    'returns networkError when a token-store write throws (non-Dio)',
+    () async {
+      when(() => tokens.refreshToken).thenReturn('old');
+      stubPost(() => okResponse({'access_token': 'a', 'refresh_token': 'r'}));
+      // Secure-storage I/O can throw (e.g. a PlatformException). The refresher
+      // must not let it escape — that would break AuthInterceptor.onError and
+      // make restoreSession throw instead of returning a Result.
+      when(
+        () => tokens.updateTokens(
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      ).thenThrow(Exception('keychain locked'));
+
+      expect(await refresher.refresh(), RefreshOutcome.networkError);
+    },
+  );
 }

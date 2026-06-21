@@ -11,6 +11,8 @@ import 'package:firebase_performance/firebase_performance.dart' as _i346;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:network/src/network_module.dart' as _i794;
 import 'package:network/src/performance_module.dart' as _i87;
+import 'package:network/src/token_refresher.dart' as _i277;
+import 'package:storage/storage.dart' as _i431;
 
 class NetworkPackageModule extends _i526.MicroPackageModule {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -24,6 +26,20 @@ class NetworkPackageModule extends _i526.MicroPackageModule {
     gh.lazySingleton<_i361.Dio>(
       () => networkModule.providePlainDio(gh<_i259.EnvConfig>()),
       instanceName: 'plain',
+    );
+    gh.lazySingleton<_i277.TokenRefresher>(
+      () => _i277.TokenRefresher(
+        gh<_i431.AuthTokenStore>(),
+        gh<_i361.Dio>(instanceName: 'plain'),
+      ),
+    );
+    gh.lazySingleton<_i361.Dio>(
+      () => networkModule.provideDio(
+        gh<_i431.AuthTokenStore>(),
+        gh<_i277.TokenRefresher>(),
+        gh<_i259.EnvConfig>(),
+        gh<_i346.FirebasePerformance>(),
+      ),
     );
   }
 }

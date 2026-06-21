@@ -1,4 +1,5 @@
 import 'package:architecture/architecture.dart';
+import 'package:clock/clock.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 
@@ -28,7 +29,7 @@ class BookmarkStatsService extends BookmarkStatsReader {
   }
 
   BookmarkStats _statsFrom(List<Bookmark> items) {
-    final cutoff = DateTime.now().subtract(_recentWindow);
+    final cutoff = clock.now().subtract(_recentWindow);
     return BookmarkStats(
       total: items.length,
       recent: items.where((b) => b.createdAt.isAfter(cutoff)).length,

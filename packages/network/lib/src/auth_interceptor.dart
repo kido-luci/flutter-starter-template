@@ -1,17 +1,17 @@
-import 'package:network/network.dart';
+import 'package:dio/dio.dart';
+import 'package:storage/storage.dart';
 
-import '../datasources/auth_local_data_source.dart';
 import 'token_refresher.dart';
 
 /// Attaches the persisted access token to outgoing requests and, on 401,
 /// transparently refreshes the token once and retries the original request.
 ///
-/// Requests already carrying `_retried` in their extras skip the retry path
-/// so a doomed refresh can never cause an infinite loop.
+/// Requests already carrying `__auth_retried__` in their extras skip the retry
+/// path so a doomed refresh can never cause an infinite loop.
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor(this._local, this._refresher, this._dio);
+  AuthInterceptor(this._tokens, this._refresher, this._dio);
 
-  final AuthLocalDataSource _local;
+  final AuthTokenStore _tokens;
   final TokenRefresher _refresher;
   final Dio _dio;
 
@@ -19,7 +19,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final token = _local.accessToken;
+    final token = _tokens.accessToken;
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -50,7 +50,7 @@ class AuthInterceptor extends Interceptor {
       final retried = await _dio.fetch<dynamic>(
         request
           ..extra[_retriedKey] = true
-          ..headers['Authorization'] = 'Bearer ${_local.accessToken}',
+          ..headers['Authorization'] = 'Bearer ${_tokens.accessToken}',
       );
       handler.resolve(retried);
     } on DioException catch (e) {
