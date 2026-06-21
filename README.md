@@ -135,7 +135,6 @@ To enable seamless local development and testing, this template is paired with a
 │   ├── config/                       # EnvConfig + Remote Config wrapper
 │   ├── analytics/                    # Analytics service + route observer
 │   ├── app_platform/                 # Camera, picker, permissions, notifications, share
-│   ├── rev_sync/                     # Reusable offline-first sync engine — published pkg, git submodule (path dep)
 │   ├── sync_connectivity_plus/       # connectivity_plus adapter for the sync engine
 │   ├── theme/                        # ThemeBloc and persisted theme state
 │   ├── app_ui/                       # Design system, theme, layout, reusable widgets
@@ -151,6 +150,9 @@ To enable seamless local development and testing, this template is paired with a
 │       ├── notifications/            # Notification & activity feed
 │       ├── bookmarks/                # Bookmarks — offline-first CRUD
 │       └── collections/             # Collections — offline-first CRUD
+├── published/                        # Independently-published packages — own repos, vendored as git submodules
+│   ├── rev_sync/                     # Offline-first sync engine (pub.dev; consumed as a path dep)
+│   └── cli/                          # `fst` project scaffolder (pub.dev: flutter_starter_template_cli)
 ├── test/                             # Root app + feature tests
 └── integration_test/                 # Device/emulator integration tests
 ```
