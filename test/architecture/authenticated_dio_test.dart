@@ -41,10 +41,11 @@ void main() {
             file.path.endsWith('.config.dart')) {
           continue;
         }
-        // Match ANY `Dio <name>(` declaration, not just `provideDio`, so a
-        // feature can't bypass the guard by renaming its provider.
+        // Match ANY Dio provider declaration — `Dio <name>(` as well as
+        // async-wrapped `Future<Dio>` / `FutureOr<Dio>` providers — so a
+        // feature can't bypass the guard by renaming or wrapping its provider.
         if (RegExp(
-          r'\bDio\s+\w+\s*\(',
+          r'\b(?:Future(?:Or)?\s*<\s*)?Dio(?:\s*>)?\s+\w+\s*\(',
         ).hasMatch(file.readAsStringSync())) {
           offenders.add(file.path);
         }

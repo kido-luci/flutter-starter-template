@@ -115,9 +115,14 @@ void main() {
       storage.releaseReads(); // let load resolve with the OLD snapshot
       await Future.wait([loading, updating]);
 
-      // The fresh write must win — the late load must not clobber it.
+      // The fresh write must win in memory AND in storage — the late load
+      // must not clobber either.
       expect(store.accessToken, 'new');
       expect(store.refreshToken, 'new');
+      expect(await storage.readAll(), {
+        'auth.access_token': 'new',
+        'auth.refresh_token': 'new',
+      });
     },
   );
 }
