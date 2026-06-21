@@ -16,9 +16,9 @@ set -euo pipefail
 if command -v fvm >/dev/null 2>&1; then
   dart() { fvm dart "$@"; }
   flutter() { fvm flutter "$@"; }
-  format_fix_cmd="fvm dart format ."
+  format_fix_cmd="fvm dart format \$(git ls-files '*.dart')"
 else
-  format_fix_cmd="dart format ."
+  format_fix_cmd="dart format \$(git ls-files '*.dart')"
 fi
 
 if ! command -v dart >/dev/null 2>&1 || ! command -v flutter >/dev/null 2>&1; then
@@ -37,9 +37,23 @@ if ! dart run build_runner build --delete-conflicting-outputs; then
 fi
 
 echo "▶ pre-push: verifying formatting (dart format)…"
-if ! dart format --output=none --set-exit-if-changed .; then
-  echo "✖ Formatting issues found. Fix with: ${format_fix_cmd}" >&2
-  exit 1
+# Check only files tracked by THIS repo. Submodule contents (published/cli,
+# published/rev_sync, simple_backend_server) are gitlinks, so `git ls-files`
+# excludes them — their own repos/CI own their formatting, and e.g. the CLI's
+# source is maintained on a different SDK. Passing `.` instead would reformat
+# the submodules and false-fail the push (CI is unaffected: it never checks out
+# published/cli).
+tracked_dart="$(git ls-files '*.dart')"
+# Pass the file list directly (not via xargs): `dart` here is a shell function
+# wrapping `fvm dart`, and xargs would invoke the PATH `dart` binary instead —
+# a different SDK whose formatter rules differ. Word-splitting is intentional
+# (paths have no spaces); the guard skips the no-files case.
+if [ -n "$tracked_dart" ]; then
+  # shellcheck disable=SC2086
+  if ! dart format --output=none --set-exit-if-changed $tracked_dart; then
+    echo "✖ Formatting issues found. Fix with: ${format_fix_cmd}" >&2
+    exit 1
+  fi
 fi
 
 echo "▶ pre-push: analyzing (flutter analyze)…"
