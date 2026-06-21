@@ -1575,7 +1575,7 @@ packages:
   rev_sync:
     dependency: "direct main"
     description:
-      path: "packages/rev_sync"
+      path: "published/rev_sync"
       relative: true
     source: path
     version: "1.0.0"

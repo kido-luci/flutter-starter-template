@@ -79,11 +79,11 @@ jobs:
               - '!.github/dependabot.yml'
               # Submodule pointer bumps (incl. Dependabot's). These two aren't
               # part of the Flutter build and aren't checked out, so a gitlink
-              # change can't affect these jobs. (packages/rev_sync is deliberately
+              # change can't affect these jobs. (published/rev_sync is deliberately
               # NOT excluded: it's a path-dependency of the build, is checked out,
               # and its bumps must trigger these jobs.)
               - '!simple_backend_server'
-              - '!tool/cli'
+              - '!published/cli'
 
   analyze-and-test:
     name: Analyze & Test
@@ -100,7 +100,7 @@ jobs:
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -261,7 +261,7 @@ jobs:
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -361,7 +361,7 @@ jobs:
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       # connectivity_plus 7.x compiles against the iOS 26 SDK: it references
       # NWPath.isUltraConstrained behind an `if #available(iOS 26.0, *)`, but
@@ -526,7 +526,7 @@ jobs:
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter

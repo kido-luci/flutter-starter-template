@@ -51,7 +51,7 @@ jobs:
       # rev_sync is a path-dependency of the build, vendored as a submodule, so
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -123,7 +123,7 @@ jobs:
       # rev_sync is a path-dependency of the build, vendored as a submodule, so
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
-        run: git submodule update --init packages/rev_sync
+        run: git submodule update --init published/rev_sync
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
