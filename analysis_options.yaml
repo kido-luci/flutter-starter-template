@@ -35,6 +35,13 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.config.dart"
     - lib/firebase_options.dart
+    # Submodules are independently-maintained repos (own pubspec / pub get / CI /
+    # formatter version). Analyzing their source from the root context yields
+    # spurious "undefined" errors (they aren't resolved here) — leave them to
+    # their own tooling. CI never checks out published/cli; this keeps local
+    # `flutter analyze` and the pre-push hook consistent with CI.
+    - published/**
+    - simple_backend_server/**
 
 
 # Additional information about this file can be found at
