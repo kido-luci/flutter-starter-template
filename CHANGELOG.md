@@ -5,6 +5,49 @@ All notable changes to this template are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-06-21
+
+Architecture clean-up release: the authenticated HTTP transport moves into the
+infrastructure layer, the two published packages are grouped under one
+directory, and data/domain time becomes testable. No breaking changes for
+generated apps.
+
+### Changed
+
+- **Published packages grouped under a top-level `published/` directory** — the
+  two independently-published submodules now live together: `rev_sync` moved
+  from `packages/rev_sync` to `published/rev_sync`, and the `fst` CLI from
+  `tool/cli` to `published/cli`. Their `path:` dependencies, CI checkout paths,
+  and the CLI's clean-slate logic were updated accordingly.
+- **Authenticated transport extracted to the infra layer** — the authenticated
+  `Dio` (auth interceptor + 401 refresh + token store) moved out of
+  `feature_auth`: `storage` now owns `AuthTokenStore` and the
+  `FlutterSecureStorage` provider; `network` owns the authenticated `Dio`,
+  `AuthInterceptor`, and `TokenRefresher`, reading tokens via
+  `storage.AuthTokenStore`. Every API feature now resolves `Dio` from `network`
+  (a declared, layering-enforced dependency) instead of an invisible runtime
+  edge on `feature_auth`. The brittle "auth before other features" DI-ordering
+  constraint is gone, and a guardrail test locks Dio ownership in `network`.
+- **Deterministic time in data/domain** — `feature_bookmarks` and
+  `feature_collections` use the `clock` package's ambient `clock.now()` instead
+  of `DateTime.now()`, so time-dependent logic (including the sync engine's
+  lost-update guard) is testable via `withClock`.
+
+### Fixed
+
+- **Token refresher and token store hardened** — `TokenRefresher` maps non-Dio
+  failures (e.g. a secure-storage write throwing) to a transient outcome instead
+  of letting them escape and break the interceptor / session-restore flow;
+  `SecureAuthTokenStore` serializes `load()` against concurrent token writes so
+  a late storage snapshot can't clobber fresh tokens.
+- **Pre-push hook no longer false-fails on submodules** — the format and analyze
+  steps now skip submodule working trees (`published/cli`, `published/rev_sync`,
+  `simple_backend_server`), which are independently maintained on their own SDKs.
+
+### Docs
+
+- The README architecture tree now shows the `published/` directory.
+
 ## [1.6.0] - 2026-06-20
 
 Makes `fst create` customize a project from scratch — Firebase and the demo
