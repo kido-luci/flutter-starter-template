@@ -32,6 +32,7 @@ class SecureAuthTokenStore implements AuthTokenStore {
   String? _accessToken;
   String? _refreshToken;
   bool _loaded = false;
+  Future<void>? _loadFuture;
 
   @override
   String? get accessToken => _accessToken;
@@ -40,7 +41,9 @@ class SecureAuthTokenStore implements AuthTokenStore {
   String? get refreshToken => _refreshToken;
 
   @override
-  Future<void> load() async {
+  Future<void> load() => _loadFuture ??= _loadImpl();
+
+  Future<void> _loadImpl() async {
     if (_loaded) return;
     final values = await _storage.readAll();
     _accessToken = values[_kAccessKey];
@@ -53,6 +56,9 @@ class SecureAuthTokenStore implements AuthTokenStore {
     required String accessToken,
     required String refreshToken,
   }) async {
+    // Wait out an in-flight load first, so its late snapshot can't clobber the
+    // fresh tokens we're about to set.
+    await _loadFuture;
     _accessToken = accessToken;
     _refreshToken = refreshToken;
     _loaded = true;
@@ -64,6 +70,9 @@ class SecureAuthTokenStore implements AuthTokenStore {
 
   @override
   Future<void> clearTokens() async {
+    // Same ordering guard as updateTokens: don't let a late load resurrect
+    // tokens we're clearing.
+    await _loadFuture;
     _accessToken = null;
     _refreshToken = null;
     await Future.wait([

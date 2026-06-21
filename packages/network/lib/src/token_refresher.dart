@@ -59,6 +59,12 @@ class TokenRefresher {
         return RefreshOutcome.invalidSession;
       }
       return RefreshOutcome.networkError;
+    } on Object {
+      // Any non-Dio failure — e.g. a secure-storage write throwing while
+      // persisting/clearing tokens — must not escape and break the caller's
+      // error handling (AuthInterceptor.onError / restoreSession). Treat it as
+      // transient so the session is kept and the next trigger retries.
+      return RefreshOutcome.networkError;
     }
   }
 }

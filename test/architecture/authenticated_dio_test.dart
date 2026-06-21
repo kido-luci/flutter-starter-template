@@ -41,8 +41,10 @@ void main() {
             file.path.endsWith('.config.dart')) {
           continue;
         }
+        // Match ANY `Dio <name>(` declaration, not just `provideDio`, so a
+        // feature can't bypass the guard by renaming its provider.
         if (RegExp(
-          r'\bDio\s+provideDio\s*\(',
+          r'\bDio\s+\w+\s*\(',
         ).hasMatch(file.readAsStringSync())) {
           offenders.add(file.path);
         }

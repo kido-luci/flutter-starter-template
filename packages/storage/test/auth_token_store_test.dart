@@ -1,8 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storage/storage.dart';
 
 class _FakeSecureStorage extends Fake implements FlutterSecureStorage {
   final Map<String, String> _data = {};
+
+  /// When set, `readAll` blocks until [releaseReads] — lets a test hold a
+  /// `load()` in flight to interleave it with token writes.
+  Completer<void>? _readGate;
+
+  void holdReads() => _readGate = Completer<void>();
+  void releaseReads() => _readGate?.complete();
 
   @override
   Future<Map<String, String>> readAll({
@@ -12,7 +21,13 @@ class _FakeSecureStorage extends Fake implements FlutterSecureStorage {
     WebOptions? webOptions,
     AppleOptions? mOptions,
     WindowsOptions? wOptions,
-  }) async => Map.of(_data);
+  }) async {
+    // Snapshot at call time (like a real read in flight): a write that lands
+    // while this read is gated must NOT change what this read returns.
+    final snapshot = Map.of(_data);
+    if (_readGate != null) await _readGate!.future;
+    return snapshot;
+  }
 
   @override
   Future<void> write({
@@ -83,4 +98,26 @@ void main() {
     expect(store.refreshToken, isNull);
     expect(await storage.readAll(), isEmpty);
   });
+
+  test(
+    'updateTokens during an in-flight load wins over the stale snapshot',
+    () async {
+      await storage.write(key: 'auth.access_token', value: 'old');
+      await storage.write(key: 'auth.refresh_token', value: 'old');
+      storage.holdReads(); // hold the load()'s readAll mid-flight
+
+      final loading = store.load();
+      final updating = store.updateTokens(
+        accessToken: 'new',
+        refreshToken: 'new',
+      );
+
+      storage.releaseReads(); // let load resolve with the OLD snapshot
+      await Future.wait([loading, updating]);
+
+      // The fresh write must win — the late load must not clobber it.
+      expect(store.accessToken, 'new');
+      expect(store.refreshToken, 'new');
+    },
+  );
 }

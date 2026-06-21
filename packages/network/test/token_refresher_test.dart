@@ -156,4 +156,23 @@ void main() {
       () => dio.post<Map<String, dynamic>>(any(), data: any(named: 'data')),
     ).called(1);
   });
+
+  test(
+    'returns networkError when a token-store write throws (non-Dio)',
+    () async {
+      when(() => tokens.refreshToken).thenReturn('old');
+      stubPost(() => okResponse({'access_token': 'a', 'refresh_token': 'r'}));
+      // Secure-storage I/O can throw (e.g. a PlatformException). The refresher
+      // must not let it escape — that would break AuthInterceptor.onError and
+      // make restoreSession throw instead of returning a Result.
+      when(
+        () => tokens.updateTokens(
+          accessToken: any(named: 'accessToken'),
+          refreshToken: any(named: 'refreshToken'),
+        ),
+      ).thenThrow(Exception('keychain locked'));
+
+      expect(await refresher.refresh(), RefreshOutcome.networkError);
+    },
+  );
 }

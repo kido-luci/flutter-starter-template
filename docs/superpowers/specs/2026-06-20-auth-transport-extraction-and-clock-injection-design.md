@@ -178,7 +178,9 @@ abstract interface class AuthTokenStore {
 
 ## Affected files (summary)
 
-- `packages/storage/` — new `auth_token_store.dart` (port + impl) + module wiring.
+- `packages/storage/` — new `auth_token_store.dart` (port + impl) + module
+  wiring, plus the relocated `FlutterSecureStorage` provider (moved out of
+  `feature_auth`).
 - `packages/network/` — new `auth_interceptor.dart`, `token_refresher.dart`;
   `network_module.dart` gains authenticated `Dio`; pubspec adds `storage`.
 - `packages/features/auth/` — `SecureStorageAuthDataSource` delegates tokens;
