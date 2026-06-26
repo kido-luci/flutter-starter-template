@@ -295,4 +295,43 @@ void main() {
       );
     });
   });
+
+  group('no auth pillar — status null, splash is the only gate', () {
+    String? resolveNoAuth({
+      required String location,
+      required DeepLinkState deepLink,
+      String? requestedUri,
+    }) {
+      return resolveSplashRedirect(
+        status: null,
+        location: location,
+        requestedUri: requestedUri ?? location,
+        deepLink: deepLink,
+        splashLocation: splash,
+        homeLocation: home,
+      );
+    }
+
+    test('still forces splash before it completes, capturing the target', () {
+      final deepLink = gate();
+      expect(resolveNoAuth(location: home, deepLink: deepLink), splash);
+      expect(deepLink.pendingRedirect, home);
+    });
+
+    test('bounces off splash to home once completed', () {
+      final deepLink = gate(splashCompleted: true);
+      expect(resolveNoAuth(location: splash, deepLink: deepLink), home);
+    });
+
+    test('replays a captured deep link', () {
+      final deepLink = gate(splashCompleted: true, pending: '/bookmarks');
+      expect(resolveNoAuth(location: splash, deepLink: deepLink), '/bookmarks');
+      expect(deepLink.pendingRedirect, isNull);
+    });
+
+    test('allows any route without an auth gate', () {
+      final deepLink = gate(splashCompleted: true);
+      expect(resolveNoAuth(location: '/bookmarks', deepLink: deepLink), isNull);
+    });
+  });
 }

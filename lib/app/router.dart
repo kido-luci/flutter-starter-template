@@ -1,4 +1,6 @@
+// fst:auth:start
 import 'package:feature_auth/feature_auth.dart';
+// fst:auth:end
 // fst:feature:bookmarks:start
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 // fst:feature:bookmarks:end
@@ -49,10 +51,12 @@ part 'router.g.dart';
           path: '/profile',
           name: 'profile',
           routes: <TypedRoute<RouteData>>[
+            // fst:auth:start
             TypedGoRoute<ChangePasswordRoute>(
               path: 'change-password',
               name: 'change-password',
             ),
+            // fst:auth:end
           ],
         ),
       ],
@@ -128,6 +132,7 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
       const ProfileScreen();
 }
 
+// fst:auth:start
 class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
   const ChangePasswordRoute();
 
@@ -135,6 +140,7 @@ class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const ChangePasswordScreen();
 }
+// fst:auth:end
 
 // fst:feature:bookmarks:start
 class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
@@ -180,15 +186,15 @@ class DeepLinkScope extends InheritedWidget {
 /// generated shell routes ([$appRoutes]) so adding a feature's screens never
 /// edits this file — the feature ships its own route table.
 ({GoRouter router, DeepLinkState deepLink}) buildRouterWithDeepLink(
-  Session session, {
+  Session? session, {
   required List<RouteBase> featureRoutes,
+  String? loginLocation,
+  String? registerLocation,
   List<NavigatorObserver>? observers,
 }) {
   final deepLink = DeepLinkState();
   final homeLocation = const HomeRoute().location;
   final splashLocation = const SplashRoute().location;
-  const loginLocation = AuthRoutes.login;
-  const registerLocation = AuthRoutes.register;
 
   final router = GoRouter(
     // No initialLocation — GoRouter resolves the platform deep-link URI on
@@ -198,7 +204,7 @@ class DeepLinkScope extends InheritedWidget {
     observers: observers,
     refreshListenable: session,
     redirect: (context, state) => resolveSplashRedirect(
-      status: session.status,
+      status: session?.status,
       location: state.matchedLocation,
       requestedUri: state.uri.toString(),
       deepLink: deepLink,
@@ -225,14 +231,14 @@ class DeepLinkScope extends InheritedWidget {
 /// target before splash/auth, then replays it once the user is authenticated.
 @visibleForTesting
 String? resolveSplashRedirect({
-  required SessionStatus status,
+  required SessionStatus? status,
   required String location,
   required String requestedUri,
   required DeepLinkState deepLink,
   required String splashLocation,
-  required String loginLocation,
-  required String registerLocation,
   required String homeLocation,
+  String? loginLocation,
+  String? registerLocation,
 }) {
   // ── Phase 1: Before splash completes ──
   // Intercept every navigation until restoreSession and the splash minimum
@@ -245,6 +251,19 @@ String? resolveSplashRedirect({
     // through splash first.
     deepLink.pendingRedirect ??= requestedUri;
     return splashLocation;
+  }
+
+  // ── No auth pillar (status == null) ──
+  // Splash is the only gate: replay any captured deep link, bounce off splash
+  // to home, and otherwise allow the navigation.
+  if (status == null) {
+    final target = deepLink.pendingRedirect;
+    if (target != null) {
+      deepLink.pendingRedirect = null;
+      if (target != requestedUri) return target;
+    }
+    if (location == splashLocation) return homeLocation;
+    return null;
   }
 
   // ── Phase 2: Unauthenticated ──
