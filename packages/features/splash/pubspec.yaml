@@ -16,7 +16,9 @@ dependencies:
 
   # Workspace packages.
   app_ui: ^0.1.0
+  # fst:auth:start
   shared_ui: ^0.1.0
+  # fst:auth:end
   localization: ^0.1.0
 
 dev_dependencies:

@@ -37,6 +37,7 @@ class _AppInfoTile extends StatelessWidget {
   }
 }
 
+// fst:auth:start
 class _SignOutButton extends StatelessWidget {
   const _SignOutButton();
 
@@ -78,3 +79,5 @@ class _SignOutButton extends StatelessWidget {
     }
   }
 }
+
+// fst:auth:end

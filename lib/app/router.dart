@@ -1,6 +1,6 @@
-import 'dart:async';
-
+// fst:auth:start
 import 'package:feature_auth/feature_auth.dart';
+// fst:auth:end
 // fst:feature:bookmarks:start
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 // fst:feature:bookmarks:end
@@ -12,6 +12,7 @@ import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_splash/feature_splash.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 
 import 'widgets/app_shell.dart';
 
@@ -50,10 +51,12 @@ part 'router.g.dart';
           path: '/profile',
           name: 'profile',
           routes: <TypedRoute<RouteData>>[
+            // fst:auth:start
             TypedGoRoute<ChangePasswordRoute>(
               path: 'change-password',
               name: 'change-password',
             ),
+            // fst:auth:end
           ],
         ),
       ],
@@ -129,6 +132,7 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
       const ProfileScreen();
 }
 
+// fst:auth:start
 class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
   const ChangePasswordRoute();
 
@@ -136,6 +140,7 @@ class ChangePasswordRoute extends GoRouteData with $ChangePasswordRoute {
   Widget build(BuildContext context, GoRouterState state) =>
       const ChangePasswordScreen();
 }
+// fst:auth:end
 
 // fst:feature:bookmarks:start
 class BookmarksListRoute extends GoRouteData with $BookmarksListRoute {
@@ -174,22 +179,22 @@ class DeepLinkScope extends InheritedWidget {
       deepLink != oldWidget.deepLink;
 }
 
-/// Builds the app router and wires auth redirects to [bloc] state changes.
+/// Builds the app router and wires auth redirects to [session] status changes.
 ///
 /// [featureRoutes] are the non-shell routes contributed by the feature
 /// packages (and auth's login/register). They are mounted alongside the
 /// generated shell routes ([$appRoutes]) so adding a feature's screens never
 /// edits this file — the feature ships its own route table.
 ({GoRouter router, DeepLinkState deepLink}) buildRouterWithDeepLink(
-  AuthBloc bloc, {
+  Session? session, {
   required List<RouteBase> featureRoutes,
+  String? loginLocation,
+  String? registerLocation,
   List<NavigatorObserver>? observers,
 }) {
   final deepLink = DeepLinkState();
   final homeLocation = const HomeRoute().location;
   final splashLocation = const SplashRoute().location;
-  const loginLocation = AuthRoutes.login;
-  const registerLocation = AuthRoutes.register;
 
   final router = GoRouter(
     // No initialLocation — GoRouter resolves the platform deep-link URI on
@@ -197,9 +202,9 @@ class DeepLinkScope extends InheritedWidget {
     // through splash / auth.
     routes: [...$appRoutes, ...featureRoutes],
     observers: observers,
-    refreshListenable: _BlocListenable(bloc.stream),
+    refreshListenable: session,
     redirect: (context, state) => resolveSplashRedirect(
-      auth: bloc.state,
+      status: session?.status,
       location: state.matchedLocation,
       requestedUri: state.uri.toString(),
       deepLink: deepLink,
@@ -216,7 +221,7 @@ class DeepLinkScope extends InheritedWidget {
 /// Resolves the auth/splash redirect for a single navigation.
 ///
 /// Pure decision function behind [buildRouterWithDeepLink]'s `redirect`: given
-/// the current [auth] state, the [location] GoRouter matched, the
+/// the current session [status], the [location] GoRouter matched, the
 /// [requestedUri] the user is trying to reach, and the mutable [deepLink] gate,
 /// it returns the location to redirect to, or `null` to allow the navigation.
 /// Extracted so the three-phase state machine can be unit-tested without
@@ -226,14 +231,14 @@ class DeepLinkScope extends InheritedWidget {
 /// target before splash/auth, then replays it once the user is authenticated.
 @visibleForTesting
 String? resolveSplashRedirect({
-  required AuthState auth,
+  required SessionStatus? status,
   required String location,
   required String requestedUri,
   required DeepLinkState deepLink,
   required String splashLocation,
-  required String loginLocation,
-  required String registerLocation,
   required String homeLocation,
+  String? loginLocation,
+  String? registerLocation,
 }) {
   // ── Phase 1: Before splash completes ──
   // Intercept every navigation until restoreSession and the splash minimum
@@ -248,9 +253,22 @@ String? resolveSplashRedirect({
     return splashLocation;
   }
 
+  // ── No auth pillar (status == null) ──
+  // Splash is the only gate: replay any captured deep link, bounce off splash
+  // to home, and otherwise allow the navigation.
+  if (status == null) {
+    final target = deepLink.pendingRedirect;
+    if (target != null) {
+      deepLink.pendingRedirect = null;
+      if (target != requestedUri) return target;
+    }
+    if (location == splashLocation) return homeLocation;
+    return null;
+  }
+
   // ── Phase 2: Unauthenticated ──
   // Splash completed with no session, or user signed out.
-  if (auth is AuthInitial || auth is AuthFailure) {
+  if (status == SessionStatus.unauthenticated) {
     if (location == loginLocation || location == registerLocation) {
       return null;
     }
@@ -259,9 +277,9 @@ String? resolveSplashRedirect({
   }
 
   // ── Phase 3: Authenticated (incl. mid-sign-out) ──
-  // AuthSigningOut still holds a user; let the screen stay put until the op
-  // completes and AuthBloc emits AuthInitial.
-  if (auth is AuthAuthenticated || auth is AuthSigningOut) {
+  // A signing-out session still holds a user; let the screen stay put until the
+  // op completes and the session settles to unauthenticated.
+  if (status == SessionStatus.authenticated) {
     final target = deepLink.pendingRedirect;
     if (target != null) {
       deepLink.pendingRedirect = null;
@@ -277,22 +295,6 @@ String? resolveSplashRedirect({
     return null;
   }
 
-  // AuthSubmitting / AuthRestoring — don't interfere.
+  // SessionStatus.unknown — still restoring/submitting; don't interfere.
   return null;
-}
-
-/// Adapts a [Stream] to the [Listenable] contract GoRouter needs for
-/// `refreshListenable`.
-class _BlocListenable extends ChangeNotifier {
-  _BlocListenable(Stream<dynamic> stream) {
-    _subscription = stream.listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
 }

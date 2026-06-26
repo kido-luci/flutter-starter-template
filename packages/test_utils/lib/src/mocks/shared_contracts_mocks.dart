@@ -19,7 +19,15 @@ class MockBookmarkSummariesReader extends Mock
 
 /// In-memory [Session] double for widget tests.
 class FakeSession extends ChangeNotifier implements Session {
-  FakeSession({this.currentUser, this.isSigningOut = false});
+  FakeSession({
+    this.currentUser,
+    this.isSigningOut = false,
+    SessionStatus? status,
+  }) : status =
+           status ??
+           (currentUser != null
+               ? SessionStatus.authenticated
+               : SessionStatus.unauthenticated);
 
   @override
   AuthUser? currentUser;
@@ -28,12 +36,16 @@ class FakeSession extends ChangeNotifier implements Session {
   bool isSigningOut;
 
   @override
+  SessionStatus status;
+
+  @override
   Future<void> restore() async {}
 
   @override
   void signOut() {
     currentUser = null;
     isSigningOut = false;
+    status = SessionStatus.unauthenticated;
     notifyListeners();
   }
 
@@ -41,6 +53,7 @@ class FakeSession extends ChangeNotifier implements Session {
   void clearSession() {
     currentUser = null;
     isSigningOut = false;
+    status = SessionStatus.unauthenticated;
     notifyListeners();
   }
 }

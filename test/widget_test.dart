@@ -1,15 +1,21 @@
 import 'package:architecture/architecture.dart';
+// fst:auth:start
 import 'package:checks/checks.dart';
 import 'package:feature_auth/src/presentation/bloc/auth_bloc.dart';
 import 'package:feature_auth/src/presentation/bloc/auth_state.dart';
+// fst:auth:end
 import 'package:feature_home/feature_home.dart';
 // fst:feature:notifications:start
 import 'package:feature_notifications/feature_notifications.dart';
 // fst:feature:notifications:end
+// fst:auth:start
 import 'package:flutter/material.dart';
 import 'package:flutter_starter_template/app/app.dart';
+// fst:auth:end
 import 'package:flutter_starter_template/app/di/injection.dart';
+// fst:auth:start
 import 'package:flutter_starter_template/app/feature_module.dart';
+// fst:auth:end
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
@@ -17,6 +23,7 @@ import 'package:theme/theme.dart';
 
 import 'test_utils.dart';
 
+// fst:auth:start
 final class _NoOpSyncModule extends FeatureModule {
   @override
   FeatureSyncController get syncController => _NoOpSync();
@@ -28,10 +35,13 @@ final class _NoOpSync implements FeatureSyncController {
   @override
   Future<void> stop() async {}
 }
+// fst:auth:end
 
 void main() {
   late MockAnalyticsService analytics;
+  // fst:auth:start
   late AuthBloc authBloc;
+  // fst:auth:end
   late ThemeBloc themeBloc;
   HomeBloc? homeBloc;
 
@@ -41,6 +51,7 @@ void main() {
     analytics = MockAnalyticsService();
     stubAnalyticsService(analytics);
 
+    // fst:auth:start
     final signIn = MockSignIn();
     when(() => signIn((username: 'alice', password: 'hunter2'))).thenAnswer((
       _,
@@ -55,6 +66,7 @@ void main() {
 
     final signOut = MockSignOut();
     when(signOut.call).thenAnswer((_) async => const Ok(null));
+    // fst:auth:end
 
     final bookmarkStats = MockBookmarkStatsReader();
     when(
@@ -66,6 +78,7 @@ void main() {
       collectionsReader.call,
     ).thenAnswer((_) async => const Ok<List<CollectionSummary>>([]));
 
+    // fst:auth:start
     authBloc = AuthBloc(
       signIn: signIn,
       register: MockRegister(),
@@ -73,6 +86,7 @@ void main() {
       restoreSession: restoreSession,
       analytics: analytics,
     );
+    // fst:auth:end
     themeBloc = ThemeBloc(await SharedPreferences.getInstance(), analytics);
 
     getIt.registerFactory<HomeBloc>(() {
@@ -95,9 +109,12 @@ void main() {
       await bloc.close();
     }
     await themeBloc.close();
+    // fst:auth:start
     await authBloc.close();
+    // fst:auth:end
   });
 
+  // fst:auth:start
   testWidgets('signs in and lands on home screen', (tester) async {
     await tester.pumpWidget(
       App(
@@ -148,4 +165,5 @@ void main() {
       'alice',
     );
   });
+  // fst:auth:end
 }

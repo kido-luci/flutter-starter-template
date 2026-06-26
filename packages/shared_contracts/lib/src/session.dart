@@ -2,6 +2,14 @@ import 'package:flutter/foundation.dart';
 
 import 'auth_user.dart';
 
+/// Coarse authentication status of the app-wide [Session].
+///
+/// Drives routing decisions (the splash/auth redirect) without exposing the
+/// auth feature's state machine. [unknown] means the session is still settling
+/// — restoring a persisted login or a sign-in in flight — and the router
+/// should not redirect yet.
+enum SessionStatus { unknown, authenticated, unauthenticated }
+
 /// Application-wide authenticated session, readable by any feature.
 ///
 /// Decouples feature UI from the auth feature's presentation layer: features
@@ -16,6 +24,13 @@ abstract interface class Session implements Listenable {
 
   /// Whether a sign-out is currently in progress.
   bool get isSigningOut;
+
+  /// Coarse authentication status, for routing decisions.
+  ///
+  /// [SessionStatus.authenticated] while a user is present (including during a
+  /// sign-out); [SessionStatus.unauthenticated] once restore settles with no
+  /// user; [SessionStatus.unknown] while still restoring or submitting.
+  SessionStatus get status;
 
   /// Restores any persisted login.
   ///

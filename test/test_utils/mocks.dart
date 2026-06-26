@@ -1,13 +1,20 @@
+// fst:feature:notifications:start
 import 'package:bloc_test/bloc_test.dart';
+// fst:feature:notifications:end
+// fst:auth:start
 import 'package:feature_auth/src/domain/usecases/register.dart';
 import 'package:feature_auth/src/domain/usecases/restore_session.dart';
 import 'package:feature_auth/src/domain/usecases/sign_in.dart';
 import 'package:feature_auth/src/domain/usecases/sign_out.dart';
+// fst:auth:end
 // fst:feature:notifications:start
 import 'package:feature_notifications/feature_notifications.dart';
 // fst:feature:notifications:end
+// fst:auth:start
 import 'package:test_utils/test_utils.dart';
+// fst:auth:end
 
+// fst:auth:start
 /// Cross-feature mocks used only by the app-level `widget_test`. Feature-local
 /// mocks live in each feature package's own `test/support.dart`; shared doubles
 /// (`FakeSession`, readers) and fixtures come from `package:test_utils`.
@@ -19,6 +26,7 @@ class MockRegister extends Mock implements RegisterUseCase {}
 class MockSignOut extends Mock implements SignOutUseCase {}
 
 class MockRestoreSession extends Mock implements RestoreSessionUseCase {}
+// fst:auth:end
 
 // fst:feature:notifications:start
 class MockNotificationsBloc

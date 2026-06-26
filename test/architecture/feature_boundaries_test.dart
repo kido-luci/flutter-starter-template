@@ -40,9 +40,11 @@ const _allowedCrossFeatureImports = <String, Set<String>>{
   // CLAUDE.md; promote to shared_ui if a second consumer appears.
   'feature_bookmarks': {'feature_collections'},
   // fst:feature:bookmarks:end
+  // fst:auth:start
   // profile surfaces auth's account-deletion flow (DeleteAccountCubit, single
   // consumer). See the DeleteAccountCubit worked example in CLAUDE.md.
   'feature_profile': {'feature_auth'},
+  // fst:auth:end
 };
 
 void main() {
