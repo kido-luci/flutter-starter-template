@@ -79,4 +79,5 @@ class _SignOutButton extends StatelessWidget {
     }
   }
 }
+
 // fst:auth:end

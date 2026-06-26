@@ -19,12 +19,15 @@ class MockBookmarkSummariesReader extends Mock
 
 /// In-memory [Session] double for widget tests.
 class FakeSession extends ChangeNotifier implements Session {
-  FakeSession({this.currentUser, this.isSigningOut = false, SessionStatus? status})
-    : status =
-          status ??
-          (currentUser != null
-              ? SessionStatus.authenticated
-              : SessionStatus.unauthenticated);
+  FakeSession({
+    this.currentUser,
+    this.isSigningOut = false,
+    SessionStatus? status,
+  }) : status =
+           status ??
+           (currentUser != null
+               ? SessionStatus.authenticated
+               : SessionStatus.unauthenticated);
 
   @override
   AuthUser? currentUser;
