@@ -277,7 +277,7 @@ jobs:
       # external deps are cached here, not generated Dart — the build_runner
       # caching caveat documented above does not apply to Gradle's cache.
       - name: Cache Gradle
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -387,7 +387,7 @@ jobs:
       # each run. Keyed on the committed ios/Podfile.lock; restore-keys give a
       # partial-cache fallback when the lockfile changes.
       - name: Cache CocoaPods
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ios/Pods
