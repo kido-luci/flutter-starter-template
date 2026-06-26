@@ -87,7 +87,7 @@ To enable seamless local development and testing, this template is paired with a
 | 📡 **REST**               | `Retrofit` + `Dio` typed clients with auth interceptor |
 | ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark & collection CRUD, uploads |
 | 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude, Cursor, Codex, Command Code, and Antigravity |
-| 🪄 **Feature Generator**  | `fst add-feature <name>` scaffolds a presentation feature package and wires the workspace, DI graph, and routing in one command |
+| 🪄 **Feature Generator**  | `fst add-feature <name>` scaffolds a feature package (presentation, or a full data+domain layer via `--source local\|api\|sync`) and wires the workspace, DI graph, and routing in one command |
 | 🚀 **Release CI**         | Fastlane lanes — iOS → TestFlight, Android → Play — flavor‑aware, wired to GitHub Actions |
 
 <br>
@@ -365,6 +365,11 @@ know about it:
 It then runs `pub get` + code generation so the tree compiles immediately. Pass
 `--no-codegen` to skip that step and regenerate yourself later.
 
+By default the slice is presentation-only. Pass `--source` to scaffold a data +
+domain layer too: `--source local` (an in-feature in-memory store), `--source
+api` (a Retrofit client over the shared `Dio`), or `--source sync` (the `api`
+layer plus guided offline-first `rev_sync` stubs and a `SYNC_TODO.md`).
+
 The wiring edits land at the `# fst:` / `// fst:` markers in those files (so the
 generator never has to parse Dart) — leave the markers in place. The `fst` CLI
 source lives in [`published/cli/`](published/cli); it's the same tool as the `fst create`
@@ -533,6 +538,18 @@ depends on it).
 
 - `--no-backend` implies `--no-auth`.
 - `--minimal` = `--no-backend --no-firebase`.
+
+### Branding & auth provider
+
+- **`--scheme <name>`** — the in-app theme (a FlexColorScheme name, e.g.
+  `deepPurple`, `indigo`).
+- **`--seed-color <hex>`** — the brand color for the launcher icon + web
+  (`adaptive_icon_background` and the web theme colors).
+- **`--font <name>`** — the app font (a `google_fonts` method prefix, e.g.
+  `roboto`, `openSans`).
+- **`--auth-provider <jwt|firebase>`** — the auth backend. `jwt` (default) keeps
+  the REST/JWT data layer; `firebase` swaps it for a Firebase Auth
+  implementation (requires the Firebase, auth, and backend pillars).
 
 <br>
 
