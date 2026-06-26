@@ -47,6 +47,7 @@ To enable seamless local development and testing, this template is paired with a
   - [📁 Feature Slice (Clean Architecture)](#-feature-slice-clean-architecture)
   - [🪄 Scaffolding a New Feature](#-scaffolding-a-new-feature)
 - [🚀 Quick Start](#-quick-start)
+- [🧩 Optional Pillars / Choose Your Stack](#-optional-pillars--choose-your-stack)
 - [🧪 Testing & Code Quality](#-testing--code-quality)
 - [🔄 Git Workflow & PRs](#-git-workflow--prs)
 - [🔥 Firebase](#-firebase)
@@ -480,6 +481,62 @@ go run .                    # → http://localhost:8080
 ```bash
 fvm flutter run
 ```
+
+<br>
+
+## 🧩 Optional Pillars / Choose Your Stack
+
+The `fst create` command scaffolds the full template by default — offline-first
+sync, JWT auth, Firebase, and all three server-backed demo features. Pass flags
+at create time to strip any pillar you don't need; the result compiles cleanly
+with no leftover stubs.
+
+| Project shape | Command |
+|---|---|
+| Full offline-first app (default) | `fst create` |
+| Without Firebase | `fst create --no-firebase` |
+| Without auth (user-less app) | `fst create --no-auth` |
+| Fully local-only (no backend, no auth) | `fst create --no-backend` |
+| Minimal (local-only + no Firebase) | `fst create --minimal` |
+
+### Flags
+
+**`--no-firebase`** — Scaffolds without Firebase. `kFirebaseEnabled` is set to
+`false`, analytics and crash-reporting bindings become no-ops, the Firebase
+Android Gradle plugins are removed, and the native credential files are deleted.
+The app builds and runs with no Firebase project.
+
+**`--no-auth`** — Removes the auth pillar. Deletes
+`packages/features/auth`, strips auth-specific UI from `profile` (leaving a
+Settings screen with theme toggle and about only — the user header,
+change-password, delete-account, and sign-out actions are gone), and removes
+auth wiring from the router and DI graph. The splash screen waits its minimum
+display time then proceeds directly.
+
+**`--no-backend`** — Scaffolds a fully local-only app. This flag is a
+composite: it implies `--no-auth` (no server means no JWT), removes the three
+server-backed demo features (`bookmarks`, `collections`, `notifications`), and
+strips the `network` and `sync_connectivity_plus` packages along with the sync
+cursor store. The `rev_sync` engine itself **stays** — `database` entities use
+its types — but no sync runs. What remains: `home`, `profile` (Settings),
+`splash`, and on-device ObjectBox storage.
+
+**`--minimal`** — `--no-backend` + `--no-firebase`. The leanest possible
+scaffold: local-only, no Firebase, no accounts.
+
+**`--exclude-feature <name>`** — Drop individual server-backed demo features
+(`bookmarks`, `collections`, `notifications`) without removing the whole backend
+pillar. Repeatable. Excluding `collections` also excludes `bookmarks` (which
+depends on it).
+
+### Composition rules
+
+- `--no-backend` implies `--no-auth`.
+- `--minimal` = `--no-backend --no-firebase`.
+
+<br>
+
+---
 
 <br>
 
