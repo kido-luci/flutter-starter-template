@@ -100,7 +100,11 @@ jobs:
             cli:
               - 'published/cli'
               - 'pubspec.yaml'
+              - 'analysis_options.yaml'
               - 'lib/app/**'
+              - 'lib/core/**'
+              - 'packages/features/profile/**'
+              - 'packages/features/splash/**'
               - 'test/widget_test.dart'
               - 'test/test_utils/**'
               - 'test/architecture/**'
@@ -260,19 +264,30 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-  # Scaffold-drift smoke-test: runs the `fst` CLI's `create` against THIS
-  # checkout (via --template-path) and asserts the generated project is coherent.
-  # It catches the failure mode flutter analyze can't — the CLI and the template
-  # drifting apart (renamed/removed `fst:` markers, changed identifiers,
-  # restructured wiring). Pure Dart: no Flutter, no codegen, no network beyond
-  # the CLI's own pub get, so it's fast. Gated on the `cli` filter. Compile-level
-  # verification of the scaffold is intentionally out of scope — analyze-and-test
-  # already builds the template itself.
+  # Scaffold-drift smoke-test (matrix over optional-pillar configs): runs the
+  # `fst` CLI's `create` against THIS checkout (via --template-path) for each
+  # pillar combination and asserts the generated project is coherent. Catches
+  # the failure mode flutter analyze can't — the CLI and the template drifting
+  # apart (renamed/removed `fst:` markers, mis-scoped strips, changed wiring) —
+  # independently per config. Pure Dart: no Flutter, no codegen, so it's fast and
+  # the configs run in parallel. Gated on the `cli` filter. Compile-level
+  # verification of each strip is done locally / at release (the default template
+  # is compiled by analyze-and-test + the build jobs).
   cli-smoke:
-    name: CLI create smoke-test
+    name: CLI scaffold (${{ matrix.name }})
     needs: changes
     if: needs.changes.outputs.cli == 'true'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: default, flags: '' }
+          - { name: exclude-notifications, flags: '--exclude-feature notifications' }
+          - { name: no-firebase, flags: '--no-firebase' }
+          - { name: no-auth, flags: '--no-auth' }
+          - { name: no-backend, flags: '--no-backend' }
+          - { name: minimal, flags: '--minimal' }
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -306,19 +321,18 @@ jobs:
             --template-path "$GITHUB_WORKSPACE" \
             --output-dir "$RUNNER_TEMP/smoke" \
             --no-setup \
-            --no-firebase \
-            --exclude-feature notifications
+            ${{ matrix.flags }}
 
       - name: Assert the scaffold is coherent
+        env:
+          CONFIG: ${{ matrix.name }}
         run: |
           out="$RUNNER_TEMP/smoke"
           fail=0
+
+          # ── Shared coherence checks (every config) ──
           grep -q '^name: smoke_app' "$out/pubspec.yaml" \
             || { echo "::error::pubspec not renamed to smoke_app"; fail=1; }
-          [ ! -d "$out/packages/features/notifications" ] \
-            || { echo "::error::excluded feature notifications not removed"; fail=1; }
-          [ -d "$out/packages/features/bookmarks" ] \
-            || { echo "::error::kept feature bookmarks missing"; fail=1; }
           [ ! -d "$out/published/cli" ] \
             || { echo "::error::dev submodule published/cli leaked"; fail=1; }
           [ ! -d "$out/simple_backend_server" ] \
@@ -329,9 +343,49 @@ jobs:
             || { echo "::error::no fresh git repo was initialised"; fail=1; }
           if grep -rIl 'flutter_starter_template\|lucistudio\|Luci Studio' \
               "$out/lib" "$out/pubspec.yaml" "$out/android" 2>/dev/null; then
-            echo "::error::template identifiers leaked into the scaffold"
-            fail=1
+            echo "::error::template identifiers leaked into the scaffold"; fail=1
           fi
+
+          auth="$out/packages/features/auth"
+          network="$out/packages/network"
+          syncconn="$out/packages/sync_connectivity_plus"
+          bookmarks="$out/packages/features/bookmarks"
+          notifications="$out/packages/features/notifications"
+          profile_header="$out/packages/features/profile/lib/src/presentation/widgets/profile_header.dart"
+
+          # ── Per-config structural assertions ──
+          case "$CONFIG" in
+            default)
+              [ -d "$auth" ] || { echo "::error::auth removed in default"; fail=1; }
+              [ -d "$bookmarks" ] || { echo "::error::bookmarks missing in default"; fail=1; }
+              ;;
+            exclude-notifications)
+              [ ! -d "$notifications" ] || { echo "::error::notifications not removed"; fail=1; }
+              [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed"; fail=1; }
+              ;;
+            no-firebase)
+              [ -d "$auth" ] || { echo "::error::auth removed in no-firebase"; fail=1; }
+              [ ! -f "$out/android/app/google-services.json" ] || { echo "::error::firebase config left in no-firebase"; fail=1; }
+              ;;
+            no-auth)
+              [ ! -d "$auth" ] || { echo "::error::auth package not removed (no-auth)"; fail=1; }
+              [ ! -f "$profile_header" ] || { echo "::error::profile_header not removed (no-auth)"; fail=1; }
+              [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed (no-auth)"; fail=1; }
+              if grep -rIq 'fst:auth' "$out/lib" "$out/test" 2>/dev/null; then
+                echo "::error::fst:auth markers survived the strip (no-auth)"; fail=1
+              fi
+              ;;
+            no-backend|minimal)
+              [ ! -d "$auth" ] || { echo "::error::auth not removed ($CONFIG)"; fail=1; }
+              [ ! -d "$network" ] || { echo "::error::network not removed ($CONFIG)"; fail=1; }
+              [ ! -d "$syncconn" ] || { echo "::error::sync_connectivity_plus not removed ($CONFIG)"; fail=1; }
+              [ ! -d "$bookmarks" ] || { echo "::error::bookmarks not removed ($CONFIG)"; fail=1; }
+              [ -d "$out/published/rev_sync" ] || { echo "::error::rev_sync wrongly removed ($CONFIG)"; fail=1; }
+              if grep -rIq 'fst:backend\|fst:auth' "$out/lib" "$out/test" 2>/dev/null; then
+                echo "::error::fst markers survived the strip ($CONFIG)"; fail=1
+              fi
+              ;;
+          esac
           exit $fail
 
   # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
