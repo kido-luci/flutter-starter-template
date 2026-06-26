@@ -6,6 +6,18 @@ import 'package:shared_contracts/shared_contracts.dart';
 import 'bloc/auth_bloc.dart';
 import 'bloc/auth_state.dart';
 
+/// Maps an [AuthState] to the coarse [SessionStatus] the router reads.
+///
+/// A user is present (so [SessionStatus.authenticated]) while authenticated or
+/// signing out; the session is settled with no user (so
+/// [SessionStatus.unauthenticated]) on the initial/failed states; otherwise it
+/// is still settling ([SessionStatus.unknown]).
+SessionStatus sessionStatusFor(AuthState state) => switch (state) {
+  AuthAuthenticated() || AuthSigningOut() => SessionStatus.authenticated,
+  AuthInitial() || AuthFailure() => SessionStatus.unauthenticated,
+  AuthRestoring() || AuthSubmitting() => SessionStatus.unknown,
+};
+
 /// Adapts [AuthBloc] to the app-wide [Session] contract.
 ///
 /// Keeps [AuthBloc] as the single source of truth while exposing only the
@@ -27,6 +39,9 @@ class AuthSession extends ChangeNotifier implements Session {
 
   @override
   bool get isSigningOut => _bloc.state is AuthSigningOut;
+
+  @override
+  SessionStatus get status => sessionStatusFor(_bloc.state);
 
   @override
   Future<void> restore() async {

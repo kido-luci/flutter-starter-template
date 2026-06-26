@@ -36,7 +36,7 @@ String? resolve({
   String? requestedUri,
 }) {
   return resolveSplashRedirect(
-    auth: auth,
+    status: sessionStatusFor(auth),
     location: location,
     requestedUri: requestedUri ?? location,
     deepLink: deepLink,

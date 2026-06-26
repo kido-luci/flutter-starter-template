@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:feature_auth/feature_auth.dart';
 // fst:feature:bookmarks:start
 import 'package:feature_bookmarks/feature_bookmarks.dart';
@@ -12,6 +10,7 @@ import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_splash/feature_splash.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_contracts/shared_contracts.dart';
 
 import 'widgets/app_shell.dart';
 
@@ -174,14 +173,14 @@ class DeepLinkScope extends InheritedWidget {
       deepLink != oldWidget.deepLink;
 }
 
-/// Builds the app router and wires auth redirects to [bloc] state changes.
+/// Builds the app router and wires auth redirects to [session] status changes.
 ///
 /// [featureRoutes] are the non-shell routes contributed by the feature
 /// packages (and auth's login/register). They are mounted alongside the
 /// generated shell routes ([$appRoutes]) so adding a feature's screens never
 /// edits this file — the feature ships its own route table.
 ({GoRouter router, DeepLinkState deepLink}) buildRouterWithDeepLink(
-  AuthBloc bloc, {
+  Session session, {
   required List<RouteBase> featureRoutes,
   List<NavigatorObserver>? observers,
 }) {
@@ -197,9 +196,9 @@ class DeepLinkScope extends InheritedWidget {
     // through splash / auth.
     routes: [...$appRoutes, ...featureRoutes],
     observers: observers,
-    refreshListenable: _BlocListenable(bloc.stream),
+    refreshListenable: session,
     redirect: (context, state) => resolveSplashRedirect(
-      auth: bloc.state,
+      status: session.status,
       location: state.matchedLocation,
       requestedUri: state.uri.toString(),
       deepLink: deepLink,
@@ -216,7 +215,7 @@ class DeepLinkScope extends InheritedWidget {
 /// Resolves the auth/splash redirect for a single navigation.
 ///
 /// Pure decision function behind [buildRouterWithDeepLink]'s `redirect`: given
-/// the current [auth] state, the [location] GoRouter matched, the
+/// the current session [status], the [location] GoRouter matched, the
 /// [requestedUri] the user is trying to reach, and the mutable [deepLink] gate,
 /// it returns the location to redirect to, or `null` to allow the navigation.
 /// Extracted so the three-phase state machine can be unit-tested without
@@ -226,7 +225,7 @@ class DeepLinkScope extends InheritedWidget {
 /// target before splash/auth, then replays it once the user is authenticated.
 @visibleForTesting
 String? resolveSplashRedirect({
-  required AuthState auth,
+  required SessionStatus status,
   required String location,
   required String requestedUri,
   required DeepLinkState deepLink,
@@ -250,7 +249,7 @@ String? resolveSplashRedirect({
 
   // ── Phase 2: Unauthenticated ──
   // Splash completed with no session, or user signed out.
-  if (auth is AuthInitial || auth is AuthFailure) {
+  if (status == SessionStatus.unauthenticated) {
     if (location == loginLocation || location == registerLocation) {
       return null;
     }
@@ -259,9 +258,9 @@ String? resolveSplashRedirect({
   }
 
   // ── Phase 3: Authenticated (incl. mid-sign-out) ──
-  // AuthSigningOut still holds a user; let the screen stay put until the op
-  // completes and AuthBloc emits AuthInitial.
-  if (auth is AuthAuthenticated || auth is AuthSigningOut) {
+  // A signing-out session still holds a user; let the screen stay put until the
+  // op completes and the session settles to unauthenticated.
+  if (status == SessionStatus.authenticated) {
     final target = deepLink.pendingRedirect;
     if (target != null) {
       deepLink.pendingRedirect = null;
@@ -277,22 +276,6 @@ String? resolveSplashRedirect({
     return null;
   }
 
-  // AuthSubmitting / AuthRestoring — don't interfere.
+  // SessionStatus.unknown — still restoring/submitting; don't interfere.
   return null;
-}
-
-/// Adapts a [Stream] to the [Listenable] contract GoRouter needs for
-/// `refreshListenable`.
-class _BlocListenable extends ChangeNotifier {
-  _BlocListenable(Stream<dynamic> stream) {
-    _subscription = stream.listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
 }

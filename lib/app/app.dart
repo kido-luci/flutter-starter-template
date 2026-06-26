@@ -54,7 +54,6 @@ class _AppState extends State<App> {
   late final DeepLinkState _deepLink;
   late final List<FeatureSyncController> _syncControllers;
   late final VideoPlayerService _videoPlayerService;
-  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
@@ -64,7 +63,7 @@ class _AppState extends State<App> {
     _session = widget.session ?? AuthSession(_authBloc);
     final features = widget.features ?? enabledFeatures;
     final result = buildRouterWithDeepLink(
-      _authBloc,
+      _session,
       featureRoutes: [
         ...authRoutes,
         for (final f in features) ...f.routes,
@@ -79,13 +78,16 @@ class _AppState extends State<App> {
         .toList(growable: false);
     _videoPlayerService =
         widget.videoPlayerService ?? getIt<VideoPlayerService>();
-    _authSub = _authBloc.stream.listen(_onAuthChanged);
+    _session.addListener(_onSessionChanged);
   }
 
-  void _onAuthChanged(AuthState state) {
+  void _onSessionChanged() {
+    // Sync runs only for a settled, signed-in user — not while signing out or
+    // still restoring (both leave no active user).
+    final active = _session.currentUser != null && !_session.isSigningOut;
     for (final c in _syncControllers) {
       unawaited(
-        (state is AuthAuthenticated ? c.start() : c.stop()).catchError(
+        (active ? c.start() : c.stop()).catchError(
           (Object error, StackTrace stackTrace) {
             developer.log(
               'Feature sync lifecycle failed',
@@ -101,7 +103,7 @@ class _AppState extends State<App> {
 
   @override
   void dispose() {
-    _authSub?.cancel();
+    _session.removeListener(_onSessionChanged);
     for (final c in _syncControllers) {
       unawaited(
         c.stop().catchError((Object error, StackTrace stackTrace) {
