@@ -39,6 +39,7 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      cli: ${{ steps.cli_filter.outputs.cli }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -84,6 +85,26 @@ jobs:
               # and its bumps must trigger these jobs.)
               - '!simple_backend_server'
               - '!published/cli'
+
+      # A separate filter (default `some`/OR quantifier — NOT `every`) for the
+      # CLI scaffold smoke-test: it must run whenever the CLI submodule OR any
+      # template surface the CLI rewrites changes (the workspace pubspec, the app
+      # wiring under lib/app/, the marker-bearing tests), so CLI↔template drift
+      # is caught from either side. Kept a distinct step because `every` (above)
+      # and the default `some` can't share one paths-filter invocation.
+      - name: Filter CLI-scaffold paths
+        uses: dorny/paths-filter@v4
+        id: cli_filter
+        with:
+          filters: |
+            cli:
+              - 'published/cli'
+              - 'pubspec.yaml'
+              - 'lib/app/**'
+              - 'test/widget_test.dart'
+              - 'test/test_utils/**'
+              - 'test/architecture/**'
+              - '.github/workflows/ci.yml'
 
   analyze-and-test:
     name: Analyze & Test
@@ -238,6 +259,80 @@ jobs:
           files: coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
+
+  # Scaffold-drift smoke-test: runs the `fst` CLI's `create` against THIS
+  # checkout (via --template-path) and asserts the generated project is coherent.
+  # It catches the failure mode flutter analyze can't — the CLI and the template
+  # drifting apart (renamed/removed `fst:` markers, changed identifiers,
+  # restructured wiring). Pure Dart: no Flutter, no codegen, no network beyond
+  # the CLI's own pub get, so it's fast. Gated on the `cli` filter. Compile-level
+  # verification of the scaffold is intentionally out of scope — analyze-and-test
+  # already builds the template itself.
+  cli-smoke:
+    name: CLI create smoke-test
+    needs: changes
+    if: needs.changes.outputs.cli == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The smoke-test scaffolds from this checkout, so both the CLI source and
+      # the kept rev_sync path-dependency must be materialised.
+      - name: Check out CLI + rev_sync submodules
+        run: git submodule update --init published/cli published/rev_sync
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Resolve CLI dependencies
+        working-directory: published/cli
+        run: dart pub get
+
+      # Scaffold into a temp dir OUTSIDE the workspace. --template-path makes the
+      # run exercise the current template (not the published remote); --no-setup
+      # keeps it to pure-Dart scaffolding.
+      - name: Scaffold a project from this checkout
+        working-directory: published/cli
+        run: |
+          dart run bin/fst.dart create \
+            --yes \
+            --name "Smoke App" \
+            --package-name smoke_app \
+            --bundle-id com.example.smoke \
+            --org "Smoke Org" \
+            --template-path "$GITHUB_WORKSPACE" \
+            --output-dir "$RUNNER_TEMP/smoke" \
+            --no-setup \
+            --no-firebase \
+            --exclude-feature notifications
+
+      - name: Assert the scaffold is coherent
+        run: |
+          out="$RUNNER_TEMP/smoke"
+          fail=0
+          grep -q '^name: smoke_app' "$out/pubspec.yaml" \
+            || { echo "::error::pubspec not renamed to smoke_app"; fail=1; }
+          [ ! -d "$out/packages/features/notifications" ] \
+            || { echo "::error::excluded feature notifications not removed"; fail=1; }
+          [ -d "$out/packages/features/bookmarks" ] \
+            || { echo "::error::kept feature bookmarks missing"; fail=1; }
+          [ ! -d "$out/published/cli" ] \
+            || { echo "::error::dev submodule published/cli leaked"; fail=1; }
+          [ ! -d "$out/simple_backend_server" ] \
+            || { echo "::error::dev submodule simple_backend_server leaked"; fail=1; }
+          [ -d "$out/published/rev_sync" ] \
+            || { echo "::error::rev_sync path-dependency missing"; fail=1; }
+          [ -d "$out/.git" ] \
+            || { echo "::error::no fresh git repo was initialised"; fail=1; }
+          if grep -rIl 'flutter_starter_template\|lucistudio\|Luci Studio' \
+              "$out/lib" "$out/pubspec.yaml" "$out/android" 2>/dev/null; then
+            echo "::error::template identifiers leaked into the scaffold"
+            fail=1
+          fi
+          exit $fail
 
   # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
   # the app, so Gradle/plugin/asset/manifest regressions slip past it and only
