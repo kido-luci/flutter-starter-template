@@ -17,10 +17,14 @@ import 'package:feature_notifications/feature_notifications.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+// fst:backend:start
 import 'package:network/network.dart';
+// fst:backend:end
 import 'package:shared_contracts/shared_contracts.dart';
 import 'package:storage/storage.dart';
+// fst:backend:start
 import 'package:sync_connectivity_plus/sync_connectivity_plus.dart';
+// fst:backend:end
 import 'package:theme/theme.dart';
 
 import 'injection.config.dart';
@@ -42,10 +46,14 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(AnalyticsPackageModule),
     ExternalModule(ConfigPackageModule),
     ExternalModule(StoragePackageModule),
+    // fst:backend:start
     ExternalModule(NetworkPackageModule),
+    // fst:backend:end
     ExternalModule(AppPlatformPackageModule),
     ExternalModule(ThemePackageModule),
+    // fst:backend:start
     ExternalModule(SyncConnectivityPlusPackageModule),
+    // fst:backend:end
     ExternalModule(SharedContractsPackageModule),
     // fst:auth:start
     ExternalModule(FeatureAuthPackageModule),

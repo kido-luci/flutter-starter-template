@@ -39,10 +39,14 @@ const _layers = <String, int>{
   'localization': 1, // gen-l10n AppLocalizations; no workspace package deps
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
   'database': 1, // centralized ObjectBox persistence -> rev_sync
+  // fst:backend:start
   'sync_connectivity_plus': 1, // connectivity_plus adapter -> rev_sync
+  // fst:backend:end
   // 2 — composed infra built on the primitives.
   'shared_ui': 2, // cross-feature presentation contracts -> shared_contracts
+  // fst:backend:start
   'network': 2, // -> config
+  // fst:backend:end
   'app_platform': 2, // -> analytics, architecture
   'theme': 2, // -> analytics, architecture
   // 3 — shared test harness, sits on top of what it provides fakes for.

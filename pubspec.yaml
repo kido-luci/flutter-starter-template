@@ -26,10 +26,14 @@ workspace:
   - packages/analytics
   - packages/config
   - packages/architecture
+  # fst:backend:start
   - packages/network
+  # fst:backend:end
   - packages/app_platform
   - packages/storage
+  # fst:backend:start
   - packages/sync_connectivity_plus
+  # fst:backend:end
   - packages/theme
   - packages/test_utils
   - packages/shared_contracts
@@ -64,12 +68,16 @@ dependencies:
   analytics: ^0.1.0
   config: ^0.1.0
   architecture: ^0.1.0
+  # fst:backend:start
   network: ^0.1.0
+  # fst:backend:end
   app_platform: ^0.1.0
   storage: ^0.1.0
   rev_sync:
     path: published/rev_sync
+  # fst:backend:start
   sync_connectivity_plus: ^0.1.0
+  # fst:backend:end
   theme: ^0.1.0
   shared_contracts: ^0.1.0
   shared_ui: ^0.1.0
