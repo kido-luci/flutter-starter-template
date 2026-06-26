@@ -9,16 +9,22 @@
 //   3. Splash done, authenticated — replay a captured deep link, otherwise
 //      bounce off splash/login/register to home and allow protected routes.
 
+// fst:auth:start
 import 'package:feature_auth/feature_auth.dart';
+// fst:auth:end
 import 'package:flutter_starter_template/app/router.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// fst:auth:start
 import '../test_utils.dart';
+// fst:auth:end
 
 const splash = '/splash';
 const home = '/';
+// fst:auth:start
 const String login = AuthRoutes.login;
 const String register = AuthRoutes.register;
+// fst:auth:end
 
 /// Builds a fresh deep-link gate for one navigation.
 DeepLinkState gate({bool splashCompleted = false, String? pending}) {
@@ -27,6 +33,7 @@ DeepLinkState gate({bool splashCompleted = false, String? pending}) {
     ..pendingRedirect = pending;
 }
 
+// fst:auth:start
 /// Resolves a redirect with the app's real locations wired in. [requestedUri]
 /// defaults to [location] (the common case where they match).
 String? resolve({
@@ -46,8 +53,10 @@ String? resolve({
     homeLocation: home,
   );
 }
+// fst:auth:end
 
 void main() {
+  // fst:auth:start
   group('Phase 1 — before splash completes', () {
     test('stays on splash when already there, capturing nothing', () {
       final deepLink = gate();
@@ -295,6 +304,7 @@ void main() {
       );
     });
   });
+  // fst:auth:end
 
   group('no auth pillar — status null, splash is the only gate', () {
     String? resolveNoAuth({

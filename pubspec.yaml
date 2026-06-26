@@ -36,7 +36,9 @@ workspace:
   - packages/shared_ui
   - packages/database
   - packages/localization
+  # fst:auth:start
   - packages/features/auth
+  # fst:auth:end
   # fst:feature:notifications:start
   - packages/features/notifications
   # fst:feature:notifications:end
@@ -73,7 +75,9 @@ dependencies:
   shared_ui: ^0.1.0
   database: ^0.1.0
   localization: ^0.1.0
+  # fst:auth:start
   feature_auth: ^0.1.0
+  # fst:auth:end
   # fst:feature:notifications:start
   feature_notifications: ^0.1.0
   # fst:feature:notifications:end

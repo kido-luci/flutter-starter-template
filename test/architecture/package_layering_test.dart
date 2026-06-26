@@ -49,7 +49,9 @@ const _layers = <String, int>{
   'test_utils': 3, // -> analytics, app_platform, storage
   // 4 — base feature packages: the top runtime layer (only the app composes
   //     them), each depending on no sibling feature.
+  // fst:auth:start
   'feature_auth': 4,
+  // fst:auth:end
   // fst:feature:collections:start
   'feature_collections': 4,
   // fst:feature:collections:end

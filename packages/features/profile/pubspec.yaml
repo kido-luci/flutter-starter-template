@@ -18,11 +18,15 @@ dependencies:
   architecture: ^0.1.0
   analytics: ^0.1.0
   app_ui: ^0.1.0
+  # fst:auth:start
   shared_ui: ^0.1.0
+  # fst:auth:end
   theme: ^0.1.0
   localization: ^0.1.0
+  # fst:auth:start
   # Capability: profile surfaces auth's delete-account flow (single consumer).
   feature_auth: ^0.1.0
+  # fst:auth:end
 
   # Third-party.
   flutter_bloc: ^9.1.1

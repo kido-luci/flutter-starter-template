@@ -20,6 +20,13 @@ linter:
     lines_longer_than_80_chars: false
     cascade_invocations: false
     sort_pub_dependencies: false
+    # Optional-pillar strips (fst:auth, fst:sync, …) wrap widgets with a
+    # `Widget x = base; x = wrap(x); return …;` idiom. The marked reassignment is
+    # deleted in the stripped tree, leaving a single-assignment local — which
+    # these two stylistic rules would each flag (in one tree or the other). Off
+    # so the template and every stripped variant both lint clean.
+    prefer_final_locals: false
+    join_return_with_assignment: false
 
 analyzer:
   language:

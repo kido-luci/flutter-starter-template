@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+// fst:auth:start
 import 'package:shared_ui/shared_ui.dart';
+// fst:auth:end
 
 import '../widgets/splash_widgets.dart';
 
@@ -31,9 +33,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _bootstrap() async {
-    final session = SessionScope.of(context);
     await Future.wait<void>([
-      session.restore(),
+      // fst:auth:start
+      SessionScope.of(context).restore(),
+      // fst:auth:end
       Future<void>.delayed(SplashScreen._minDisplay),
     ]);
     if (!mounted) return;

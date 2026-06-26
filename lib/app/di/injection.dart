@@ -1,7 +1,9 @@
 import 'package:analytics/analytics.dart';
 import 'package:app_platform/app_platform.dart';
 import 'package:config/config.dart';
+// fst:auth:start
 import 'package:feature_auth/feature_auth.dart';
+// fst:auth:end
 // fst:feature:bookmarks:start
 import 'package:feature_bookmarks/feature_bookmarks.dart';
 // fst:feature:bookmarks:end
@@ -45,7 +47,9 @@ final GetIt getIt = GetIt.instance;
     ExternalModule(ThemePackageModule),
     ExternalModule(SyncConnectivityPlusPackageModule),
     ExternalModule(SharedContractsPackageModule),
+    // fst:auth:start
     ExternalModule(FeatureAuthPackageModule),
+    // fst:auth:end
     // fst:feature:notifications:start
     ExternalModule(FeatureNotificationsPackageModule),
     // fst:feature:notifications:end

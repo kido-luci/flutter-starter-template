@@ -1,20 +1,26 @@
 import 'package:app_ui/app_ui.dart';
+// fst:auth:start
 // Deliberate cross-feature capability import: profile surfaces auth's
 // delete-account flow (see the capability exception in CLAUDE.md).
 import 'package:feature_auth/feature_auth.dart';
+// fst:auth:end
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+// fst:auth:start
 import 'package:shared_ui/shared_ui.dart';
+// fst:auth:end
 import 'package:theme/theme.dart';
 
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_state.dart';
+// fst:auth:start
 part 'profile_header.dart';
 part 'profile_account.dart';
+// fst:auth:end
 part 'profile_appearance.dart';
 part 'profile_about.dart';
 
@@ -24,6 +30,7 @@ class ProfileBody extends StatelessWidget {
   /// Extra bottom padding so content clears the floating bottom bar.
   static const double _bottomInset = 96;
 
+  // fst:auth:start
   void _onDeleteAccountState(BuildContext context, DeleteAccountState state) {
     switch (state) {
       case DeleteAccountSuccess():
@@ -41,35 +48,44 @@ class ProfileBody extends StatelessWidget {
         break;
     }
   }
+  // fst:auth:end
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<DeleteAccountCubit, DeleteAccountState>(
-      listener: _onDeleteAccountState,
-      child: AppScaffold(
-        title: context.l10n.profileAppBarTitle,
-        padding: EdgeInsets.zero,
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.xl,
-            AppSpacing.lg,
-            AppSpacing.xl,
-            _bottomInset,
-          ),
-          children: [
-            const _ProfileHeader().animateSlideDown(),
-            const SizedBox(height: AppSpacing.lg),
-            const _AccountCard().animateSlideUp(delay: 120.ms),
-            const SizedBox(height: AppSpacing.lg),
-            const _AppearanceCard().animateSlideUp(delay: 200.ms),
-            const SizedBox(height: AppSpacing.lg),
-            const _AboutCard().animateSlideUp(delay: 280.ms),
-            const SizedBox(height: AppSpacing.xxl),
-            const _SignOutButton().animateFadeIn(delay: 360.ms),
-          ],
+    Widget body = AppScaffold(
+      title: context.l10n.profileAppBarTitle,
+      padding: EdgeInsets.zero,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.lg,
+          AppSpacing.xl,
+          _bottomInset,
         ),
+        children: [
+          // fst:auth:start
+          const _ProfileHeader().animateSlideDown(),
+          const SizedBox(height: AppSpacing.lg),
+          const _AccountCard().animateSlideUp(delay: 120.ms),
+          const SizedBox(height: AppSpacing.lg),
+          // fst:auth:end
+          const _AppearanceCard().animateSlideUp(delay: 200.ms),
+          const SizedBox(height: AppSpacing.lg),
+          const _AboutCard().animateSlideUp(delay: 280.ms),
+          // fst:auth:start
+          const SizedBox(height: AppSpacing.xxl),
+          const _SignOutButton().animateFadeIn(delay: 360.ms),
+          // fst:auth:end
+        ],
       ),
     );
+    // fst:auth:start
+    body = BlocListener<DeleteAccountCubit, DeleteAccountState>(
+      listener: _onDeleteAccountState,
+      child: body,
+    );
+    // fst:auth:end
+    return body;
   }
 }
 
