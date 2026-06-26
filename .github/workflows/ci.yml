@@ -371,7 +371,7 @@ jobs:
               [ ! -d "$auth" ] || { echo "::error::auth package not removed (no-auth)"; fail=1; }
               [ ! -f "$profile_header" ] || { echo "::error::profile_header not removed (no-auth)"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed (no-auth)"; fail=1; }
-              if grep -rIq 'fst:auth' "$out/lib" "$out/test" 2>/dev/null; then
+              if grep -rIq 'fst:auth:' "$out/lib" "$out/test" "$out/packages" 2>/dev/null; then
                 echo "::error::fst:auth markers survived the strip (no-auth)"; fail=1
               fi
               ;;
@@ -380,8 +380,10 @@ jobs:
               [ ! -d "$network" ] || { echo "::error::network not removed ($CONFIG)"; fail=1; }
               [ ! -d "$syncconn" ] || { echo "::error::sync_connectivity_plus not removed ($CONFIG)"; fail=1; }
               [ ! -d "$bookmarks" ] || { echo "::error::bookmarks not removed ($CONFIG)"; fail=1; }
+              [ ! -d "$out/packages/features/collections" ] || { echo "::error::collections not removed ($CONFIG)"; fail=1; }
+              [ ! -d "$notifications" ] || { echo "::error::notifications not removed ($CONFIG)"; fail=1; }
               [ -d "$out/published/rev_sync" ] || { echo "::error::rev_sync wrongly removed ($CONFIG)"; fail=1; }
-              if grep -rIq 'fst:backend\|fst:auth' "$out/lib" "$out/test" 2>/dev/null; then
+              if grep -rIq 'fst:backend:\|fst:auth:' "$out/lib" "$out/test" "$out/packages" 2>/dev/null; then
                 echo "::error::fst markers survived the strip ($CONFIG)"; fail=1
               fi
               ;;
