@@ -107,6 +107,27 @@ void main() {
       }
     }
   });
+
+  test('each deploy job is gated on its platform identity variable so an '
+      'unconfigured repo skips a tag push instead of failing', () {
+    const identityVarByJob = <String, String>{
+      'android': 'ANDROID_PACKAGE_NAME_BASE',
+      'ios': 'IOS_BUNDLE_ID_BASE',
+    };
+    identityVarByJob.forEach((job, identityVar) {
+      final body = jobs[job] ?? '';
+      expect(
+        body.contains("vars.$identityVar != ''"),
+        isTrue,
+        reason:
+            "The $job job's `if:` must gate on `vars.$identityVar != ''` so a "
+            'repo without $job store credentials skips on a tag push instead '
+            'of firing a red deploy run. (`vars` is readable in `if:`; secrets '
+            'are not — and the identity variable is what the build needs '
+            'anyway.)',
+      );
+    });
+  });
 }
 
 /// Whether [name] is exempt from job [job]'s required list because the job

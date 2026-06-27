@@ -92,8 +92,10 @@ required) on tag push / manual dispatch, with `FLUTTER_CMD=flutter` and
 
 From the repository root, push all of these in one shot with
 `tool/ci-secrets-setup.sh --platform ios` instead of pasting them into the
-Settings UI by hand. The workflow also fails fast at the top of the job if any
-required secret or variable is missing, naming exactly which.
+Settings UI by hand. The iOS job runs only once `IOS_BUNDLE_ID_BASE` is set, so
+a repo that hasn't configured the App Store skips on a tag push instead of
+failing; once it's set, the job fails fast if any required secret is still
+missing, naming exactly which.
 
 ## Troubleshooting (first real run)
 
