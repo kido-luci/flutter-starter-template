@@ -180,8 +180,8 @@ jobs:
     runs-on: macos-15
     steps:
       # Fail fast if the store-deploy secrets/vars aren't configured yet (see the
-      # Android job's note). MATCH_GIT_BASIC_AUTHORIZATION is optional — only
-      # HTTPS match repos need it — so it warns rather than fails.
+      # Android job's note). MATCH_GIT_BASIC_AUTHORIZATION is gated on the
+      # MATCH_GIT_URL scheme: required for an HTTPS match repo, skipped for SSH.
       - name: Verify required App Store secrets
         env:
           IOS_BUNDLE_ID_BASE: ${{ vars.IOS_BUNDLE_ID_BASE }}
@@ -218,8 +218,15 @@ jobs:
             } >&2
             exit 1
           fi
-          if [[ -z "${MATCH_GIT_BASIC_AUTHORIZATION:-}" ]]; then
-            echo "::warning::MATCH_GIT_BASIC_AUTHORIZATION is unset — fine for an SSH match repo, required for HTTPS."
+          # An HTTPS match repo can't clone without basic-auth, so a missing
+          # token there is a hard fail too; SSH repos don't need it.
+          if [[ "$MATCH_GIT_URL" =~ ^https?:// ]]; then
+            if [[ -z "${MATCH_GIT_BASIC_AUTHORIZATION:-}" ]]; then
+              echo "::error::MATCH_GIT_BASIC_AUTHORIZATION is required when MATCH_GIT_URL is HTTPS (base64 user:token)." >&2
+              exit 1
+            fi
+          elif [[ -z "${MATCH_GIT_BASIC_AUTHORIZATION:-}" ]]; then
+            echo "::notice::MATCH_GIT_BASIC_AUTHORIZATION is unset — fine for an SSH match repo."
           fi
           echo "All required App Store secrets are configured."
 

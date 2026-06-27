@@ -89,10 +89,10 @@ the lane. Expected repository secrets/vars:
 | `ANDROID_KEY_ALIAS` | secret | Key alias |
 | `ANDROID_GOOGLE_SERVICES_JSON` | secret | base64 of `google-services.json` (git-ignored) |
 
-Push all of these in one shot with `tool/ci-secrets-setup.sh --platform android`
-instead of pasting them into the Settings UI by hand. The workflow also fails
-fast at the top of the job if any required secret is missing, naming exactly
-which.
+From the repository root, push all of these in one shot with
+`tool/ci-secrets-setup.sh --platform android` instead of pasting them into the
+Settings UI by hand. The workflow also fails fast at the top of the job if any
+required secret or variable is missing, naming exactly which.
 
 ## Troubleshooting (first real run)
 

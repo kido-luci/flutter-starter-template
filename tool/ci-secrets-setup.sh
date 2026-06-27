@@ -77,7 +77,8 @@ secret_from_file() {  # NAME PROMPT base64|raw
   path="${path/#\~/$HOME}"
   if [[ -z "$path" ]]; then echo "  ↳ skipped $name"; return; fi
   if [[ ! -f "$path" ]]; then
-    echo "  ↳ error: no file at '$path' — skipped $name" >&2; return
+    echo "  ↳ error: no file at '$path' — aborting setup for $name" >&2
+    return 1
   fi
   if [[ "$encode" == base64 ]]; then
     base64 < "$path" | gh secret set "$name" --repo "$repo"

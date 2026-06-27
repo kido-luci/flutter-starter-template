@@ -1,12 +1,14 @@
 // Architecture guardrail: keeps the release workflow's fail-fast preflight in
-// sync with the secrets it actually consumes.
+// sync with the secrets it actually consumes — per job.
 //
 // .github/workflows/release.yml verifies every required store-deploy
 // secret/var at the top of each job (the `required=( … )` lists), so a
 // misconfigured repo fails in ~2s with a clear message instead of ~15 min into
-// a Fastlane build. If someone wires a new `secrets.X` / `vars.X` into a build
-// step but forgets to add it to a preflight list, that fail-fast guarantee
-// silently regresses — this test catches it.
+// a Fastlane build. The check is scoped per job: a name consumed by the Android
+// job must be guarded by the *Android* preflight, not merely by some list in
+// the iOS job. If someone wires a new `secrets.X` / `vars.X` into a build step
+// but forgets its job's preflight list, that fail-fast guarantee silently
+// regresses — this test catches it.
 //
 // Pure file-scan, no third-party dependency; runs in the normal
 // `fvm flutter test` / CI flow.
@@ -18,15 +20,18 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final workflow = File('.github/workflows/release.yml');
 
-  // Names intentionally left out of the required lists: the preflight warns
-  // instead of failing when they're unset. Keep this set tiny and justified.
-  const optional = <String>{
-    // Only HTTPS match repos need basic-auth; SSH setups don't.
-    'MATCH_GIT_BASIC_AUTHORIZATION',
+  // Names a job's preflight intentionally omits from its required list because
+  // the workflow gates them on a runtime condition this static test can't
+  // evaluate. Keyed by job. Keep each entry tiny and justified.
+  const optionalByJob = <String, Set<String>>{
+    // The iOS preflight requires MATCH_GIT_BASIC_AUTHORIZATION only when
+    // MATCH_GIT_URL is HTTPS — a runtime check — and skips it for SSH. The
+    // transport rule lives in the workflow; here we just exempt it from the
+    // static presence check.
+    'ios': {'MATCH_GIT_BASIC_AUTHORIZATION'},
   };
 
-  late final Set<String> referenced;
-  late final Set<String> guarded;
+  late final Map<String, String> jobs;
 
   setUpAll(() {
     expect(
@@ -36,50 +41,86 @@ void main() {
           'Expected .github/workflows/release.yml relative to the current '
           'directory. Run this test from the repository root.',
     );
-    final yaml = workflow.readAsStringSync();
-    referenced = _referencedSecretsAndVars(yaml);
-    guarded = _guardedNames(yaml);
+    jobs = _jobSections(workflow.readAsStringSync());
   });
 
-  test('release.yml references store-deploy secrets (sanity)', () {
-    expect(referenced, isNotEmpty);
+  test('release.yml exposes the android and ios jobs (sanity)', () {
+    expect(jobs.keys, containsAll(<String>['android', 'ios']));
   });
 
-  test('every secret/var consumed by release.yml is covered by a preflight '
-      'fail-fast check (or allow-listed as optional)', () {
-    final unguarded =
-        referenced
-            .where(
-              (name) => !guarded.contains(name) && !optional.contains(name),
-            )
-            .toList()
-          ..sort();
+  test('each job guards every secret/var it consumes with its own preflight '
+      'fail-fast list (or a justified optional)', () {
+    final problems = <String>[];
+    jobs.forEach((job, body) {
+      final referenced = _referencedSecretsAndVars(body);
+      final guarded = _guardedNames(body);
+      final optional = optionalByJob[job] ?? const <String>{};
+      final unguarded =
+          referenced
+              .where((n) => !guarded.contains(n) && !optional.contains(n))
+              .map((n) => '[$job] $n')
+              .toList()
+            ..sort();
+      problems.addAll(unguarded);
+    });
     expect(
-      unguarded,
+      problems,
       isEmpty,
       reason:
-          'These secrets/vars are used by release.yml but no "Verify '
-          'required …" preflight step guards them, so a misconfigured repo '
-          'would fail deep inside the build instead of fast. Add each to a '
-          'required=( … ) list in the relevant job (or, if genuinely '
-          'optional, to the allowlist in this test):\n\n'
-          '${unguarded.join('\n')}',
+          'These secrets/vars are consumed by a release.yml job but are not '
+          "covered by that job's preflight required=( … ) list, so a "
+          'misconfigured repo would fail deep in the build instead of fast. '
+          'Add each to the right job (or, if gated on a runtime condition, to '
+          'optionalByJob in this test):\n\n${problems.join('\n')}',
     );
   });
 }
 
-/// Every distinct `secrets.X` / `vars.X` name referenced anywhere in the
-/// workflow, minus `GITHUB_TOKEN` (provided automatically by Actions, never
-/// user-configured).
-Set<String> _referencedSecretsAndVars(String yaml) {
-  final pattern = RegExp(r'\$\{\{\s*(?:secrets|vars)\.(\w+)\s*\}\}');
-  return {
-    for (final match in pattern.allMatches(yaml)) match.group(1)!,
-  }..remove('GITHUB_TOKEN');
+/// Slices release.yml into `{jobName: jobBody}` for the top-level jobs — the
+/// 2-space-indented keys under `jobs:` — so coverage is checked per job rather
+/// than against the union of every job's references and lists.
+Map<String, String> _jobSections(String yaml) {
+  final lines = yaml.split('\n');
+  final jobsStart = lines.indexWhere((line) => line == 'jobs:');
+  expect(
+    jobsStart,
+    isNonNegative,
+    reason: 'release.yml has no top-level `jobs:` key.',
+  );
+
+  final header = RegExp(r'^  ([A-Za-z0-9_-]+):\s*$');
+  final sections = <String, String>{};
+  String? current;
+  final buffer = StringBuffer();
+  void flush() {
+    final name = current;
+    if (name != null) sections[name] = buffer.toString();
+    buffer.clear();
+  }
+
+  for (final line in lines.skip(jobsStart + 1)) {
+    final match = header.firstMatch(line);
+    if (match != null) {
+      flush();
+      current = match.group(1);
+    } else if (current != null) {
+      buffer.writeln(line);
+    }
+  }
+  flush();
+  return sections;
 }
 
-/// The names listed inside every `required=( … )` bash array across the
-/// preflight steps — the workflow's own source of truth for what it checks.
+/// Every distinct `secrets.X` / `vars.X` name referenced in [yaml], minus
+/// `GITHUB_TOKEN` (provided automatically by Actions, never user-configured).
+Set<String> _referencedSecretsAndVars(String yaml) {
+  final pattern = RegExp(r'\$\{\{\s*(?:secrets|vars)\.(\w+)\s*\}\}');
+  return {for (final match in pattern.allMatches(yaml)) match.group(1)!}
+    ..remove('GITHUB_TOKEN');
+}
+
+/// The names listed inside every `required=( … )` bash array in [yaml] — the
+/// workflow's own source of truth for what each preflight checks.
 Set<String> _guardedNames(String yaml) {
   final blocks = RegExp(r'required=\(([^)]*)\)');
   final names = <String>{};
