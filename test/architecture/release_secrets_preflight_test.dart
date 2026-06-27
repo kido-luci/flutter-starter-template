@@ -116,8 +116,12 @@ void main() {
     };
     identityVarByJob.forEach((job, identityVar) {
       final body = jobs[job] ?? '';
+      // Only the job header (everything before `runs-on:`) holds the job-level
+      // `if:`; scanning the whole body would also pass on a step-level `if:`,
+      // missing the exact regression this guards against.
+      final header = body.split(RegExp(r'^\s*runs-on:', multiLine: true)).first;
       expect(
-        body.contains("vars.$identityVar != ''"),
+        header.contains("vars.$identityVar != ''"),
         isTrue,
         reason:
             "The $job job's `if:` must gate on `vars.$identityVar != ''` so a "
