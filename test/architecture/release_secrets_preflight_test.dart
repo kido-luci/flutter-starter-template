@@ -10,6 +10,12 @@
 // but forgets its job's preflight list, that fail-fast guarantee silently
 // regresses — this test catches it.
 //
+// A name can also be exempt from a job's `required=( … )` list when the job
+// gates it on a runtime condition this static test can't evaluate (e.g.
+// MATCH_GIT_BASIC_AUTHORIZATION is required only for an HTTPS match repo). Such
+// exemptions are *earned*: they hold only while the job body still contains the
+// runtime guard, so deleting the guard re-arms the static check.
+//
 // Pure file-scan, no third-party dependency; runs in the normal
 // `fvm flutter test` / CI flow.
 
@@ -17,19 +23,23 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+/// An exemption from a job's `required=( … )` list, valid only while every
+/// guard pattern still matches the job body. If the runtime guard is removed,
+/// the exemption lapses and the name must return to `required=( … )`.
+const _exemptions = <({String job, String name, List<String> guards})>[
+  (
+    job: 'ios',
+    name: 'MATCH_GIT_BASIC_AUTHORIZATION',
+    // The iOS preflight requires the token only for HTTPS match repos and
+    // hard-fails (`exit 1`) when it's missing under that branch; SSH repos
+    // don't need it. The transport rule lives in the workflow — this test only
+    // confirms the guard exists before honoring the exemption.
+    guards: [r'MATCH_GIT_URL"?\s*=~\s*\^https\?://', r'exit\s+1'],
+  ),
+];
+
 void main() {
   final workflow = File('.github/workflows/release.yml');
-
-  // Names a job's preflight intentionally omits from its required list because
-  // the workflow gates them on a runtime condition this static test can't
-  // evaluate. Keyed by job. Keep each entry tiny and justified.
-  const optionalByJob = <String, Set<String>>{
-    // The iOS preflight requires MATCH_GIT_BASIC_AUTHORIZATION only when
-    // MATCH_GIT_URL is HTTPS — a runtime check — and skips it for SSH. The
-    // transport rule lives in the workflow; here we just exempt it from the
-    // static presence check.
-    'ios': {'MATCH_GIT_BASIC_AUTHORIZATION'},
-  };
 
   late final Map<String, String> jobs;
 
@@ -49,15 +59,16 @@ void main() {
   });
 
   test('each job guards every secret/var it consumes with its own preflight '
-      'fail-fast list (or a justified optional)', () {
+      'fail-fast list (or an earned runtime exemption)', () {
     final problems = <String>[];
     jobs.forEach((job, body) {
       final referenced = _referencedSecretsAndVars(body);
       final guarded = _guardedNames(body);
-      final optional = optionalByJob[job] ?? const <String>{};
       final unguarded =
           referenced
-              .where((n) => !guarded.contains(n) && !optional.contains(n))
+              .where(
+                (n) => !guarded.contains(n) && !_isExempt(job, n, body),
+              )
               .map((n) => '[$job] $n')
               .toList()
             ..sort();
@@ -68,13 +79,40 @@ void main() {
       isEmpty,
       reason:
           'These secrets/vars are consumed by a release.yml job but are not '
-          "covered by that job's preflight required=( … ) list, so a "
-          'misconfigured repo would fail deep in the build instead of fast. '
-          'Add each to the right job (or, if gated on a runtime condition, to '
-          'optionalByJob in this test):\n\n${problems.join('\n')}',
+          "covered by that job's preflight required=( … ) list (nor an earned "
+          'runtime exemption), so a misconfigured repo would fail deep in the '
+          'build instead of fast. Add each to the right job (or, if gated on a '
+          'runtime condition, register an exemption in this test):\n\n'
+          '${problems.join('\n')}',
     );
   });
+
+  test("every runtime exemption is still earned by its job's guard", () {
+    for (final exemption in _exemptions) {
+      final body = jobs[exemption.job] ?? '';
+      for (final guard in exemption.guards) {
+        expect(
+          RegExp(guard).hasMatch(body),
+          isTrue,
+          reason:
+              'The ${exemption.job} preflight no longer matches /$guard/, '
+              'so the ${exemption.name} exemption is unjustified. Restore the '
+              'runtime guard, or move ${exemption.name} back into '
+              'required=( … ).',
+        );
+      }
+    }
+  });
 }
+
+/// Whether [name] is exempt from job [job]'s required list because the job
+/// [body] still carries every guard the exemption depends on.
+bool _isExempt(String job, String name, String body) => _exemptions.any(
+  (e) =>
+      e.job == job &&
+      e.name == name &&
+      e.guards.every((pattern) => RegExp(pattern).hasMatch(body)),
+);
 
 /// Slices release.yml into `{jobName: jobBody}` for the top-level jobs — the
 /// 2-space-indented keys under `jobs:` — so coverage is checked per job rather
