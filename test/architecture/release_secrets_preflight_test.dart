@@ -31,10 +31,14 @@ const _exemptions = <({String job, String name, List<String> guards})>[
     job: 'ios',
     name: 'MATCH_GIT_BASIC_AUTHORIZATION',
     // The iOS preflight requires the token only for HTTPS match repos and
-    // hard-fails (`exit 1`) when it's missing under that branch; SSH repos
-    // don't need it. The transport rule lives in the workflow — this test only
-    // confirms the guard exists before honoring the exemption.
-    guards: [r'MATCH_GIT_URL"?\s*=~\s*\^https\?://', r'exit\s+1'],
+    // hard-fails when it's missing under that branch; SSH repos don't need it.
+    // The guard matches the whole hard-fail path in order — the HTTPS scheme
+    // test, then the MATCH_GIT_BASIC_AUTHORIZATION check, then `exit 1` — so the
+    // exemption lapses if that specific path is removed. (A stray `exit 1`
+    // elsewhere in the job — e.g. the missing-secrets block — no longer counts.)
+    guards: [
+      r'MATCH_GIT_URL"?\s*=~\s*\^https\?://[\s\S]*?MATCH_GIT_BASIC_AUTHORIZATION[\s\S]*?exit\s+1',
+    ],
   ),
 ];
 
