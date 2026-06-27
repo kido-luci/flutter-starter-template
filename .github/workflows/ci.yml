@@ -342,7 +342,7 @@ jobs:
           [ -d "$out/.git" ] \
             || { echo "::error::no fresh git repo was initialised"; fail=1; }
           if grep -rIl 'flutter_starter_template\|lucistudio\|Luci Studio' \
-              "$out/lib" "$out/pubspec.yaml" "$out/android" 2>/dev/null; then
+              "$out/lib" "$out/pubspec.yaml" "$out/android" "$out/ios" 2>/dev/null; then
             echo "::error::template identifiers leaked into the scaffold"; fail=1
           fi
 
