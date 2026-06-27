@@ -37,6 +37,21 @@ After that, the normal CocoaPods flow works (`fvm flutter clean`,
 support Swift Package Manager" warning printed during `pub get`/build is then
 harmless.
 
+## iOS: Privacy Manifest
+
+`ios/Runner/PrivacyInfo.xcprivacy` is the **app-level** privacy manifest, wired
+into the Runner target's resources. Apple rejects uploads without it
+(`ITMS-91053: Missing API declarations`). Firebase and other pods ship their own
+manifests, so this file only covers the app target and the statically-linked
+Flutter plugins that don't provide one — currently the required-reason APIs
+`UserDefaults` (CA92.1), `FileTimestamp` (C617.1), `DiskSpace` (E174.1), and
+`SystemBootTime` (35F9.1).
+
+When you add a plugin that uses a required-reason API or collects/links user
+data, update this file: add the `NSPrivacyAccessedAPICategory*` entry (with a
+valid reason code) or extend `NSPrivacyCollectedDataTypes`. If an ad/attribution
+SDK is added, flip `NSPrivacyTracking` to `true` and list the tracking domains.
+
 ## Common commands
 
 ```bash
