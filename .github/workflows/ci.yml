@@ -380,12 +380,16 @@ jobs:
           }
 
           assert_media_perms_present() {
-            grep -q 'NSCameraUsageDescription' "$infoplist" \
-              || { echo "::error::NSCameraUsageDescription wrongly stripped ($CONFIG)"; fail=1; }
-            grep -q 'NSPhotoLibraryUsageDescription' "$infoplist" \
-              || { echo "::error::NSPhotoLibraryUsageDescription wrongly stripped ($CONFIG)"; fail=1; }
-            grep -q 'android.permission.CAMERA' "$manifest" \
-              || { echo "::error::CAMERA permission wrongly stripped ($CONFIG)"; fail=1; }
+            local key
+            for key in NSCameraUsageDescription NSMicrophoneUsageDescription \
+                NSPhotoLibraryUsageDescription NSPhotoLibraryAddUsageDescription; do
+              grep -q "$key" "$infoplist" \
+                || { echo "::error::$key wrongly stripped ($CONFIG)"; fail=1; }
+            done
+            for key in android.permission.CAMERA android.permission.RECORD_AUDIO; do
+              grep -q "$key" "$manifest" \
+                || { echo "::error::$key wrongly stripped ($CONFIG)"; fail=1; }
+            done
           }
 
           # ── Per-config structural assertions ──
@@ -405,6 +409,8 @@ jobs:
               [ -d "$out/packages/features/collections" ] || { echo "::error::collections wrongly removed (exclude-bookmarks)"; fail=1; }
               [ -d "$auth" ] || { echo "::error::auth wrongly removed (exclude-bookmarks)"; fail=1; }
               assert_no_media_perms
+              grep -q 'android.permission.POST_NOTIFICATIONS' "$manifest" \
+                || { echo "::error::POST_NOTIFICATIONS wrongly stripped (exclude-bookmarks)"; fail=1; }
               ;;
             no-firebase)
               [ -d "$auth" ] || { echo "::error::auth removed in no-firebase"; fail=1; }
