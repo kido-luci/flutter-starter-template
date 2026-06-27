@@ -54,6 +54,47 @@ jobs:
       github.event.inputs.platform == 'android'
     runs-on: ubuntu-latest
     steps:
+      # Fail fast if the store-deploy secrets/vars aren't configured yet, so a
+      # tag push doesn't burn ~15 min cloning, installing the SDK and building
+      # only to die deep inside Fastlane on an empty base64 blob or an auth
+      # error. Bootstrap them in one shot with tool/ci-secrets-setup.sh. Secrets
+      # are mapped to env (not interpolated into the script) and read by
+      # indirect expansion, so this stays template-injection-safe (zizmor).
+      - name: Verify required Play secrets
+        env:
+          ANDROID_PACKAGE_NAME_BASE: ${{ vars.ANDROID_PACKAGE_NAME_BASE }}
+          PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_GOOGLE_SERVICES_JSON: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          required=(
+            ANDROID_PACKAGE_NAME_BASE
+            PLAY_STORE_JSON_KEY
+            ANDROID_KEYSTORE_BASE64
+            ANDROID_KEYSTORE_PASSWORD
+            ANDROID_KEY_PASSWORD
+            ANDROID_KEY_ALIAS
+            ANDROID_GOOGLE_SERVICES_JSON
+          )
+          missing=()
+          for name in "${required[@]}"; do
+            [[ -z "${!name:-}" ]] && missing+=("$name")
+          done
+          if (( ${#missing[@]} )); then
+            {
+              echo "::error::Missing ${#missing[@]} required Play secret(s)/var(s): ${missing[*]}"
+              echo "Set them under Settings → Secrets and variables → Actions,"
+              echo "or bootstrap all at once: tool/ci-secrets-setup.sh"
+              echo "Full table: android/fastlane/README.md"
+            } >&2
+            exit 1
+          fi
+          echo "All required Play secrets are configured."
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -138,6 +179,57 @@ jobs:
       github.event.inputs.platform == 'ios'
     runs-on: macos-15
     steps:
+      # Fail fast if the store-deploy secrets/vars aren't configured yet (see the
+      # Android job's note). MATCH_GIT_BASIC_AUTHORIZATION is gated on the
+      # MATCH_GIT_URL scheme: required for an HTTPS match repo, skipped for SSH.
+      - name: Verify required App Store secrets
+        env:
+          IOS_BUNDLE_ID_BASE: ${{ vars.IOS_BUNDLE_ID_BASE }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          IOS_GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.IOS_GOOGLE_SERVICE_INFO_PLIST }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: |
+          set -euo pipefail
+          required=(
+            IOS_BUNDLE_ID_BASE
+            APPLE_TEAM_ID
+            APP_STORE_CONNECT_API_KEY_ID
+            APP_STORE_CONNECT_API_ISSUER_ID
+            APP_STORE_CONNECT_API_KEY_CONTENT
+            MATCH_GIT_URL
+            MATCH_PASSWORD
+            IOS_GOOGLE_SERVICE_INFO_PLIST
+          )
+          missing=()
+          for name in "${required[@]}"; do
+            [[ -z "${!name:-}" ]] && missing+=("$name")
+          done
+          if (( ${#missing[@]} )); then
+            {
+              echo "::error::Missing ${#missing[@]} required App Store secret(s)/var(s): ${missing[*]}"
+              echo "Set them under Settings → Secrets and variables → Actions,"
+              echo "or bootstrap all at once: tool/ci-secrets-setup.sh"
+              echo "Full table: ios/fastlane/README.md"
+            } >&2
+            exit 1
+          fi
+          # An HTTPS match repo can't clone without basic-auth, so a missing
+          # token there is a hard fail too; SSH repos don't need it.
+          if [[ "$MATCH_GIT_URL" =~ ^https?:// ]]; then
+            if [[ -z "${MATCH_GIT_BASIC_AUTHORIZATION:-}" ]]; then
+              echo "::error::MATCH_GIT_BASIC_AUTHORIZATION is required when MATCH_GIT_URL is HTTPS (base64 user:token)." >&2
+              exit 1
+            fi
+          elif [[ -z "${MATCH_GIT_BASIC_AUTHORIZATION:-}" ]]; then
+            echo "::notice::MATCH_GIT_BASIC_AUTHORIZATION is unset — fine for an SSH match repo."
+          fi
+          echo "All required App Store secrets are configured."
+
       - name: Checkout
         uses: actions/checkout@v7
 
