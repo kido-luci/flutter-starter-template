@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App-level privacy manifest. Third-party SDKs (Firebase, GoogleUtilities,
+	     …) ship their own PrivacyInfo.xcprivacy inside their pods and are not
+	     repeated here. This file covers the app target and the statically-linked
+	     Flutter plugins that do not provide a manifest of their own. -->
+
+	<!-- The app itself performs no tracking. Flip to <true/> and populate
+	     NSPrivacyTrackingDomains when an ad or attribution SDK is added
+	     (roadmap FST-21, ads pillar). -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- Data the app's own code collects is empty: analytics / crash / messaging
+	     data is declared by the Firebase SDK manifests, not here. -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- Required-reason APIs used by statically-linked plugins that ship no
+	     manifest of their own. Add a category here when a new plugin uses one. -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!-- shared_preferences_foundation reads/writes the app's own NSUserDefaults. -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+		<!-- sqflite_darwin / objectbox_flutter_libs / path_provider read file
+		     modification timestamps inside the app container. -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+		<!-- ObjectBox / SQLite check available disk space before writing. -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>E174.1</string>
+			</array>
+		</dict>
+		<!-- System boot time, used to measure elapsed time on-device. -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>35F9.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
