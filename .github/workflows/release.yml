@@ -40,6 +40,11 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# Least-privilege default: these jobs only deploy to the stores, never write
+# back to the repo, so read access to the checkout is sufficient.
+permissions:
+  contents: read
+
 jobs:
   android:
     name: Android → Play
@@ -118,7 +123,12 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
           ANDROID_PACKAGE_NAME_BASE: ${{ vars.ANDROID_PACKAGE_NAME_BASE }}
           PLAY_STORE_JSON_KEY_PATH: ${{ github.workspace }}/android/play-store-key.json
-        run: bundle exec fastlane ${{ github.event_name == 'push' && 'release' || 'beta' }} flavor:${{ github.event.inputs.flavor || 'prod' }}
+          # Bind the lane/flavor expressions to env vars (Actions evaluates
+          # them), then reference them as shell vars so nothing is expanded into
+          # the run command — closes the template-injection class (zizmor).
+          LANE: ${{ github.event_name == 'push' && 'release' || 'beta' }}
+          FLAVOR: ${{ github.event.inputs.flavor || 'prod' }}
+        run: bundle exec fastlane "$LANE" "flavor:$FLAVOR"
 
   ios:
     name: iOS → TestFlight
@@ -193,4 +203,6 @@ jobs:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-        run: bundle exec fastlane ${{ github.event_name == 'push' && 'release' || 'beta' }} flavor:${{ github.event.inputs.flavor || 'prod' }}
+          LANE: ${{ github.event_name == 'push' && 'release' || 'beta' }}
+          FLAVOR: ${{ github.event.inputs.flavor || 'prod' }}
+        run: bundle exec fastlane "$LANE" "flavor:$FLAVOR"

@@ -22,9 +22,10 @@ new="$version"
 [[ -n "$build" ]] && new="$version+$build"
 
 # Rewrite the top-level `version:` line (column 0, so dependency versions — which
-# are indented — are never touched). -i.bak keeps both GNU and BSD sed happy
-# (Linux CI + macOS CI); drop the backup afterwards.
-sed -i.bak -E "s/^version: .*/version: ${new}/" pubspec.yaml
-rm -f pubspec.yaml.bak
+# are indented — are never touched). awk writes $new literally, so a version
+# containing sed-special characters (`&` or `\`) can't corrupt the line.
+tmp="$(mktemp)"
+awk -v v="$new" '!seen && /^version: / { print "version: " v; seen = 1; next } { print }' \
+  pubspec.yaml >"$tmp" && mv "$tmp" pubspec.yaml
 
 echo "pubspec.yaml version → ${new}"
