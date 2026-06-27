@@ -1,18 +1,22 @@
 name: Release
 
-# Builds and uploads mobile releases via Fastlane: iOS → TestFlight,
-# Android → Google Play. Triggered manually with a chosen flavor/platform.
+# Builds and uploads mobile releases via Fastlane.
 #
-# This is a template repo, so the store-deploy is opt-in: run it from the
-# Actions tab (workflow_dispatch) once you have configured the secrets and
-# variables listed under each job's `env:` (Settings → Secrets and variables →
-# Actions). To restore tag-triggered releases in a project built from this
-# template, add a `push: tags: ['v*']` entry below.
+#   • Push a `vX.Y.Z` tag → production release: iOS → App Store, Android → Play
+#     production (staged rollout). The published version name comes from the tag
+#     (see tool/set_version.sh); the build number is the CI run number.
+#   • Run manually (Actions tab → Run workflow) → `beta`: iOS → TestFlight,
+#     Android → internal track, with a chosen flavor/platform.
 #
-# This workflow only does the CI plumbing; the lane logic lives in
-# ios/fastlane/Fastfile and android/fastlane/Fastfile. See the fastlane READMEs.
+# Store-deploy is opt-in: configure the secrets and variables listed under each
+# job's `env:` (Settings → Secrets and variables → Actions) first. This workflow
+# only does the CI plumbing; the lane logic lives in ios/fastlane/Fastfile and
+# android/fastlane/Fastfile. See the fastlane READMEs.
 
 on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch:
     inputs:
       flavor:
@@ -36,6 +40,11 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# Least-privilege default: these jobs only deploy to the stores, never write
+# back to the repo, so read access to the checkout is sufficient.
+permissions:
+  contents: read
+
 jobs:
   android:
     name: Android → Play
@@ -52,6 +61,13 @@ jobs:
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+
+      # On a tag push, stamp the published version name from the tag (e.g.
+      # v1.2.3 → 1.2.3); the build number stays the CI run number. The lanes
+      # build from pubspec.yaml, so this must run before the build step.
+      - name: Stamp release version from the tag
+        if: github.event_name == 'push'
+        run: ./tool/set_version.sh "${GITHUB_REF_NAME#v}" "${{ github.run_number }}"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -107,7 +123,12 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
           ANDROID_PACKAGE_NAME_BASE: ${{ vars.ANDROID_PACKAGE_NAME_BASE }}
           PLAY_STORE_JSON_KEY_PATH: ${{ github.workspace }}/android/play-store-key.json
-        run: bundle exec fastlane beta flavor:${{ github.event.inputs.flavor || 'prod' }}
+          # Bind the lane/flavor expressions to env vars (Actions evaluates
+          # them), then reference them as shell vars so nothing is expanded into
+          # the run command — closes the template-injection class (zizmor).
+          LANE: ${{ github.event_name == 'push' && 'release' || 'beta' }}
+          FLAVOR: ${{ github.event.inputs.flavor || 'prod' }}
+        run: bundle exec fastlane "$LANE" "flavor:$FLAVOR"
 
   ios:
     name: iOS → TestFlight
@@ -124,6 +145,13 @@ jobs:
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+
+      # On a tag push, stamp the published version name from the tag (e.g.
+      # v1.2.3 → 1.2.3); the build number stays the CI run number. The lanes
+      # build from pubspec.yaml, so this must run before the build step.
+      - name: Stamp release version from the tag
+        if: github.event_name == 'push'
+        run: ./tool/set_version.sh "${GITHUB_REF_NAME#v}" "${{ github.run_number }}"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -175,4 +203,6 @@ jobs:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-        run: bundle exec fastlane beta flavor:${{ github.event.inputs.flavor || 'prod' }}
+          LANE: ${{ github.event_name == 'push' && 'release' || 'beta' }}
+          FLAVOR: ${{ github.event.inputs.flavor || 'prod' }}
+        run: bundle exec fastlane "$LANE" "flavor:$FLAVOR"
