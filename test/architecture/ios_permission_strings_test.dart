@@ -18,6 +18,18 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   final infoPlist = File('ios/Runner/Info.plist');
+  late final Map<String, String> descriptions;
+
+  setUpAll(() {
+    expect(
+      infoPlist.existsSync(),
+      isTrue,
+      reason:
+          'Expected to find ios/Runner/Info.plist relative to the current '
+          'directory. Run this test from the repository root.',
+    );
+    descriptions = _usageDescriptions(infoPlist);
+  });
 
   test('ios/Runner/Info.plist exists (run from the repository root)', () {
     expect(
@@ -40,8 +52,6 @@ void main() {
   // Words tied to the template's own demo features — copy that would be wrong
   // for an app scaffolded from this template.
   const bannedTerms = <String>['bookmark', 'collection'];
-
-  final descriptions = _usageDescriptions(infoPlist);
 
   test('every declared usage description is present and non-empty', () {
     for (final key in usageKeys) {
