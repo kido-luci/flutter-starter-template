@@ -75,6 +75,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- fst:feature:bookmarks:start -->
+	<!-- Media-capture permissions for the bookmarks feature. The fst CLI strips
+	     this block when bookmarks is removed (see test/architecture/
+	     ios_permission_strings_test.dart for the marker contract). -->
 	<key>NSCameraUsageDescription</key>
 	<string>$(APP_DISPLAY_NAME) uses the camera to let you take photos and videos.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -83,5 +87,6 @@
 	<string>$(APP_DISPLAY_NAME) accesses your photo library so you can choose images and videos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>$(APP_DISPLAY_NAME) saves images and videos to your photo library.</string>
+	<!-- fst:feature:bookmarks:end -->
 </dict>
 </plist>
