@@ -284,6 +284,7 @@ jobs:
         include:
           - { name: default, flags: '' }
           - { name: exclude-notifications, flags: '--exclude-feature notifications' }
+          - { name: exclude-bookmarks, flags: '--exclude-feature bookmarks' }
           - { name: no-firebase, flags: '--no-firebase' }
           - { name: no-auth, flags: '--no-auth' }
           - { name: no-backend, flags: '--no-backend' }
@@ -352,16 +353,58 @@ jobs:
           bookmarks="$out/packages/features/bookmarks"
           notifications="$out/packages/features/notifications"
           profile_header="$out/packages/features/profile/lib/src/presentation/widgets/profile_header.dart"
+          infoplist="$out/ios/Runner/Info.plist"
+          manifest="$out/android/app/src/main/AndroidManifest.xml"
+
+          # The camera / microphone / photo-library permissions exist only for
+          # the bookmarks media-capture flow, so the CLI strips them (and their
+          # fst:feature:bookmarks markers) whenever bookmarks is removed. These
+          # helpers keep the native config from drifting into declaring — or
+          # over-stripping — those permissions.
+          assert_no_media_perms() {
+            local key
+            for key in NSCameraUsageDescription NSMicrophoneUsageDescription \
+                NSPhotoLibraryUsageDescription NSPhotoLibraryAddUsageDescription; do
+              if grep -q "$key" "$infoplist"; then
+                echo "::error::$key not stripped from Info.plist ($CONFIG)"; fail=1
+              fi
+            done
+            for key in android.permission.CAMERA android.permission.RECORD_AUDIO; do
+              if grep -q "$key" "$manifest"; then
+                echo "::error::$key not stripped from AndroidManifest ($CONFIG)"; fail=1
+              fi
+            done
+            if grep -q 'fst:feature:bookmarks' "$infoplist" "$manifest"; then
+              echo "::error::bookmarks permission markers survived ($CONFIG)"; fail=1
+            fi
+          }
+
+          assert_media_perms_present() {
+            grep -q 'NSCameraUsageDescription' "$infoplist" \
+              || { echo "::error::NSCameraUsageDescription wrongly stripped ($CONFIG)"; fail=1; }
+            grep -q 'NSPhotoLibraryUsageDescription' "$infoplist" \
+              || { echo "::error::NSPhotoLibraryUsageDescription wrongly stripped ($CONFIG)"; fail=1; }
+            grep -q 'android.permission.CAMERA' "$manifest" \
+              || { echo "::error::CAMERA permission wrongly stripped ($CONFIG)"; fail=1; }
+          }
 
           # ── Per-config structural assertions ──
           case "$CONFIG" in
             default)
               [ -d "$auth" ] || { echo "::error::auth removed in default"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks missing in default"; fail=1; }
+              assert_media_perms_present
               ;;
             exclude-notifications)
               [ ! -d "$notifications" ] || { echo "::error::notifications not removed"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed"; fail=1; }
+              assert_media_perms_present
+              ;;
+            exclude-bookmarks)
+              [ ! -d "$bookmarks" ] || { echo "::error::bookmarks not removed (exclude-bookmarks)"; fail=1; }
+              [ -d "$out/packages/features/collections" ] || { echo "::error::collections wrongly removed (exclude-bookmarks)"; fail=1; }
+              [ -d "$auth" ] || { echo "::error::auth wrongly removed (exclude-bookmarks)"; fail=1; }
+              assert_no_media_perms
               ;;
             no-firebase)
               [ -d "$auth" ] || { echo "::error::auth removed in no-firebase"; fail=1; }
@@ -386,6 +429,7 @@ jobs:
               if grep -rIq 'fst:backend:\|fst:auth:' "$out/lib" "$out/test" "$out/packages" 2>/dev/null; then
                 echo "::error::fst markers survived the strip ($CONFIG)"; fail=1
               fi
+              assert_no_media_perms
               ;;
           esac
           exit $fail
