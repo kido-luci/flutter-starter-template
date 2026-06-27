@@ -90,6 +90,11 @@ required) on tag push / manual dispatch, with `FLUTTER_CMD=flutter` and
 | `MATCH_GIT_BASIC_AUTHORIZATION` | secret | base64 `user:token` for HTTPS clone (omit for SSH) |
 | `IOS_GOOGLE_SERVICE_INFO_PLIST` | secret | base64 of `GoogleService-Info.plist` (git-ignored) |
 
+Push all of these in one shot with `tool/ci-secrets-setup.sh --platform ios`
+instead of pasting them into the Settings UI by hand. The workflow also fails
+fast at the top of the job if any required secret is missing, naming exactly
+which.
+
 ## Troubleshooting (first real run)
 
 The lane is wired but has not been run end-to-end against a real account. Watch
