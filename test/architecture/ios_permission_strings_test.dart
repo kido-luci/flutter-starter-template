@@ -95,38 +95,40 @@ void main() {
   // `fst` CLI strips them when bookmarks is removed by stripping the
   // `fst:feature:bookmarks` region — so every usage key must stay inside it,
   // otherwise a trimmed app ships permissions it never requests.
-  test('every usage description sits inside an fst:feature:bookmarks region',
-      () {
-    final xml = infoPlist.readAsStringSync();
-    final start = xml.indexOf('fst:feature:bookmarks:start');
-    final end = xml.indexOf('fst:feature:bookmarks:end');
+  test(
+    'every usage description sits inside an fst:feature:bookmarks region',
+    () {
+      final xml = infoPlist.readAsStringSync();
+      final start = xml.indexOf('fst:feature:bookmarks:start');
+      final end = xml.indexOf('fst:feature:bookmarks:end');
 
-    expect(
-      start,
-      greaterThanOrEqualTo(0),
-      reason: 'Missing the fst:feature:bookmarks:start marker. The CLI needs '
-          'it to strip the media permissions when bookmarks is removed.',
-    );
-    expect(
-      end,
-      greaterThan(start),
-      reason: 'fst:feature:bookmarks:end must follow its :start marker.',
-    );
+      expect(
+        start,
+        greaterThanOrEqualTo(0),
+        reason:
+            'Missing the fst:feature:bookmarks:start marker. The CLI needs '
+            'it to strip the media permissions when bookmarks is removed.',
+      );
+      expect(
+        end,
+        greaterThan(start),
+        reason: 'fst:feature:bookmarks:end must follow its :start marker.',
+      );
 
-    final outside = usageKeys
-        .where((key) {
-          final at = xml.indexOf('<key>$key</key>');
-          return at < start || at > end;
-        })
-        .toList();
-    expect(
-      outside,
-      isEmpty,
-      reason: 'These usage keys are outside the fst:feature:bookmarks region, '
-          'so the CLI would leave them behind when bookmarks is stripped:\n\n'
-          '${outside.map((k) => '  $k').join('\n')}',
-    );
-  });
+      final outside = usageKeys.where((key) {
+        final at = xml.indexOf('<key>$key</key>');
+        return at < start || at > end;
+      }).toList();
+      expect(
+        outside,
+        isEmpty,
+        reason:
+            'These usage keys are outside the fst:feature:bookmarks region, '
+            'so the CLI would leave them behind when bookmarks is stripped:\n\n'
+            '${outside.map((k) => '  $k').join('\n')}',
+      );
+    },
+  );
 }
 
 /// Extracts the `<key>NS…UsageDescription</key><string>…</string>` pairs from
