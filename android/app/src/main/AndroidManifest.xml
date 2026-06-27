@@ -1,7 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- fst:feature:bookmarks:start -->
+    <!-- Media-capture permissions for the bookmarks feature; stripped by the
+         fst CLI when bookmarks is removed. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- fst:feature:bookmarks:end -->
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
