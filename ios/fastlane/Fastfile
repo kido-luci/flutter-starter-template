@@ -1,10 +1,11 @@
-# Fastfile — iOS build + TestFlight upload for the flavored Flutter app.
+# Fastfile — iOS build + TestFlight / App Store delivery for the flavored app.
 #
 # This is a template/scaffold: every account-specific value is read from the
 # environment (see fastlane/.env.example), so the repo carries no secrets and
 # no project-specific identifiers. Fill in fastlane/.env, then run:
 #
-#   bundle exec fastlane beta flavor:prod
+#   bundle exec fastlane beta    flavor:prod   # → TestFlight
+#   bundle exec fastlane release flavor:prod   # → App Store (build + metadata)
 #
 # Authentication uses an App Store Connect API key (.p8). Code signing uses
 # `match`: the distribution certificate and provisioning profiles live in a
@@ -33,10 +34,11 @@ def require_env(name)
   value
 end
 
-# Resolve the build number (CFBundleVersion). TestFlight rejects a duplicate or
-# non-increasing value, so prefer an explicit, monotonic source: the lane arg,
-# then BUILD_NUMBER (CI sets this), then the git commit count as a fallback.
-# In CI use BUILD_NUMBER — a shallow checkout makes the commit count unreliable.
+# Resolve the build number (CFBundleVersion). The App Store rejects a duplicate
+# or non-increasing value, so prefer an explicit, monotonic source: the lane
+# arg, then BUILD_NUMBER (CI sets this), then the git commit count as a
+# fallback. In CI use BUILD_NUMBER — a shallow checkout makes the commit count
+# unreliable.
 def resolve_build_number(options)
   explicit = options[:build_number] || ENV["BUILD_NUMBER"]
   return explicit.to_s unless explicit.nil? || explicit.to_s.strip.empty?
@@ -53,89 +55,128 @@ def flutter(*args)
   end
 end
 
+# Build, sign, and archive a flavor into an .ipa with match-provisioned signing,
+# then upload its dSYMs to Crashlytics. Shared by the `beta` (TestFlight) and
+# `release` (App Store) lanes. Returns the App Store Connect API key and the
+# resolved bundle id so the caller can reuse them for the upload step.
+def build_and_sign(options)
+  flavor = (options[:flavor] || "prod").to_s
+  config = FLAVORS.fetch(flavor) do
+    UI.user_error!(
+      "Unknown flavor '#{flavor}'. Expected one of: #{FLAVORS.keys.join(', ')}."
+    )
+  end
+
+  # On CI, create a temporary keychain for match to import the cert into.
+  setup_ci if is_ci?
+
+  bundle_id = "#{require_env('IOS_BUNDLE_ID_BASE')}#{config[:suffix]}"
+  build_number = resolve_build_number(options)
+
+  api_key = app_store_connect_api_key(
+    key_id: require_env("APP_STORE_CONNECT_API_KEY_ID"),
+    issuer_id: require_env("APP_STORE_CONNECT_API_ISSUER_ID"),
+    key_content: require_env("APP_STORE_CONNECT_API_KEY_CONTENT"),
+    is_key_content_base64: true,
+  )
+
+  # Fetch the signing cert + App Store profile for this bundle id. readonly on
+  # CI so a runner never mutates the match repo; locally it can create assets.
+  match(
+    type: "appstore",
+    app_identifier: bundle_id,
+    api_key: api_key,
+    readonly: is_ci?,
+  )
+
+  # Compile Dart + assets without signing; gym handles archive & signing using
+  # the match-provisioned profile selected below. The dart-define file carries
+  # the flavor's runtime config (API URL, FLAVOR, etc.) read via
+  # String.fromEnvironment — without it the build ships default/empty config.
+  flutter(
+    "build", "ios", "--release", "--no-codesign",
+    "--flavor", flavor, "--build-number", build_number,
+    "--dart-define-from-file", "env/#{flavor}.json"
+  )
+
+  build_app(
+    workspace: "Runner.xcworkspace",
+    scheme: config[:scheme],
+    configuration: config[:configuration],
+    export_method: "app-store",
+    output_directory: "build/ipa",
+    output_name: "#{flavor}.ipa",
+    export_options: {
+      signingStyle: "manual",
+      provisioningProfiles: {
+        bundle_id => "match AppStore #{bundle_id}",
+      },
+    },
+  )
+
+  # Upload dSYMs so release crashes symbolicate in Firebase Crashlytics. Skip
+  # gracefully when the Firebase config or symbols are absent (e.g. a local
+  # build without GoogleService-Info.plist in place).
+  dsym_path = lane_context[SharedValues::DSYM_OUTPUT_PATH]
+  gsp_path = "Runner/GoogleService-Info.plist"
+  if dsym_path && File.exist?(gsp_path)
+    upload_symbols_to_crashlytics(
+      dsym_path: dsym_path,
+      gsp_path: gsp_path,
+      binary_path: ENV.fetch(
+        "CRASHLYTICS_UPLOAD_SYMBOLS_BIN",
+        "Pods/FirebaseCrashlytics/upload-symbols",
+      ),
+    )
+  end
+
+  { api_key: api_key, bundle_id: bundle_id }
+end
+
 default_platform(:ios)
 
 platform :ios do
   desc "Build a flavor and upload it to TestFlight."
   desc "Usage: bundle exec fastlane beta flavor:prod (flavor: dev|staging|prod)"
   lane :beta do |options|
-    flavor = (options[:flavor] || "prod").to_s
-    config = FLAVORS.fetch(flavor) do
-      UI.user_error!(
-        "Unknown flavor '#{flavor}'. Expected one of: #{FLAVORS.keys.join(', ')}."
-      )
-    end
-
-    # On CI, create a temporary keychain for match to import the cert into.
-    setup_ci if is_ci?
-
-    bundle_id = "#{require_env('IOS_BUNDLE_ID_BASE')}#{config[:suffix]}"
-    build_number = resolve_build_number(options)
-
-    api_key = app_store_connect_api_key(
-      key_id: require_env("APP_STORE_CONNECT_API_KEY_ID"),
-      issuer_id: require_env("APP_STORE_CONNECT_API_ISSUER_ID"),
-      key_content: require_env("APP_STORE_CONNECT_API_KEY_CONTENT"),
-      is_key_content_base64: true,
-    )
-
-    # Fetch the signing cert + App Store profile for this bundle id. readonly on
-    # CI so a runner never mutates the match repo; locally it can create assets.
-    match(
-      type: "appstore",
-      app_identifier: bundle_id,
-      api_key: api_key,
-      readonly: is_ci?,
-    )
-
-    # Compile Dart + assets without signing; gym handles archive & signing using
-    # the match-provisioned profile selected below. The dart-define file carries
-    # the flavor's runtime config (API URL, FLAVOR, etc.) read via
-    # String.fromEnvironment — without it the build ships default/empty config.
-    flutter(
-      "build", "ios", "--release", "--no-codesign",
-      "--flavor", flavor, "--build-number", build_number,
-      "--dart-define-from-file", "env/#{flavor}.json"
-    )
-
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: config[:scheme],
-      configuration: config[:configuration],
-      export_method: "app-store",
-      output_directory: "build/ipa",
-      output_name: "#{flavor}.ipa",
-      export_options: {
-        signingStyle: "manual",
-        provisioningProfiles: {
-          bundle_id => "match AppStore #{bundle_id}",
-        },
-      },
-    )
-
-    # Upload dSYMs so release crashes symbolicate in Firebase Crashlytics. Skip
-    # gracefully when the Firebase config or symbols are absent (e.g. a local
-    # build without GoogleService-Info.plist in place).
-    dsym_path = lane_context[SharedValues::DSYM_OUTPUT_PATH]
-    gsp_path = "Runner/GoogleService-Info.plist"
-    if dsym_path && File.exist?(gsp_path)
-      upload_symbols_to_crashlytics(
-        dsym_path: dsym_path,
-        gsp_path: gsp_path,
-        binary_path: ENV.fetch(
-          "CRASHLYTICS_UPLOAD_SYMBOLS_BIN",
-          "Pods/FirebaseCrashlytics/upload-symbols",
-        ),
-      )
-    end
+    result = build_and_sign(options)
 
     upload_to_testflight(
-      api_key: api_key,
-      app_identifier: bundle_id,
+      api_key: result[:api_key],
+      app_identifier: result[:bundle_id],
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
       # Don't block the lane on Apple's server-side processing; flip to false
       # if a later lane needs the build immediately (e.g. external testers).
       skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Build a flavor and upload it to the App Store with its store listing."
+  desc "Uploads the build + fastlane/metadata and leaves the version in " \
+       "'Prepare for Submission'. Pass submit:true to also submit for review " \
+       "(the irreversible step); the build then phases out to users gradually. " \
+       "The app record must already exist in App Store Connect."
+  desc "Usage: bundle exec fastlane release flavor:prod [submit:true]"
+  lane :release do |options|
+    result = build_and_sign(options)
+
+    upload_to_app_store(
+      api_key: result[:api_key],
+      app_identifier: result[:bundle_id],
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      metadata_path: "./fastlane/metadata",
+      # Screenshots are a separate concern (the screenshot-automation roadmap
+      # item); upload the text metadata only.
+      skip_screenshots: true,
+      skip_metadata: false,
+      # Once approved, release the build to users gradually over several days.
+      phased_release: true,
+      # Default to a safe upload that stops short of submitting for review;
+      # pass submit:true to submit. Apple's review is the irreversible step.
+      submit_for_review: options[:submit].to_s == "true",
+      # Non-interactive: skip the HTML metadata-preview confirmation.
+      force: true,
+      run_precheck_before_submit: false,
     )
   end
 end

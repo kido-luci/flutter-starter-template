@@ -1,16 +1,17 @@
-# Fastfile — Android build + Google Play upload for the flavored Flutter app.
+# Fastfile — Android build + Google Play delivery for the flavored Flutter app.
 #
 # This is a template/scaffold: every account-specific value is read from the
 # environment (see fastlane/.env.example), so the repo carries no secrets and
 # no project-specific identifiers. Fill in fastlane/.env, then run:
 #
-#   bundle exec fastlane beta flavor:prod
+#   bundle exec fastlane beta    flavor:prod   # → internal testing track (draft)
+#   bundle exec fastlane release flavor:prod   # → production, staged rollout
 #
 # Authentication uses a Google Play service-account JSON key. Release signing
 # is configured separately via android/key.properties (see ../app/build.gradle.kts).
 
 # Map a Flutter flavor to the applicationId suffix this template applies and
-# the default Play track to publish to (prod uses the base id, no suffix).
+# the default Play track the `beta` lane publishes to (prod uses the base id).
 FLAVORS = {
   "dev"     => { suffix: ".dev",     track: "internal" },
   "staging" => { suffix: ".staging", track: "internal" },
@@ -50,46 +51,82 @@ def flutter(*args)
   end
 end
 
+# Build a flavor's release app bundle (.aab). Shared by the `beta` and
+# `release` lanes. Returns the resolved package name, the path to the bundle,
+# and the flavor's config.
+def build_appbundle(options)
+  flavor = (options[:flavor] || "prod").to_s
+  config = FLAVORS.fetch(flavor) do
+    UI.user_error!(
+      "Unknown flavor '#{flavor}'. Expected one of: #{FLAVORS.keys.join(', ')}."
+    )
+  end
+
+  package_name = "#{require_env('ANDROID_PACKAGE_NAME_BASE')}#{config[:suffix]}"
+  build_number = resolve_build_number(options)
+
+  # Requires release signing configured via android/key.properties; without it
+  # the bundle is debug-signed and Play will reject it. The dart-define file
+  # carries the flavor's runtime config (API URL, FLAVOR, etc.) read via
+  # String.fromEnvironment — without it the build ships default/empty config.
+  flutter(
+    "build", "appbundle", "--release",
+    "--flavor", flavor, "--build-number", build_number,
+    "--dart-define-from-file", "env/#{flavor}.json"
+  )
+
+  # Output path is relative to android/ (fastlane's working directory).
+  aab = "../build/app/outputs/bundle/" \
+        "#{flavor}Release/app-#{flavor}-release.aab"
+
+  { package_name: package_name, aab: aab, config: config }
+end
+
 default_platform(:android)
 
 platform :android do
-  desc "Build a flavor's app bundle and upload it to Google Play."
+  desc "Build a flavor's app bundle and upload it to an internal testing track."
   desc "Usage: bundle exec fastlane beta flavor:prod (flavor: dev|staging|prod)"
   lane :beta do |options|
-    flavor = (options[:flavor] || "prod").to_s
-    config = FLAVORS.fetch(flavor) do
-      UI.user_error!(
-        "Unknown flavor '#{flavor}'. Expected one of: #{FLAVORS.keys.join(', ')}."
-      )
-    end
-
-    package_name = "#{require_env('ANDROID_PACKAGE_NAME_BASE')}#{config[:suffix]}"
-    build_number = resolve_build_number(options)
-
-    # Requires release signing configured via android/key.properties; without
-    # it the bundle is debug-signed and Play will reject it. The dart-define
-    # file carries the flavor's runtime config (API URL, FLAVOR, etc.) read via
-    # String.fromEnvironment — without it the build ships default/empty config.
-    flutter(
-      "build", "appbundle", "--release",
-      "--flavor", flavor, "--build-number", build_number,
-      "--dart-define-from-file", "env/#{flavor}.json"
-    )
-
-    # Output path is relative to android/ (fastlane's working directory).
-    aab = "../build/app/outputs/bundle/" \
-          "#{flavor}Release/app-#{flavor}-release.aab"
+    build = build_appbundle(options)
 
     upload_to_play_store(
-      package_name: package_name,
-      track: options[:track] || config[:track],
-      aab: aab,
+      package_name: build[:package_name],
+      track: options[:track] || build[:config][:track],
+      aab: build[:aab],
       json_key: require_env("PLAY_STORE_JSON_KEY_PATH"),
       # Publish as a draft so it can be reviewed before going live; switch to
       # "completed" to release straight to the track's testers.
       release_status: "draft",
       skip_upload_apk: true,
       skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Build a flavor and roll it out to production with its store listing."
+  desc "Staged rollout (default 10%); pass rollout:1.0 for a full release. " \
+       "Uploads fastlane/metadata/android text + changelogs (no screenshots)."
+  desc "Usage: bundle exec fastlane release flavor:prod [rollout:0.2]"
+  lane :release do |options|
+    build = build_appbundle(options)
+
+    rollout = (options[:rollout] || "0.1").to_s
+    # A full rollout must be "completed"; a partial one is "inProgress".
+    release_status = rollout.to_f >= 1.0 ? "completed" : "inProgress"
+
+    upload_to_play_store(
+      package_name: build[:package_name],
+      track: "production",
+      aab: build[:aab],
+      json_key: require_env("PLAY_STORE_JSON_KEY_PATH"),
+      release_status: release_status,
+      rollout: rollout,
+      metadata_path: "fastlane/metadata/android",
+      skip_upload_apk: true,
+      skip_upload_metadata: false,
+      # Feature graphics / screenshots are a separate concern; text only.
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )

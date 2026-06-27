@@ -1,0 +1,4 @@
+Replace this placeholder with your App Store description.
+
+Describe what your app does and why people will want it. This text appears on
+your product page on the App Store.

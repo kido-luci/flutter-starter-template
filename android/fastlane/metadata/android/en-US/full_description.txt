@@ -1,0 +1,4 @@
+Replace this placeholder with your Google Play description.
+
+Describe your app's features and benefits here. This text appears on your store
+listing on Google Play.
