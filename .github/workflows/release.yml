@@ -9,9 +9,12 @@ name: Release
 #     Android → internal track, with a chosen flavor/platform.
 #
 # Store-deploy is opt-in: configure the secrets and variables listed under each
-# job's `env:` (Settings → Secrets and variables → Actions) first. This workflow
-# only does the CI plumbing; the lane logic lives in ios/fastlane/Fastfile and
-# android/fastlane/Fastfile. See the fastlane READMEs.
+# job's `env:` (Settings → Secrets and variables → Actions) first. Each job runs
+# only when its platform identity variable (ANDROID_PACKAGE_NAME_BASE /
+# IOS_BUNDLE_ID_BASE) is set, so a repo that hasn't been configured — the
+# template itself, or a fresh scaffold — skips on a tag push instead of failing.
+# This workflow only does the CI plumbing; the lane logic lives in
+# ios/fastlane/Fastfile and android/fastlane/Fastfile. See the fastlane READMEs.
 
 on:
   push:
@@ -48,10 +51,18 @@ permissions:
 jobs:
   android:
     name: Android → Play
+    # Skip cleanly (no red run) until this platform is configured: the job runs
+    # only once its identity variable is set — which the build needs anyway and
+    # which tool/ci-secrets-setup.sh sets. A repo with no Play account (the
+    # template, a fresh scaffold) therefore skips on a tag push instead of
+    # failing the preflight; once configured, a missing *secret* still fails fast
+    # (the Verify step below). `vars` is readable in `if:`, secrets aren't —
+    # hence gating on the identity variable.
     if: >-
+      vars.ANDROID_PACKAGE_NAME_BASE != '' && (
       github.event_name == 'push' ||
       github.event.inputs.platform == 'both' ||
-      github.event.inputs.platform == 'android'
+      github.event.inputs.platform == 'android' )
     runs-on: ubuntu-latest
     steps:
       # Fail fast if the store-deploy secrets/vars aren't configured yet, so a
@@ -173,10 +184,14 @@ jobs:
 
   ios:
     name: iOS → TestFlight
+    # Skip cleanly until configured — see the Android job's note. Gated on the
+    # iOS identity variable so an unconfigured repo's tag push skips instead of
+    # failing the preflight.
     if: >-
+      vars.IOS_BUNDLE_ID_BASE != '' && (
       github.event_name == 'push' ||
       github.event.inputs.platform == 'both' ||
-      github.event.inputs.platform == 'ios'
+      github.event.inputs.platform == 'ios' )
     runs-on: macos-15
     steps:
       # Fail fast if the store-deploy secrets/vars aren't configured yet (see the

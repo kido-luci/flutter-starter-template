@@ -91,8 +91,10 @@ the lane. Expected repository secrets/vars:
 
 From the repository root, push all of these in one shot with
 `tool/ci-secrets-setup.sh --platform android` instead of pasting them into the
-Settings UI by hand. The workflow also fails fast at the top of the job if any
-required secret or variable is missing, naming exactly which.
+Settings UI by hand. The Android job runs only once `ANDROID_PACKAGE_NAME_BASE`
+is set, so a repo that hasn't configured Play skips on a tag push instead of
+failing; once it's set, the job fails fast if any required secret is still
+missing, naming exactly which.
 
 ## Troubleshooting (first real run)
 
