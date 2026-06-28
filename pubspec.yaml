@@ -38,7 +38,12 @@ workspace:
   - packages/test_utils
   - packages/shared_contracts
   - packages/shared_ui
+  # fst:db:objectbox:start
   - packages/database
+  # fst:db:objectbox:end
+  # fst:db:drift:start
+  - packages/database_drift
+  # fst:db:drift:end
   - packages/localization
   # fst:auth:start
   - packages/features/auth
@@ -131,10 +136,12 @@ dependencies:
   # immutable data classes and sealed unions (used by auth models).
   freezed_annotation: ^3.1.0
 
+  # fst:db:objectbox:start
   # Native ObjectBox runtime libraries bundled into the iOS/Android app.
   # Pulled in transitively via package:database, but kept explicit here so the
   # native binaries are guaranteed to link into the final app build.
   objectbox_flutter_libs: ^5.3.2
+  # fst:db:objectbox:end
 
   # Client-side UUID generation for offline-first creates: the app mints a
   # stable id locally and the server accepts it on POST /api/bookmarks.
