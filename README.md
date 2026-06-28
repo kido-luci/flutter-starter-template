@@ -86,7 +86,7 @@ To enable seamless local development and testing, this template is paired with a
 | 💉 **DI**                 | `get_it` + `injectable` code‑gen — zero manual wiring |
 | 📡 **REST**               | `Retrofit` + `Dio` typed clients with auth interceptor |
 | ⚙️ **Go Backend**         | Companion server — `chi/v5`, JWT issuer, bookmark & collection CRUD, uploads |
-| 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude Code and Cursor |
+| 🤖 **AI-Native**          | Rules, MCP servers, and agent skills for Claude Code |
 | 🪄 **Feature Generator**  | `fst add-feature <name>` scaffolds a feature package (presentation, or a full data+domain layer via `--source local\|api\|sync`) and wires the workspace, DI graph, and routing in one command |
 | 🚀 **Release CI**         | Fastlane lanes — iOS → TestFlight, Android → Play — flavor‑aware, wired to GitHub Actions |
 
@@ -916,7 +916,7 @@ to bookmark attachment behavior.
 
 ## 🤖 AI‑Native Workflow
 
-This project is built for AI‑assisted development with **Claude Code** and Cursor.
+This project is built for AI‑assisted development with **Claude Code**.
 
 ### 🧪 MCP Servers
 
@@ -935,10 +935,9 @@ Project‑scoped MCP servers in `.mcp.json` give agents direct access to:
 
 ### 📜 Rules Files
 
-| Tool            | File                        |
-|-----------------|-----------------------------|
-| Claude Code     | `CLAUDE.md`                 |
-| Cursor          | `.cursor/rules/`            |
+| Tool            | File        |
+|-----------------|-------------|
+| Claude Code     | `CLAUDE.md` |
 
 ### 🛠 Agent Skills
 
