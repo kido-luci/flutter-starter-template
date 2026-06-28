@@ -40,7 +40,8 @@ const _layers = <String, int>{
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
   'database': 1, // centralized persistence -> rev_sync
   // fst:db:drift:start
-  'database_drift': 1, // Drift pkg (template state only; CLI renames to database)
+  'database_drift':
+      1, // Drift pkg (template state only; CLI renames to database)
   // fst:db:drift:end
   // fst:backend:start
   'sync_connectivity_plus': 1, // connectivity_plus adapter -> rev_sync

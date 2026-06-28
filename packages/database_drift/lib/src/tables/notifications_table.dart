@@ -11,6 +11,5 @@ class Notifications extends Table {
   TextColumn get type => text()();
   BoolColumn get isRead => boolean()();
   IntColumn get createdAtUs => integer()();
-  BoolColumn get pendingRead =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get pendingRead => boolean().withDefault(const Constant(false))();
 }

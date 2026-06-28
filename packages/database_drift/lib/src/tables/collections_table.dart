@@ -9,8 +9,7 @@ class Collections extends Table {
   TextColumn get name => text()();
   TextColumn get icon => text()();
   IntColumn get color => integer()();
-  TextColumn get bookmarkIdsJson =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get bookmarkIdsJson => text().withDefault(const Constant('[]'))();
   IntColumn get createdAtUs => integer()();
   IntColumn get updatedAtUs => integer()();
   IntColumn get serverUpdatedAtUs => integer().nullable()();
