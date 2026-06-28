@@ -38,7 +38,11 @@ const _layers = <String, int>{
   'app_ui': 1, // design tokens; no workspace package deps
   'localization': 1, // gen-l10n AppLocalizations; no workspace package deps
   'shared_contracts': 1, // cross-feature domain contracts -> architecture
-  'database': 1, // centralized ObjectBox persistence -> rev_sync
+  'database': 1, // centralized persistence -> rev_sync
+  // fst:db:drift:start
+  'database_drift':
+      1, // Drift pkg (template state only; CLI renames to database)
+  // fst:db:drift:end
   // fst:backend:start
   'sync_connectivity_plus': 1, // connectivity_plus adapter -> rev_sync
   // fst:backend:end

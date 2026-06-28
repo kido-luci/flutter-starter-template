@@ -26,6 +26,10 @@ build/
 # for on-device DB migrations. The binding lives in the database package now that
 # entities are centralized there, so it is un-ignored at that path.
 !packages/database/lib/objectbox.g.dart
+# Drift's generated database binding is similarly tracked; it must be present at
+# scaffold time so `fst create --database drift` works without requiring a
+# build_runner run before the first compile.
+!packages/database_drift/lib/src/app_database.g.dart
 
 # Test coverage output
 coverage/

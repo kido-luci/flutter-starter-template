@@ -1,11 +1,10 @@
 import 'package:database/database.dart';
 import 'package:injectable/injectable.dart' hide Order;
 
-/// ObjectBox-backed cache for the notifications feed. All operations are
-/// synchronous on the ObjectBox side; wrapped in `Future` to keep the
-/// repository contract async-friendly.
+/// Cache for the notifications feed. Wrapped in `Future` to keep the
+/// repository contract async-friendly regardless of the backing store.
 ///
-/// Identity is the string `uuid` (the server id); the integer ObjectBox PK is
+/// Identity is the string `uuid` (the server id); the integer store PK is
 /// internal and only used for [removeNotification] / [removeActivity].
 abstract interface class NotificationsLocalDataSource {
   /// Cached notifications, newest-first.
