@@ -147,7 +147,7 @@ dependencies:
   # stable id locally and the server accepts it on POST /api/bookmarks.
   uuid: ^4.5.3
 
-  package_info_plus: ^10.1.0
+  package_info_plus: ^10.2.0
 
   # SVG rendering. Pairs with flutter_gen_runner: SVGs placed in assets/icons/
   # get typed accessors that expose a ready-to-use SvgPicture widget.

@@ -11,7 +11,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  connectivity_plus: ^7.1.1
+  connectivity_plus: ^7.2.0
   injectable: ^3.0.0
   rev_sync:
     path: ../../published/rev_sync
