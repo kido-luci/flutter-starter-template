@@ -20,15 +20,15 @@ dependencies:
   firebase_crashlytics: ^5.2.4
   firebase_messaging: ^16.4.1
   flutter_local_notifications: ^22.0.1
-  image_picker: ^1.2.2
+  image_picker: ^1.2.3
   permission_handler: ^12.0.3
-  share_plus: ^13.1.0
-  video_player: ^2.11.1
+  share_plus: ^13.2.1
+  video_player: ^2.13.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  build_runner: ^2.15.0
+  build_runner: ^2.15.1
   injectable_generator: ^3.0.2
   test_utils: ^0.1.0
