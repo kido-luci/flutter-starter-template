@@ -570,6 +570,14 @@ jobs:
         working-directory: ${{ runner.temp }}/analyze-smoke
         run: flutter analyze
 
+      # The scaffold ships with a pre-push hook and a CI format gate of its
+      # own, so unformatted output blocks the project's first push. Stripping a
+      # marker region leaves the blank lines that surrounded it, which is
+      # exactly the kind of damage `analyze` is blind to.
+      - name: Check the scaffold's formatting
+        working-directory: ${{ runner.temp }}/analyze-smoke
+        run: dart format --output=none --set-exit-if-changed .
+
       - name: Test the scaffold
         working-directory: ${{ runner.temp }}/analyze-smoke
         run: flutter test

@@ -5,7 +5,7 @@
 #
 # It chains the steps documented in the README Quick Start and the iOS one-time
 # setup note: submodules, FVM SDK, disabling Swift Package Manager (macOS),
-# dependencies, code generation, import ordering, backend deps, and the
+# dependencies, code generation, source normalisation, backend deps, and the
 # pre-push hook.
 #
 # Usage: tool/setup.sh [options]
@@ -133,15 +133,24 @@ else
     "until you run build_runner."
 fi
 
-# --- 7. import ordering -----------------------------------------------------
-# `fst create` renames the app package, which moves its own imports in the
-# alphabetical order `directives_ordering` expects — so a freshly scaffolded
-# project trips the lint through no fault of its source. Re-sorting with the
-# real analyzer fix is exact and idempotent (a no-op in this template, whose
-# imports are already sorted for its own package name).
-echo "▶ setup: sorting import directives…"
+# --- 7. source normalisation ------------------------------------------------
+# Two things `fst create` unavoidably disturbs, both fixed with the real tools
+# rather than by trying to emit perfect output:
+#
+#   * Renaming the app package moves its own imports in the alphabetical order
+#     `directives_ordering` expects, so a scaffold trips the lint through no
+#     fault of its source.
+#   * Stripping an `fst:` marker region leaves the blank lines that surrounded
+#     it — a leading blank line, or three in a row where two regions were
+#     adjacent — which `dart format` rejects.
+#
+# Left alone, a fresh scaffold fails its own pre-push hook and CI format gate
+# on the very first push. Both steps are exact and idempotent: no-ops in this
+# template, whose own source is already sorted and formatted.
+echo "▶ setup: normalising sources (imports, formatting)…"
 dart fix --apply --code=directives_ordering . >/dev/null
-echo "✓ imports sorted"
+dart format . >/dev/null
+echo "✓ sources normalised"
 
 # --- 8. backend dependencies ------------------------------------------------
 if [[ "$setup_backend" -eq 1 ]]; then
