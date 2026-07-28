@@ -60,9 +60,11 @@ class _AppState extends State<App> {
   // fst:auth:end
   late final ThemeBloc _themeBloc;
   Session? _session;
+  // fst:auth:start
   // Whether this State created _session (and so must dispose it). An injected
   // widget.session is owned by the caller and must outlive this widget.
   bool _ownsSession = false;
+  // fst:auth:end
   late final GoRouter _router;
   late final DeepLinkState _deepLink;
   late final List<FeatureSyncController> _syncControllers;
@@ -152,9 +154,11 @@ class _AppState extends State<App> {
         }),
       );
     }
+    // fst:auth:start
     if (_ownsSession) {
       _session?.dispose();
     }
+    // fst:auth:end
     _router.dispose();
     super.dispose();
   }

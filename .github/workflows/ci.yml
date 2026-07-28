@@ -160,6 +160,12 @@ jobs:
         run: |
           ./tool/codegen.sh
           (cd packages/database && dart run build_runner build --delete-conflicting-outputs)
+          drift_files="packages/database_drift/lib/src/app_database.g.dart packages/database_drift/drift_schemas"
+          if ! git diff --quiet --exit-code -- $drift_files; then
+            echo "::error::Drift generated files are out of date. Run tool/codegen.sh and commit the regenerated binding + schema snapshot."
+            git diff --stat -- $drift_files
+            exit 1
+          fi
           objectbox_files="packages/database/lib/objectbox.g.dart packages/database/lib/objectbox-model.json"
           if ! git diff --quiet --exit-code -- $objectbox_files; then
             echo "::error::ObjectBox generated files are out of date. Run 'dart run build_runner build --delete-conflicting-outputs' inside packages/database and commit the binding + model."
@@ -289,6 +295,12 @@ jobs:
           - { name: no-auth, flags: '--no-auth' }
           - { name: no-backend, flags: '--no-backend' }
           - { name: minimal, flags: '--minimal' }
+          # Drift diverges from ObjectBox in what it can strip — it drops
+          # per-feature tables and the sync engine, ObjectBox keeps both — so
+          # the configs where that shows have to be covered on both engines.
+          - { name: default-drift, flags: '--database drift' }
+          - { name: exclude-bookmarks-drift, flags: '--exclude-feature bookmarks --database drift' }
+          - { name: minimal-drift, flags: '--minimal --database drift' }
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -338,8 +350,6 @@ jobs:
             || { echo "::error::dev submodule published/cli leaked"; fail=1; }
           [ ! -d "$out/simple_backend_server" ] \
             || { echo "::error::dev submodule simple_backend_server leaked"; fail=1; }
-          [ -d "$out/published/rev_sync" ] \
-            || { echo "::error::rev_sync path-dependency missing"; fail=1; }
           [ -d "$out/.git" ] \
             || { echo "::error::no fresh git repo was initialised"; fail=1; }
           if grep -rIl 'flutter_starter_template\|lucistudio\|Luci Studio' \
@@ -392,53 +402,177 @@ jobs:
             done
           }
 
+          # rev_sync is a path dependency, so a scaffold that keeps it must
+          # keep the directory — and one that sheds it must shed both. Only
+          # `--database drift` with the backend off can: ObjectBox entities
+          # implement `Syncable`, so on that path the engine always stays.
+          assert_rev_sync_present() {
+            [ -d "$out/published/rev_sync" ] \
+              || { echo "::error::rev_sync path-dependency missing ($CONFIG)"; fail=1; }
+            grep -q 'rev_sync' "$out/pubspec.yaml" \
+              || { echo "::error::rev_sync dependency wrongly stripped ($CONFIG)"; fail=1; }
+          }
+
+          assert_rev_sync_absent() {
+            [ ! -d "$out/published/rev_sync" ] \
+              || { echo "::error::rev_sync directory not removed ($CONFIG)"; fail=1; }
+            if grep -q 'rev_sync' "$out/pubspec.yaml"; then
+              echo "::error::rev_sync dependency left behind, pub get will fail ($CONFIG)"; fail=1
+            fi
+          }
+
+          # A table whose feature is gone is dead schema: created on every
+          # install, replayed in every migration.
+          assert_drift_table_absent() {
+            local table="$1"
+            [ ! -f "$out/packages/database/lib/src/tables/${table}_table.dart" ] \
+              || { echo "::error::${table} table not removed ($CONFIG)"; fail=1; }
+            if grep -q "${table}_table" "$out/packages/database/lib/src/app_database.dart"; then
+              echo "::error::${table} still registered in AppDatabase ($CONFIG)"; fail=1
+            fi
+          }
+
           # ── Per-config structural assertions ──
           case "$CONFIG" in
-            default)
+            default|default-drift)
               [ -d "$auth" ] || { echo "::error::auth removed in default"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks missing in default"; fail=1; }
               assert_media_perms_present
+              assert_rev_sync_present
               ;;
             exclude-notifications)
               [ ! -d "$notifications" ] || { echo "::error::notifications not removed"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed"; fail=1; }
               assert_media_perms_present
+              assert_rev_sync_present
               ;;
-            exclude-bookmarks)
+            exclude-bookmarks|exclude-bookmarks-drift)
               [ ! -d "$bookmarks" ] || { echo "::error::bookmarks not removed (exclude-bookmarks)"; fail=1; }
               [ -d "$out/packages/features/collections" ] || { echo "::error::collections wrongly removed (exclude-bookmarks)"; fail=1; }
               [ -d "$auth" ] || { echo "::error::auth wrongly removed (exclude-bookmarks)"; fail=1; }
               assert_no_media_perms
+              assert_rev_sync_present
               grep -q 'android.permission.POST_NOTIFICATIONS' "$manifest" \
                 || { echo "::error::POST_NOTIFICATIONS wrongly stripped (exclude-bookmarks)"; fail=1; }
+              if [ "$CONFIG" = exclude-bookmarks-drift ]; then
+                assert_drift_table_absent bookmarks
+                [ -f "$out/packages/database/lib/src/tables/collections_table.dart" ] \
+                  || { echo "::error::collections table wrongly removed ($CONFIG)"; fail=1; }
+              fi
               ;;
             no-firebase)
               [ -d "$auth" ] || { echo "::error::auth removed in no-firebase"; fail=1; }
               [ ! -f "$out/android/app/google-services.json" ] || { echo "::error::firebase config left in no-firebase"; fail=1; }
+              assert_rev_sync_present
               ;;
             no-auth)
               [ ! -d "$auth" ] || { echo "::error::auth package not removed (no-auth)"; fail=1; }
               [ ! -f "$profile_header" ] || { echo "::error::profile_header not removed (no-auth)"; fail=1; }
               [ -d "$bookmarks" ] || { echo "::error::bookmarks wrongly removed (no-auth)"; fail=1; }
+              assert_rev_sync_present
               if grep -rIq 'fst:auth:' "$out/lib" "$out/test" "$out/packages" 2>/dev/null; then
                 echo "::error::fst:auth markers survived the strip (no-auth)"; fail=1
               fi
               ;;
-            no-backend|minimal)
+            no-backend|minimal|minimal-drift)
               [ ! -d "$auth" ] || { echo "::error::auth not removed ($CONFIG)"; fail=1; }
               [ ! -d "$network" ] || { echo "::error::network not removed ($CONFIG)"; fail=1; }
               [ ! -d "$syncconn" ] || { echo "::error::sync_connectivity_plus not removed ($CONFIG)"; fail=1; }
               [ ! -d "$bookmarks" ] || { echo "::error::bookmarks not removed ($CONFIG)"; fail=1; }
               [ ! -d "$out/packages/features/collections" ] || { echo "::error::collections not removed ($CONFIG)"; fail=1; }
               [ ! -d "$notifications" ] || { echo "::error::notifications not removed ($CONFIG)"; fail=1; }
-              [ -d "$out/published/rev_sync" ] || { echo "::error::rev_sync wrongly removed ($CONFIG)"; fail=1; }
               if grep -rIq 'fst:backend:\|fst:auth:' "$out/lib" "$out/test" "$out/packages" 2>/dev/null; then
                 echo "::error::fst markers survived the strip ($CONFIG)"; fail=1
               fi
               assert_no_media_perms
+              [ ! -d "$out/integration_test" ] \
+                || { echo "::error::demo e2e suite not removed ($CONFIG)"; fail=1; }
+              if [ "$CONFIG" = minimal-drift ]; then
+                assert_rev_sync_absent
+                for t in bookmarks collections notifications activities sync_cursors; do
+                  assert_drift_table_absent "$t"
+                done
+              else
+                assert_rev_sync_present
+              fi
               ;;
           esac
           exit $fail
+
+  # The assertions above prove the right files are gone; only the analyzer
+  # proves what's left still compiles. That gap is exactly how a --minimal
+  # scaffold once shipped with 39 analyzer errors — every strip target was
+  # correctly removed, and the source still referencing it was not.
+  #
+  # Deliberately a separate job from cli-smoke: this one needs the Flutter SDK
+  # and a full codegen run per config, so it is minutes rather than seconds.
+  # The matrix is therefore the four corners — both engines at their fullest
+  # and their emptiest — rather than every flag combination.
+  cli-scaffold-analyze:
+    name: CLI scaffold analyzes (${{ matrix.name }})
+    needs: changes
+    if: needs.changes.outputs.cli == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: default, flags: '' }
+          - { name: default-drift, flags: '--database drift' }
+          - { name: minimal, flags: '--minimal' }
+          - { name: minimal-drift, flags: '--minimal --database drift' }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check out CLI + rev_sync submodules
+        run: git submodule update --init published/cli published/rev_sync
+
+      # Same SDK as .fvmrc (3.44.0); bump together. Provides the `dart` the CLI
+      # runs on too, so no separate setup-dart step is needed.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      - name: Resolve CLI dependencies
+        working-directory: published/cli
+        run: dart pub get
+
+      - name: Scaffold a project from this checkout
+        working-directory: published/cli
+        run: |
+          dart run bin/fst.dart create \
+            --yes \
+            --name "Smoke App" \
+            --package-name smoke_app \
+            --bundle-id com.example.smoke \
+            --org "Smoke Org" \
+            --template-path "$GITHUB_WORKSPACE" \
+            --output-dir "$RUNNER_TEMP/analyze-smoke" \
+            --no-setup \
+            ${{ matrix.flags }}
+
+      # Runs the scaffold's own bootstrap rather than open-coding the steps, so
+      # a break in tool/setup.sh fails here too. --no-hooks keeps CI out of the
+      # pre-push gate; --no-backend skips Go deps the analyzer doesn't need.
+      # Generated code is git-ignored, so a scaffold from a fresh checkout has
+      # none and cannot be analyzed until this has run.
+      - name: Bootstrap the scaffold
+        working-directory: ${{ runner.temp }}/analyze-smoke
+        run: ./tool/setup.sh --no-hooks --no-backend
+
+      - name: Analyze the scaffold
+        working-directory: ${{ runner.temp }}/analyze-smoke
+        run: flutter analyze
+
+      - name: Test the scaffold
+        working-directory: ${{ runner.temp }}/analyze-smoke
+        run: flutter test
 
   # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
   # the app, so Gradle/plugin/asset/manifest regressions slip past it and only

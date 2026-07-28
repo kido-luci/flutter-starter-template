@@ -5,7 +5,8 @@
 #
 # It chains the steps documented in the README Quick Start and the iOS one-time
 # setup note: submodules, FVM SDK, disabling Swift Package Manager (macOS),
-# dependencies, code generation, backend deps, and the pre-push hook.
+# dependencies, code generation, import ordering, backend deps, and the
+# pre-push hook.
 #
 # Usage: tool/setup.sh [options]
 #   --no-hooks      Don't enable the .githooks pre-push gate (enabled by default).
@@ -132,7 +133,17 @@ else
     "until you run build_runner."
 fi
 
-# --- 7. backend dependencies ------------------------------------------------
+# --- 7. import ordering -----------------------------------------------------
+# `fst create` renames the app package, which moves its own imports in the
+# alphabetical order `directives_ordering` expects — so a freshly scaffolded
+# project trips the lint through no fault of its source. Re-sorting with the
+# real analyzer fix is exact and idempotent (a no-op in this template, whose
+# imports are already sorted for its own package name).
+echo "▶ setup: sorting import directives…"
+dart fix --apply --code=directives_ordering . >/dev/null
+echo "✓ imports sorted"
+
+# --- 8. backend dependencies ------------------------------------------------
 if [[ "$setup_backend" -eq 1 ]]; then
   if command -v go >/dev/null 2>&1 && [[ -f "$backend_dir/go.mod" ]]; then
     echo "▶ setup: fetching backend Go dependencies…"
@@ -143,7 +154,7 @@ if [[ "$setup_backend" -eq 1 ]]; then
   fi
 fi
 
-# --- 8. git hooks (opt-in, default on) --------------------------------------
+# --- 9. git hooks (opt-in, default on) --------------------------------------
 if [[ "$enable_hooks" -eq 1 ]]; then
   current_hooks_path="$(git config --get core.hooksPath || true)"
   if [[ "$current_hooks_path" != ".githooks" ]]; then
@@ -155,7 +166,7 @@ if [[ "$enable_hooks" -eq 1 ]]; then
   fi
 fi
 
-# --- 9. Firebase reminder ---------------------------------------------------
+# --- 10. Firebase reminder ---------------------------------------------------
 if [[ ! -f "$repo_root/android/app/google-services.json" ]] ||
   [[ ! -f "$repo_root/ios/Runner/GoogleService-Info.plist" ]]; then
   echo "• Firebase config is git-ignored and missing. The app builds with"
@@ -163,7 +174,7 @@ if [[ ! -f "$repo_root/android/app/google-services.json" ]] ||
   echo "  drop google-services.json / GoogleService-Info.plist into place."
 fi
 
-# --- 10. summary ------------------------------------------------------------
+# --- 11. summary ------------------------------------------------------------
 fvm_prefix=""
 [[ "$has_fvm" -eq 1 ]] && fvm_prefix="fvm "
 cat <<EOF

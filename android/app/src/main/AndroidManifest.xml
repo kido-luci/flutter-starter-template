@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Lets NotificationsService.scheduleDaily survive a reboot: Android
+         drops every pending alarm on shutdown, so the plugin re-registers
+         them from its boot receiver below. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- fst:feature:bookmarks:start -->
     <!-- Media-capture permissions for the bookmarks feature; stripped by the
          fst CLI when bookmarks is removed. -->
@@ -45,6 +49,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Re-arms scheduled notifications after a reboot or an app update.
+             Required by flutter_local_notifications' zonedSchedule. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <queries>
         <intent>

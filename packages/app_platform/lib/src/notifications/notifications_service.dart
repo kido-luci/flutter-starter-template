@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:injectable/injectable.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../permissions/permission_service.dart';
 
@@ -29,6 +33,13 @@ class NotificationsService {
 
   Future<void> init() async {
     if (_initialized) return;
+    // Load the IANA database and pin `tz.local` to the device's zone. Without
+    // this `tz.local` is UTC, so [scheduleDaily] would fire at the wrong wall
+    // time for everyone outside it.
+    tz_data.initializeTimeZones();
+    final localZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(localZone.identifier));
+
     const initSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       iOS: DarwinInitializationSettings(
@@ -80,7 +91,95 @@ class NotificationsService {
     );
   }
 
+  /// Schedules [id] to fire every day at [hour]:[minute] device-local time.
+  ///
+  /// Scheduling the same [id] again replaces the pending one, so calling this
+  /// whenever the user picks a new time needs no [cancel] first. The schedule
+  /// survives reboots on both platforms; it does not survive an app
+  /// reinstall, so re-arm it on startup from whatever stores the preference.
+  ///
+  /// [init] must have run first — it pins the local timezone.
+  ///
+  /// Android uses an inexact alarm so the app needs no `SCHEDULE_EXACT_ALARM`
+  /// permission (Google rejects it for anything but alarms and calendars).
+  /// Delivery may drift by a few minutes, which is the right trade for a
+  /// reminder; a wake-the-user alarm would need [AndroidScheduleMode.alarmClock]
+  /// and that permission.
+  Future<void> scheduleDaily({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) {
+    return _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: nextDailyInstance(
+        now: tz.TZDateTime.now(tz.local),
+        hour: hour,
+        minute: minute,
+      ),
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          _defaultChannel.id,
+          _defaultChannel.name,
+          channelDescription: _defaultChannel.description,
+          importance: _defaultChannel.importance,
+        ),
+        iOS: const DarwinNotificationDetails(),
+        macOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      // Repeats daily by matching only the time-of-day components.
+      matchDateTimeComponents: DateTimeComponents.time,
+      payload: payload,
+    );
+  }
+
   Future<void> cancel(int id) => _plugin.cancel(id: id);
 
   Future<void> cancelAll() => _plugin.cancelAll();
+}
+
+/// The next [hour]:[minute] after [now] in `now`'s zone — today when it is
+/// still ahead, otherwise tomorrow.
+///
+/// Tomorrow is built from calendar fields rather than `now.add(Duration(days:
+/// 1))`, because `Duration` is absolute elapsed time: a day that crosses a
+/// daylight-saving transition is 23 or 25 hours long, so adding exactly 24
+/// would shift the reminder an hour off the time the user picked.
+///
+/// Compares with `isAfter` rather than `isBefore` so scheduling for the
+/// current minute lands tomorrow instead of firing immediately.
+///
+/// Top-level and visible for testing because the interesting behaviour is
+/// entirely a function of [now], which the service reads from the clock.
+@visibleForTesting
+tz.TZDateTime nextDailyInstance({
+  required tz.TZDateTime now,
+  required int hour,
+  required int minute,
+}) {
+  final today = tz.TZDateTime(
+    now.location,
+    now.year,
+    now.month,
+    now.day,
+    hour,
+    minute,
+  );
+  if (today.isAfter(now)) return today;
+  // TZDateTime normalises an overflowing day the way DateTime does, so this
+  // rolls into the next month or year on its own.
+  return tz.TZDateTime(
+    now.location,
+    now.year,
+    now.month,
+    now.day + 1,
+    hour,
+    minute,
+  );
 }

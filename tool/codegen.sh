@@ -41,6 +41,29 @@ for pkg in packages/features/*/; do
   run_pkg "${pkg%/}"
 done
 
+# The Drift package owns build_runner output (app_database.g.dart) that the
+# app-root build cannot reach, and `fst create` may have removed tables with
+# their feature — so the committed binding has to be rebuilt against whatever
+# tables survived. Detected by app_database.dart rather than by directory name,
+# because `--database drift` renames the package to `database`. The ObjectBox
+# package stays excluded: its binding holds stable schema UIDs and is
+# regenerated + verified separately in CI.
+for db in packages/database packages/database_drift; do
+  [ -f "$db/lib/src/app_database.dart" ] || continue
+  run_pkg "$db"
+
+  # Re-dump the v1 schema. `fst create` may have removed tables, which would
+  # leave the committed snapshot describing a schema this project never had —
+  # and every future migration test replays from it. A no-op once the project
+  # has its own history, since only the current version is ever re-dumped.
+  if [ -d "$db/drift_schemas" ]; then
+    echo "::group::drift schema dump: $db"
+    (cd "$db" && dart run drift_dev schema dump \
+      lib/src/app_database.dart drift_schemas/)
+    echo "::endgroup::"
+  fi
+done
+
 echo "::group::build_runner: app root"
 dart run build_runner build --delete-conflicting-outputs
 echo "::endgroup::"
