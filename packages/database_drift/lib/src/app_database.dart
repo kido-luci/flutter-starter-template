@@ -1,18 +1,45 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+// fst:feature:notifications:start
 import 'tables/activities_table.dart';
+// fst:feature:notifications:end
+// fst:feature:bookmarks:start
 import 'tables/bookmarks_table.dart';
+// fst:feature:bookmarks:end
+// fst:feature:collections:start
 import 'tables/collections_table.dart';
+// fst:feature:collections:end
+// fst:feature:notifications:start
 import 'tables/notifications_table.dart';
+// fst:feature:notifications:end
+// fst:backend:start
 import 'tables/sync_cursors_table.dart';
+// fst:backend:end
 
 part 'app_database.g.dart';
 
 /// Single Drift database for the app. Feature data layers receive this via DI
 /// and access their respective table accessors.
+///
+/// One table per line so `fst create` can strip an excluded feature's table
+/// without rewriting the list.
 @DriftDatabase(
-  tables: [Bookmarks, Collections, Notifications, Activities, SyncCursors],
+  tables: [
+    // fst:feature:bookmarks:start
+    Bookmarks,
+    // fst:feature:bookmarks:end
+    // fst:feature:collections:start
+    Collections,
+    // fst:feature:collections:end
+    // fst:feature:notifications:start
+    Notifications,
+    Activities,
+    // fst:feature:notifications:end
+    // fst:backend:start
+    SyncCursors,
+    // fst:backend:end
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);

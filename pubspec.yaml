@@ -78,8 +78,12 @@ dependencies:
   # fst:backend:end
   app_platform: ^0.1.0
   storage: ^0.1.0
+  # fst:revsync:start
+  # Kept on the ObjectBox path even without a backend: its entities implement
+  # `Syncable`. Only `--database drift --no-backend` can shed it.
   rev_sync:
     path: published/rev_sync
+  # fst:revsync:end
   # fst:backend:start
   sync_connectivity_plus: ^0.1.0
   # fst:backend:end

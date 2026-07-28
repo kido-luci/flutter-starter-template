@@ -16,8 +16,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # fst:revsync:start
+  # Only the sync-aware entities need this, and they go with the backend.
   rev_sync:
     path: ../../published/rev_sync
+  # fst:revsync:end
   drift: ^2.22.0
   drift_flutter: ^0.2.2
 
