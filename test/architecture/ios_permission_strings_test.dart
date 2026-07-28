@@ -41,7 +41,15 @@ void main() {
     );
   });
 
-  // The permission usage-description keys whose copy must stay generic.
+  // The permission usage-description keys whose copy must stay generic. All
+  // four are declared for the bookmarks media-capture flow, so a project
+  // scaffolded without that feature declares none of them — the assertions
+  // that require them are marked, the rest hold either way.
+  //
+  // This list is deliberately NOT inside a marker region: the region test
+  // below needs it, and that test cannot be marked because its own source
+  // contains the marker strings it searches for — the stripper matches by
+  // substring and would close the region on them.
   const usageKeys = <String>[
     'NSCameraUsageDescription',
     'NSMicrophoneUsageDescription',
@@ -53,6 +61,7 @@ void main() {
   // for an app scaffolded from this template.
   const bannedTerms = <String>['bookmark', 'collection'];
 
+  // fst:feature:bookmarks:start
   test('every declared usage description is present and non-empty', () {
     for (final key in usageKeys) {
       expect(
@@ -62,6 +71,7 @@ void main() {
       );
     }
   });
+  // fst:feature:bookmarks:end
 
   test('usage descriptions name no template-specific demo feature', () {
     final offenders = <String>[];
@@ -83,6 +93,7 @@ void main() {
     );
   });
 
+  // fst:feature:bookmarks:start
   test(
     r'usage descriptions interpolate the app name via $(APP_DISPLAY_NAME)',
     () {
@@ -100,6 +111,7 @@ void main() {
       );
     },
   );
+  // fst:feature:bookmarks:end
 
   // These permissions exist only for the bookmarks media-capture flow. The
   // `fst` CLI strips them when bookmarks is removed by stripping the
@@ -109,23 +121,36 @@ void main() {
     'every usage description sits inside an fst:feature:bookmarks region',
     () {
       final xml = infoPlist.readAsStringSync();
-      final start = xml.indexOf('fst:feature:bookmarks:start');
-      final end = xml.indexOf('fst:feature:bookmarks:end');
+      // Built by interpolation on purpose. The CLI's stripper matches marker
+      // needles by plain substring, so a source line spelling one out in full
+      // would open or close a region in this very file.
+      const marker = 'fst:feature:bookmarks';
+      final start = xml.indexOf('$marker:start');
+      final end = xml.indexOf('$marker:end');
+
+      // A project scaffolded without bookmarks declares none of these keys,
+      // so there is nothing left to keep inside a region and the invariant
+      // holds vacuously. Asserted rather than assumed: if any key survived
+      // without its region, the checks below still run and catch it.
+      final declared = usageKeys
+          .where((key) => xml.contains('<key>$key</key>'))
+          .toList();
+      if (declared.isEmpty) return;
 
       expect(
         start,
         greaterThanOrEqualTo(0),
         reason:
-            'Missing the fst:feature:bookmarks:start marker. The CLI needs '
-            'it to strip the media permissions when bookmarks is removed.',
+            'Missing the $marker start marker. The CLI needs it to strip the '
+            'media permissions when bookmarks is removed.',
       );
       expect(
         end,
         greaterThan(start),
-        reason: 'fst:feature:bookmarks:end must follow its :start marker.',
+        reason: 'The $marker end marker must follow its start marker.',
       );
 
-      final outside = usageKeys.where((key) {
+      final outside = declared.where((key) {
         final at = xml.indexOf('<key>$key</key>');
         return at < start || at > end;
       }).toList();
