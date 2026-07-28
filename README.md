@@ -421,9 +421,15 @@ cd flutter-starter-template
 ```bash
 fvm flutter pub get
 fvm dart run build_runner build --delete-conflicting-outputs
+fvm dart fix --apply --code=directives_ordering .      # see below
 fvm flutter config --no-enable-swift-package-manager   # macOS only — see below
 git config core.hooksPath .githooks                    # enable the pre-push gate
 ```
+
+The `dart fix` step matters in a scaffolded project, not in this repo:
+`fst create` renames the app package, which moves its own imports in the
+alphabetical order `directives_ordering` expects. Re-sorting with the
+analyzer's own fix is exact, and a no-op here.
 
 </details>
 
@@ -1030,20 +1036,30 @@ Until you do, your IDE/analyzer will show errors for the missing generated
 sources. This keeps PR diffs free of generated noise and avoids
 generated-file merge conflicts.
 
-**ObjectBox is the one deliberate exception** — `lib/objectbox.g.dart` **and**
-`lib/objectbox-model.json` stay version-controlled (the `.gitignore` negates
-the binding; the model file matches no glob). Together they hold the stable
-entity/property **UIDs** that keep on-device data intact across schema
-migrations, so regenerating them from scratch would risk a destructive schema
-change. Both are source-of-truth files.
+**The database packages are the deliberate exceptions.** ObjectBox's
+`lib/objectbox.g.dart` **and** `lib/objectbox-model.json` stay
+version-controlled (the `.gitignore` negates the binding; the model file
+matches no glob). Together they hold the stable entity/property **UIDs** that
+keep on-device data intact across schema migrations, so regenerating them from
+scratch would risk a destructive schema change. Drift's
+`lib/src/app_database.g.dart` and its `drift_schemas/` snapshots are tracked
+for a related reason: the snapshots are the only record of what each released
+`schemaVersion` looked like, and every migration test replays from them. All
+are source-of-truth files.
+
+That difference in UID stability is also why only the Drift package is
+regenerated at scaffold time: `fst create` can remove a feature's table, so
+the binding has to be rebuilt against what survived. ObjectBox keeps its
+entities instead — see [`drift_schemas/README.md`](packages/database_drift/drift_schemas/README.md)
+for the schema-change workflow.
 
 How the pieces stay consistent:
 
 - **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs
   `build_runner` before analyze/test (producing the ignored files), and the
   _"Generate code & verify ObjectBox binding is up to date"_ step fails if the
-  tracked ObjectBox files drift — i.e. someone changed an `@Entity` without
-  committing the regenerated binding.
+  tracked database files drift — i.e. someone changed an `@Entity` or a Drift
+  table without committing the regenerated binding.
 - **Release lanes** ([`.github/workflows/release.yml`](.github/workflows/release.yml))
   run `build_runner` before the Fastlane build, since `flutter build` does not.
 - **`.dart_tool/build` is intentionally not cached** in CI/release. Because the
