@@ -109,10 +109,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # fst:template-only:start
       # rev_sync is a path-dependency of the build, vendored as a submodule, so
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # On a tag push, stamp the published version name from the tag (e.g.
       # v1.2.3 → 1.2.3); the build number stays the CI run number. The lanes
@@ -248,10 +250,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # fst:template-only:start
       # rev_sync is a path-dependency of the build, vendored as a submodule, so
       # it must be checked out for `flutter pub get` to resolve.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # On a tag push, stamp the published version name from the tag (e.g.
       # v1.2.3 → 1.2.3); the build number stays the CI run number. The lanes
