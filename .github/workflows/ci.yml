@@ -641,6 +641,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # fst:firebase:start
       # The com.google.gms.google-services Gradle plugin parses
       # google-services.json at build time (it never contacts Firebase), and
       # the file is git-ignored — so a fresh checkout has none and Gradle fails
@@ -685,6 +686,7 @@ jobs:
       # job, we do NOT cache .dart_tool/build: with the outputs git-ignored, a
       # restored cache makes build_runner skip files it believes exist,
       # producing a broken tree.
+      # fst:firebase:end
       - name: Generate code
         run: |
           flutter pub get --enforce-lockfile
@@ -758,6 +760,7 @@ jobs:
       - name: Disable Swift Package Manager
         run: flutter config --no-enable-swift-package-manager
 
+      # fst:firebase:start
       # GoogleService-Info.plist is git-ignored but the Xcode project references
       # it as a bundled resource, so a fresh checkout fails with "Build input
       # file cannot be found". As on Android, write a placeholder rather than
@@ -796,7 +799,9 @@ jobs:
           </dict>
           </plist>
           EOF
+      # fst:firebase:end
 
+      # fst:firebase:start
       # firebase.json (git-ignored) drives the FlutterFire Crashlytics build
       # phase. Write a placeholder with "uploadDebugSymbols": false so the
       # `flutterfire upload-crashlytics-symbols` phase reads it and skips the
@@ -843,6 +848,7 @@ jobs:
       # building. As elsewhere, we do NOT cache .dart_tool/build: a restored
       # cache makes build_runner skip files it believes exist, producing a
       # broken tree.
+      # fst:firebase:end
       - name: Generate code
         run: |
           flutter pub get --enforce-lockfile
