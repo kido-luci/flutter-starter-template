@@ -5,10 +5,16 @@ import 'package:app_ui/app_ui.dart';
 import 'package:feature_auth/feature_auth.dart';
 // fst:auth:end
 import 'package:flutter/material.dart';
+// fst:auth:start
+// Only `profile_header.dart` (an auth-only part) uses Clipboard.
 import 'package:flutter/services.dart';
+// fst:auth:end
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// fst:auth:start
+// Only `profile_account.dart` (an auth-only part) navigates.
 import 'package:go_router/go_router.dart';
+// fst:auth:end
 import 'package:localization/localization.dart';
 // fst:auth:start
 import 'package:shared_ui/shared_ui.dart';

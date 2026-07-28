@@ -7,6 +7,7 @@ import 'package:feature_splash/feature_splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:localization/localization.dart';
+// fst:auth:start
 import 'package:shared_ui/shared_ui.dart';
 import 'package:test_utils/test_utils.dart';
 
@@ -19,25 +20,32 @@ class _RecordingSession extends FakeSession {
     restoreCalls++;
   }
 }
+// fst:auth:end
 
 void main() {
-  Widget host(
-    _RecordingSession session,
-    void Function(BuildContext context) onRestored,
-  ) {
+  // fst:auth:start
+  late _RecordingSession session;
+
+  setUp(() => session = _RecordingSession());
+  // fst:auth:end
+
+  // Kept session-free at the call site so the harness reads the same with and
+  // without the auth pillar — only the SessionScope wrapper differs.
+  Widget host(void Function(BuildContext context) onRestored) {
+    Widget home = SplashScreen(onRestored: onRestored);
+    // fst:auth:start
+    home = SessionScope(session: session, child: home);
+    // fst:auth:end
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: SessionScope(
-        session: session,
-        child: SplashScreen(onRestored: onRestored),
-      ),
+      home: home,
     );
   }
 
+  // fst:auth:start
   testWidgets('restores the session on the first frame', (tester) async {
-    final session = _RecordingSession();
-    await tester.pumpWidget(host(session, (_) {}));
+    await tester.pumpWidget(host((_) {}));
 
     await tester.pump(); // fire the post-frame callback → bootstrap
     expect(session.restoreCalls, 1);
@@ -46,13 +54,13 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pump();
   });
+  // fst:auth:end
 
   testWidgets('calls onRestored only after the minimum display time', (
     tester,
   ) async {
-    final session = _RecordingSession();
     var restoredCalls = 0;
-    await tester.pumpWidget(host(session, (_) => restoredCalls++));
+    await tester.pumpWidget(host((_) => restoredCalls++));
 
     await tester.pump(); // start bootstrap
     await tester.pump(const Duration(milliseconds: 1900)); // just before 2s
@@ -64,8 +72,7 @@ void main() {
   });
 
   testWidgets('shows the splash content while bootstrapping', (tester) async {
-    final session = _RecordingSession();
-    await tester.pumpWidget(host(session, (_) {}));
+    await tester.pumpWidget(host((_) {}));
     await tester.pump();
 
     expect(find.byType(SplashContent), findsOneWidget);

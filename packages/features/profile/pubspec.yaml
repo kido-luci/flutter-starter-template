@@ -31,7 +31,10 @@ dependencies:
   # Third-party.
   flutter_bloc: ^9.1.1
   bloc_concurrency: ^0.3.0
+  # fst:auth:start
+  # Only the auth-only `profile_account.dart` part navigates.
   go_router: ^17.3.0
+  # fst:auth:end
   injectable: ^3.0.0
   get_it: ^9.2.1
   package_info_plus: ^10.1.0
