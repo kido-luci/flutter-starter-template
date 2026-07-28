@@ -25,11 +25,14 @@ void main() {
   late _MockPlugin plugin;
   late NotificationsService service;
 
+  // Loaded before any group body runs — `tz.getLocation` throws until the
+  // database is initialised, and group bodies execute at declaration time.
+  tz_data.initializeTimeZones();
+  // A fixed non-UTC zone: a bug that silently schedules in UTC would still
+  // look correct if the test happened to run in UTC.
+  tz.setLocalLocation(tz.getLocation('Asia/Ho_Chi_Minh'));
+
   setUpAll(() {
-    tz_data.initializeTimeZones();
-    // A fixed non-UTC zone: a bug that silently schedules in UTC would still
-    // look correct if the test ran in UTC.
-    tz.setLocalLocation(tz.getLocation('Asia/Ho_Chi_Minh'));
     registerFallbackValue(const NotificationDetails());
     registerFallbackValue(AndroidScheduleMode.inexactAllowWhileIdle);
     registerFallbackValue(tz.TZDateTime.now(tz.local));
@@ -120,6 +123,66 @@ void main() {
       reset(plugin);
       stubSchedule();
     }
+  });
+
+  group('nextDailyInstance', () {
+    // A zone that actually observes DST, unlike the fixed-offset one above:
+    // 2026-03-08 02:00 EST jumps to 03:00 EDT, so that calendar day is 23
+    // hours long. Adding a 24-hour Duration would land at 10:00 instead of
+    // the 09:00 the user asked for.
+    final newYork = tz.getLocation('America/New_York');
+
+    test('keeps the wall-clock time when tomorrow loses an hour', () {
+      final now = tz.TZDateTime(newYork, 2026, 3, 7, 10);
+
+      final next = nextDailyInstance(now: now, hour: 9, minute: 0);
+
+      expect(next.year, 2026);
+      expect(next.month, 3);
+      expect(next.day, 8);
+      expect(next.hour, 9);
+      expect(next.minute, 0);
+    });
+
+    test('keeps the wall-clock time when tomorrow gains an hour', () {
+      // 2026-11-01 02:00 EDT falls back to 01:00 EST — a 25-hour day.
+      final now = tz.TZDateTime(newYork, 2026, 10, 31, 10);
+
+      final next = nextDailyInstance(now: now, hour: 9, minute: 0);
+
+      expect(next.day, 1);
+      expect(next.month, 11);
+      expect(next.hour, 9);
+    });
+
+    test('stays today when the time is still ahead', () {
+      final now = tz.TZDateTime(newYork, 2026, 6, 10, 8);
+
+      final next = nextDailyInstance(now: now, hour: 9, minute: 30);
+
+      expect(next.day, 10);
+      expect(next.hour, 9);
+      expect(next.minute, 30);
+    });
+
+    test('rolls into the next month, and the next year', () {
+      final endOfMonth = tz.TZDateTime(newYork, 2026, 6, 30, 10);
+      expect(nextDailyInstance(now: endOfMonth, hour: 9, minute: 0).month, 7);
+
+      final endOfYear = tz.TZDateTime(newYork, 2026, 12, 31, 10);
+      final next = nextDailyInstance(now: endOfYear, hour: 9, minute: 0);
+      expect(next.year, 2027);
+      expect(next.month, 1);
+      expect(next.day, 1);
+    });
+
+    test('schedules tomorrow when the requested minute is the current one', () {
+      final now = tz.TZDateTime(newYork, 2026, 6, 10, 9, 30);
+
+      final next = nextDailyInstance(now: now, hour: 9, minute: 30);
+
+      expect(next.day, 11);
+    });
   });
 
   test('repeats daily without requiring an exact-alarm permission', () async {

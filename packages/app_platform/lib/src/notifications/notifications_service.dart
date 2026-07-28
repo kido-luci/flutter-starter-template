@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:injectable/injectable.dart';
@@ -116,7 +117,11 @@ class NotificationsService {
       id: id,
       title: title,
       body: body,
-      scheduledDate: _nextInstanceOf(hour: hour, minute: minute),
+      scheduledDate: nextDailyInstance(
+        now: tz.TZDateTime.now(tz.local),
+        hour: hour,
+        minute: minute,
+      ),
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _defaultChannel.id,
@@ -134,28 +139,47 @@ class NotificationsService {
     );
   }
 
-  /// The next [hour]:[minute] in the device's zone — today when it is still
-  /// ahead, otherwise tomorrow.
-  ///
-  /// Uses `!isAfter` rather than `isBefore` so scheduling for the current
-  /// minute lands tomorrow instead of firing immediately.
-  static tz.TZDateTime _nextInstanceOf({
-    required int hour,
-    required int minute,
-  }) {
-    final now = tz.TZDateTime.now(tz.local);
-    final today = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-    return today.isAfter(now) ? today : today.add(const Duration(days: 1));
-  }
-
   Future<void> cancel(int id) => _plugin.cancel(id: id);
 
   Future<void> cancelAll() => _plugin.cancelAll();
+}
+
+/// The next [hour]:[minute] after [now] in `now`'s zone — today when it is
+/// still ahead, otherwise tomorrow.
+///
+/// Tomorrow is built from calendar fields rather than `now.add(Duration(days:
+/// 1))`, because `Duration` is absolute elapsed time: a day that crosses a
+/// daylight-saving transition is 23 or 25 hours long, so adding exactly 24
+/// would shift the reminder an hour off the time the user picked.
+///
+/// Compares with `isAfter` rather than `isBefore` so scheduling for the
+/// current minute lands tomorrow instead of firing immediately.
+///
+/// Top-level and visible for testing because the interesting behaviour is
+/// entirely a function of [now], which the service reads from the clock.
+@visibleForTesting
+tz.TZDateTime nextDailyInstance({
+  required tz.TZDateTime now,
+  required int hour,
+  required int minute,
+}) {
+  final today = tz.TZDateTime(
+    now.location,
+    now.year,
+    now.month,
+    now.day,
+    hour,
+    minute,
+  );
+  if (today.isAfter(now)) return today;
+  // TZDateTime normalises an overflowing day the way DateTime does, so this
+  // rolls into the next month or year on its own.
+  return tz.TZDateTime(
+    now.location,
+    now.year,
+    now.month,
+    now.day + 1,
+    hour,
+    minute,
+  );
 }
