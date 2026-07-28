@@ -39,7 +39,9 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      # fst:template-only:start
       cli: ${{ steps.cli_filter.outputs.cli }}
+      # fst:template-only:end
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -83,9 +85,12 @@ jobs:
               # change can't affect these jobs. (published/rev_sync is deliberately
               # NOT excluded: it's a path-dependency of the build, is checked out,
               # and its bumps must trigger these jobs.)
+              # fst:template-only:start
               - '!simple_backend_server'
               - '!published/cli'
+              # fst:template-only:end
 
+      # fst:template-only:start
       # A separate filter (default `some`/OR quantifier — NOT `every`) for the
       # CLI scaffold smoke-test: it must run whenever the CLI submodule OR any
       # template surface the CLI rewrites changes (the workspace pubspec, the app
@@ -109,6 +114,7 @@ jobs:
               - 'test/test_utils/**'
               - 'test/architecture/**'
               - '.github/workflows/ci.yml'
+      # fst:template-only:end
 
   analyze-and-test:
     name: Analyze & Test
@@ -121,11 +127,13 @@ jobs:
         with:
           persist-credentials: false
 
+      # fst:template-only:start
       # rev_sync is a published package vendored as a submodule but consumed as
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -270,6 +278,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
+  # fst:template-only:start
   # Scaffold-drift smoke-test (matrix over optional-pillar configs): runs the
   # `fst` CLI's `create` against THIS checkout (via --template-path) for each
   # pillar combination and asserts the generated project is coherent. Catches
@@ -581,6 +590,7 @@ jobs:
       - name: Test the scaffold
         working-directory: ${{ runner.temp }}/analyze-smoke
         run: flutter test
+  # fst:template-only:end
 
   # Compile smoke-test: `flutter analyze` type-checks Dart but never assembles
   # the app, so Gradle/plugin/asset/manifest regressions slip past it and only
@@ -600,11 +610,13 @@ jobs:
         with:
           persist-credentials: false
 
+      # fst:template-only:start
       # rev_sync is a published package vendored as a submodule but consumed as
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter
@@ -700,11 +712,13 @@ jobs:
         with:
           persist-credentials: false
 
+      # fst:template-only:start
       # rev_sync is a published package vendored as a submodule but consumed as
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # connectivity_plus 7.x compiles against the iOS 26 SDK: it references
       # NWPath.isUltraConstrained behind an `if #available(iOS 26.0, *)`, but
@@ -865,11 +879,13 @@ jobs:
         with:
           persist-credentials: false
 
+      # fst:template-only:start
       # rev_sync is a published package vendored as a submodule but consumed as
       # a path dependency, so unlike the Go backend / CLI submodules it must be
       # checked out for `flutter pub get` to resolve. Fetch only that submodule.
       - name: Check out rev_sync submodule
         run: git submodule update --init published/rev_sync
+      # fst:template-only:end
 
       # Pin to the same Flutter SDK as .fvmrc (3.44.0). Bump both together.
       - name: Set up Flutter

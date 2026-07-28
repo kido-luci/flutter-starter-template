@@ -48,6 +48,7 @@ updates:
         patterns:
           - "*"
 
+  # fst:template-only:start
   # Git submodules (simple_backend_server + published/cli). Dependabot watches each
   # submodule's default branch and opens the parent pointer-bump PR when it
   # moves, so the embedded backend and CLI stay in sync without a manual bump.
@@ -58,3 +59,4 @@ updates:
     labels:
       - dependencies
       - submodules
+  # fst:template-only:end
