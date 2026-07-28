@@ -25,4 +25,5 @@ export 'src/entities/notification_entity.dart';
 // fst:feature:notifications:end
 // fst:backend:start
 export 'src/entities/sync_cursor_entity.dart';
+
 // fst:backend:end
