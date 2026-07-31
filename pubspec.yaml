@@ -149,9 +149,9 @@ dependencies:
 
   # Client-side UUID generation for offline-first creates: the app mints a
   # stable id locally and the server accepts it on POST /api/bookmarks.
-  uuid: ^4.5.3
+  uuid: ^4.6.0
 
-  package_info_plus: ^10.1.0
+  package_info_plus: ^10.2.1
 
   # SVG rendering. Pairs with flutter_gen_runner: SVGs placed in assets/icons/
   # get typed accessors that expose a ready-to-use SvgPicture widget.
@@ -178,11 +178,11 @@ dev_dependencies:
   bloc_test: ^10.0.0
 
   # Codegen for typed route classes (TypedGoRoute) — strongly-typed navigation.
-  go_router_builder: ^4.3.0
+  go_router_builder: ^4.4.0
 
   # Codegen driver. Runs every generator below.
   # Run: dart run build_runner build --delete-conflicting-outputs
-  build_runner: ^2.15.0
+  build_runner: ^2.15.1
 
   # CI guard: fails the build if generated files are stale
   # (i.e. someone forgot to re-run build_runner).
@@ -195,7 +195,7 @@ dev_dependencies:
   # Generates type-safe references to assets and fonts declared below
   # (output: lib/gen/assets.gen.dart). Use e.g. Assets.images.logo instead
   # of raw 'assets/images/logo.png' strings.
-  flutter_gen_runner: ^5.14.1
+  flutter_gen_runner: ^5.15.0
   very_good_analysis: ^10.3.0
 
   # Generates native launcher icons for all platforms from a single source
