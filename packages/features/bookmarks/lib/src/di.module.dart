@@ -46,8 +46,8 @@ import 'package:feature_bookmarks/src/presentation/bloc/bookmarks_list/bookmarks
     as _i330;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:network/network.dart' as _i372;
+import 'package:rev_sync/rev_sync.dart' as _i520;
 import 'package:shared_contracts/shared_contracts.dart' as _i856;
-import 'package:rev_sync/rev_sync.dart' as _i846;
 import 'package:uuid/uuid.dart' as _i706;
 
 class FeatureBookmarksPackageModule extends _i526.MicroPackageModule {
@@ -67,8 +67,8 @@ class FeatureBookmarksPackageModule extends _i526.MicroPackageModule {
       () => _i353.BookmarksSyncService(
         gh<_i524.BookmarksLocalDataSource>(),
         gh<_i436.BookmarksRemoteDataSource>(),
-        gh<_i846.ConnectivitySource>(),
-        gh<_i846.SyncCursorStore>(),
+        gh<_i520.ConnectivitySource>(),
+        gh<_i520.SyncCursorStore>(),
       ),
     );
     gh.lazySingleton<_i263.BookmarksRepository>(
