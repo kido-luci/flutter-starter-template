@@ -37,7 +37,7 @@ dependencies:
   # fst:auth:end
   injectable: ^3.0.0
   get_it: ^9.2.1
-  package_info_plus: ^10.1.0
+  package_info_plus: ^10.2.1
   font_awesome_flutter: ^11.0.0
   freezed_annotation: ^3.1.0
 
@@ -47,6 +47,6 @@ dev_dependencies:
 
   test_utils: ^0.1.0
 
-  build_runner: ^2.15.0
+  build_runner: ^2.15.1
   freezed: ^3.2.5
   injectable_generator: ^3.0.2

@@ -9,6 +9,17 @@ updates:
     labels:
       - dependencies
       - dart
+    ignore:
+      # Held at <2.34.1, matching the caps in packages/database_drift/pubspec.yaml.
+      # `objectbox_generator` pins `analyzer <11.0.0` for the whole workspace,
+      # which holds `drift_dev` at 2.34.0, and that version's schema verifier
+      # does not compile against drift >=2.34.1. Without this, the weekly group
+      # PR keeps proposing a drift bump that cannot build. Drop both this entry
+      # and the pubspec caps once objectbox_generator supports analyzer >=11.
+      - dependency-name: drift
+        versions: [">=2.34.1"]
+      - dependency-name: drift_dev
+        versions: [">=2.34.1"]
     groups:
       # Bundle all non-major pub bumps into a single PR.
       pub-minor-and-patch:
