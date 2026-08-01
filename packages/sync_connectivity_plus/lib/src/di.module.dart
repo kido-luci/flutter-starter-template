@@ -7,7 +7,7 @@ import 'dart:async' as _i687;
 
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:rev_sync/rev_sync.dart' as _i846;
+import 'package:rev_sync/rev_sync.dart' as _i520;
 import 'package:sync_connectivity_plus/src/connectivity_plus_module.dart'
     as _i462;
 import 'package:sync_connectivity_plus/src/connectivity_plus_source.dart'
@@ -21,7 +21,7 @@ class SyncConnectivityPlusPackageModule extends _i526.MicroPackageModule {
     gh.lazySingleton<_i895.Connectivity>(
       () => connectivityPlusModule.provideConnectivity(),
     );
-    gh.lazySingleton<_i846.ConnectivitySource>(
+    gh.lazySingleton<_i520.ConnectivitySource>(
       () => _i916.ConnectivityPlusSource(gh<_i895.Connectivity>()),
     );
   }
