@@ -90,6 +90,12 @@ class RetryInterceptor extends Interceptor {
         // process the request, so it's safe to retry regardless of method.
         final status = err.response?.statusCode;
         return status != null && _retryableStatusCodes.contains(status);
+      case DioExceptionType.transformTimeout:
+        // The response already arrived and the server has processed the
+        // request — only the local decode of the body ran past its budget.
+        // Replaying would re-run the same deterministic work on the same
+        // payload, and for a non-idempotent method it would double-fire.
+        return false;
       case DioExceptionType.cancel:
       case DioExceptionType.badCertificate:
       case DioExceptionType.unknown:

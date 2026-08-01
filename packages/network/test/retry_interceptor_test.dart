@@ -131,6 +131,23 @@ void main() {
       expect(adapter.calls, 1);
     });
 
+    test('does not retry a transform timeout', () async {
+      // The response arrived and the server has already processed the request
+      // — only the local decode overran its budget. Replaying would repeat the
+      // same deterministic work, so even a GET is left alone.
+      final adapter = _ScriptedAdapter([
+        DioException(
+          requestOptions: RequestOptions(path: '/'),
+          type: DioExceptionType.transformTimeout,
+        ),
+        ok(),
+      ]);
+      final dio = buildDio(adapter);
+
+      await expectLater(dio.get<dynamic>('/'), throwsA(isA<DioException>()));
+      expect(adapter.calls, 1);
+    });
+
     test('does NOT retry a POST on an ambiguous transport failure', () async {
       // A timed-out POST may already have been processed; replaying it could
       // duplicate the side effect, so it must not be retried.
