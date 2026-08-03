@@ -2,15 +2,23 @@
 #
 # Generate build_runner output across the workspace.
 #
-# Feature packages under packages/features/<name> own internal codegen
-# (retrofit / json_serializable / freezed part files) that is git-ignored and
-# regenerated on demand. The app-root build_runner does NOT generate code inside
-# path-dependency packages, so each feature package must be built individually —
-# otherwise the app fails to compile against missing `part '*.g.dart'` files.
+# Workspace packages own internal codegen (retrofit / json_serializable /
+# freezed part files) that is git-ignored and regenerated on demand, plus the
+# injectable micro-package module (di.module.dart) which IS tracked. The
+# app-root build_runner does NOT generate code inside path-dependency packages,
+# so each package must be built individually — otherwise the app fails to
+# compile against missing `part '*.g.dart'` files.
 #
-# Build the feature packages first, then the app root, so the app's analysis and
-# build see the generated parts. The ObjectBox binding under packages/database is
-# a tracked exception (committed, holds stable schema UIDs) and is regenerated +
+# This covers infra packages (packages/<name>) as well as feature packages
+# (packages/features/<name>). It used to build only the latter, which left the
+# eight infra di.module.dart files tracked but never regenerated — so a stale
+# one could sit in git indefinitely. That is exactly how the rev_sync import
+# alias in sync_connectivity_plus drifted; CI now diff-guards these files, and
+# the guard is only meaningful if every package holding one is rebuilt here.
+#
+# Build the packages first, then the app root, so the app's analysis and build
+# see the generated parts. The ObjectBox binding under packages/database is a
+# tracked exception (committed, holds stable schema UIDs) and is regenerated +
 # verified separately in CI, so it is not built here.
 #
 # Prefers the FVM-pinned SDK when `fvm` is installed (this template pins Flutter
@@ -35,9 +43,17 @@ run_pkg() {
   echo "::endgroup::"
 }
 
-for pkg in packages/features/*/; do
+# packages/*/ also matches the packages/features/ container directory, which has
+# no pubspec.yaml and is skipped by the guard below. The two database packages
+# are handled by the dedicated loop further down (Drift additionally needs a
+# schema dump; ObjectBox is excluded from this script entirely), so skip them
+# here rather than building them twice.
+for pkg in packages/*/ packages/features/*/; do
   [ -f "${pkg}pubspec.yaml" ] || continue
   grep -q 'build_runner' "${pkg}pubspec.yaml" || continue
+  case "${pkg%/}" in
+    packages/database | packages/database_drift) continue ;;
+  esac
   run_pkg "${pkg%/}"
 done
 

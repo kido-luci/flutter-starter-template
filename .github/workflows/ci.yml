@@ -181,6 +181,34 @@ jobs:
             exit 1
           fi
 
+      # The injectable micro-package modules (packages/**/lib/src/di.module.dart)
+      # are tracked but were previously ungated: they match none of .gitignore's
+      # generated-file patterns (*.g.dart, *.config.dart, ...) so they are
+      # committed by default, and the format/analyze steps below inspect the
+      # freshly regenerated tree rather than what is in git. A stale module could
+      # therefore sit on main indefinitely — four of them did, including an
+      # import alias bound to two different libraries at once.
+      #
+      # codegen.sh (run above) rebuilds every package that owns one, so any
+      # difference here means the committed output no longer matches the
+      # generator. test/architecture/di_module_codegen_coverage_test.dart keeps
+      # that coverage honest, so this guard cannot quietly go blind.
+      # Matched with a glob pathspec rather than an expanded file list: git
+      # applies the glob itself, so the check never depends on the shell
+      # word-splitting a newline-separated `git ls-files` result.
+      - name: Verify generated DI modules are up to date
+        run: |
+          if [ -z "$(git ls-files -- '*di.module.dart')" ]; then
+            echo "::error::No tracked di.module.dart files found. Has the DI module layout changed? Update this guard."
+            exit 1
+          fi
+          if ! git diff --quiet --exit-code -- '*di.module.dart'; then
+            echo "::error::Generated DI modules are out of date. Run ./tool/codegen.sh and commit the regenerated di.module.dart files."
+            git diff --stat -- '*di.module.dart'
+            git diff -- '*di.module.dart'
+            exit 1
+          fi
+
       # Localizations are generated (generate: true) and the output under
       # packages/localization/lib/l10n/ is tracked in git, so editing an .arb
       # without regenerating AppLocalizations would drift undetected. Regenerate
