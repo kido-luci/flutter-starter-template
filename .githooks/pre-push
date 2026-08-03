@@ -11,6 +11,25 @@
 #
 set -euo pipefail
 
+# Git exports GIT_DIR (and friends) when it runs a hook, and those variables
+# leak into every child process. FVM resolves its pinned SDK by inspecting its
+# own cache with a git subprocess — the inherited GIT_DIR makes that lookup
+# resolve against THIS repository instead, and fvm aborts before running
+# anything:
+#
+#   Invalid argument(s): The provided value "~/fvm/cache.git" is not the root
+#   of a git directory
+#
+# The failure is unconditional, so without this the hook can never run through
+# `git push` on an FVM machine — it is not a property of the branch or the
+# diff, and repairing the fvm cache does not help (git honours GIT_DIR over
+# `-C` even for a valid bare repo).
+#
+# Dropping the variables is safe for our own git calls below: during pre-push
+# the working directory is the repository root, so `git ls-files` rediscovers
+# the repo on its own.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+
 # Prefer the FVM-pinned SDK (this repo pins Flutter via .fvmrc); fall back to a
 # plain toolchain if FVM is not installed.
 if command -v fvm >/dev/null 2>&1; then
