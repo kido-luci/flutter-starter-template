@@ -6,6 +6,6 @@
   "type": "module",
   "main": "server.js",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.18.0"
+    "@modelcontextprotocol/sdk": "^1.30.0"
   }
 }
