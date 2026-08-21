@@ -33,7 +33,7 @@ dependencies:
   bloc_concurrency: ^0.3.0
   # fst:auth:start
   # Only the auth-only `profile_account.dart` part navigates.
-  go_router: ^17.3.0
+  go_router: ^17.5.0
   # fst:auth:end
   injectable: ^3.0.0
   get_it: ^9.2.1
