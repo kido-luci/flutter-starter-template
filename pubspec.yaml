@@ -160,7 +160,7 @@ dependencies:
   # Firebase platform initialization — required by every Firebase plugin.
   firebase_core: ^4.9.0
 
-  vector_graphics: ^1.2.2
+  vector_graphics: ^1.2.3
   font_awesome_flutter: ^11.0.0
 dev_dependencies:
   flutter_test:
