@@ -11,9 +11,9 @@ resolution: workspace
 dependencies:
   config: ^0.1.0
   dio: ^5.11.0
-  firebase_performance: ^0.11.4+1
+  firebase_performance: ^0.11.5
   injectable: ^3.0.0
-  retrofit: ^4.9.2
+  retrofit: ^4.10.0
   storage: ^0.1.0
 
 dev_dependencies:
