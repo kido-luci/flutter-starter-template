@@ -160,7 +160,7 @@ dependencies:
   # Firebase platform initialization — required by every Firebase plugin.
   firebase_core: ^4.9.0
 
-  vector_graphics: ^1.2.2
+  vector_graphics: ^1.2.3
   font_awesome_flutter: ^11.0.0
 dev_dependencies:
   flutter_test:
@@ -178,7 +178,7 @@ dev_dependencies:
   bloc_test: ^10.0.0
 
   # Codegen for typed route classes (TypedGoRoute) — strongly-typed navigation.
-  go_router_builder: ^4.4.0
+  go_router_builder: ^4.5.0
 
   # Codegen driver. Runs every generator below.
   # Run: dart run build_runner build --delete-conflicting-outputs
@@ -201,7 +201,7 @@ dev_dependencies:
   # Generates native launcher icons for all platforms from a single source
   # image. Run: dart run flutter_launcher_icons (config below).
   flutter_launcher_icons: ^0.14.3
-  checks: ^0.3.1
+  checks: ^0.3.2
 
 flutter_gen:
   output: lib/gen/
