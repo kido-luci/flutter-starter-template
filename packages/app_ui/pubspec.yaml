@@ -15,7 +15,7 @@ dependencies:
   flex_color_scheme: ^8.4.0
   flutter_animate: ^4.5.2
   animated_text_kit: ^4.3.0
-  flutter_link_previewer: ^4.2.0
+  flutter_link_previewer: ^4.2.1
   flutter_slidable: ^4.0.3
   photo_view: ^0.15.0
   cached_network_image: ^3.4.1
