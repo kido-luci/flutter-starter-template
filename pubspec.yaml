@@ -134,7 +134,7 @@ dependencies:
   injectable: ^3.0.0
 
   # Service-locator container that holds the DI graph injectable generates.
-  get_it: ^9.2.1
+  get_it: ^9.3.0
 
   # Runtime annotations (@freezed) consumed by freezed to generate
   # immutable data classes and sealed unions (used by auth models).
@@ -144,14 +144,14 @@ dependencies:
   # Native ObjectBox runtime libraries bundled into the iOS/Android app.
   # Pulled in transitively via package:database, but kept explicit here so the
   # native binaries are guaranteed to link into the final app build.
-  objectbox_flutter_libs: ^5.3.2
+  objectbox_flutter_libs: ^6.0.0-preview.4
   # fst:db:objectbox:end
 
   # Client-side UUID generation for offline-first creates: the app mints a
   # stable id locally and the server accepts it on POST /api/bookmarks.
   uuid: ^4.6.0
 
-  package_info_plus: ^10.2.1
+  package_info_plus: ^10.2.2
 
   # SVG rendering. Pairs with flutter_gen_runner: SVGs placed in assets/icons/
   # get typed accessors that expose a ready-to-use SvgPicture widget.
@@ -160,7 +160,7 @@ dependencies:
   # Firebase platform initialization — required by every Firebase plugin.
   firebase_core: ^4.9.0
 
-  vector_graphics: ^1.2.2
+  vector_graphics: ^1.2.3
   font_awesome_flutter: ^11.0.0
 dev_dependencies:
   flutter_test:
@@ -178,7 +178,7 @@ dev_dependencies:
   bloc_test: ^10.0.0
 
   # Codegen for typed route classes (TypedGoRoute) — strongly-typed navigation.
-  go_router_builder: ^4.4.0
+  go_router_builder: ^4.5.0
 
   # Codegen driver. Runs every generator below.
   # Run: dart run build_runner build --delete-conflicting-outputs
@@ -190,7 +190,7 @@ dev_dependencies:
 
   # Generates configureDependencies() registration code for get_it
   # from @injectable annotations.
-  injectable_generator: ^3.0.2
+  injectable_generator: ^3.1.3
 
   # Generates type-safe references to assets and fonts declared below
   # (output: lib/gen/assets.gen.dart). Use e.g. Assets.images.logo instead
@@ -201,7 +201,7 @@ dev_dependencies:
   # Generates native launcher icons for all platforms from a single source
   # image. Run: dart run flutter_launcher_icons (config below).
   flutter_launcher_icons: ^0.14.3
-  checks: ^0.3.1
+  checks: ^0.3.2
 
 flutter_gen:
   output: lib/gen/
